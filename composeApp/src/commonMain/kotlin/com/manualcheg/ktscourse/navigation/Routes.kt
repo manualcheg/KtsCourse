@@ -3,10 +3,10 @@ package com.manualcheg.ktscourse.navigation
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class Screen
+sealed class Screen {
+    @Serializable
+    object Onboard : Screen()
 
-@Serializable
-object Onboard: Screen()
-
-@Serializable
-object Login: Screen()
+    @Serializable
+    object Login : Screen()
+}
