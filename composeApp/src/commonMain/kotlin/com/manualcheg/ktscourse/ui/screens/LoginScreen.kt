@@ -46,15 +46,6 @@ fun LoginScreen() {
                 textObfuscationMode = RevealLastTyped,
                 textObfuscationCharacter = Char(42)
             )
-            /*TextField(
-                state = rememberTextFieldState(""),
-                modifier = Modifier.padding(start = 40.dp, end = 40.dp),
-                label = Text("Password repeat"),
-                lineLimits = TextFieldLineLimits.SingleLine,
-                textObfuscationMode = RevealLastTyped,
-                textObfuscationCharacter = Char(42),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-            )*/
             Button(
                 onClick = { },
                 modifier = Modifier.padding(40.dp)
