@@ -1,4 +1,4 @@
-package com.manualcheg.ktscourse.ui.screens
+package com.manualcheg.ktscourse.presentation.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
