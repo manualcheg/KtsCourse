@@ -81,5 +81,4 @@ android {
 
 dependencies {
     debugImplementation(libs.compose.uiTooling)
-    implementation(libs.androidx.navigation.compose)
 }
