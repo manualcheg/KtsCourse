@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextObfuscationMode.Companion.RevealLastTyped
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
@@ -19,15 +18,41 @@ import androidx.compose.material3.SecureTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
-import com.manualcheg.ktscourse.ui.LocalDimensions
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.manualcheg.ktscourse.presentation.LocalDimensions
+import com.manualcheg.ktscourse.presentation.ViewModelLoginUiScreen
+import kotlinx.coroutines.flow.collectLatest
+import ktscourse.composeapp.generated.resources.Res
+import ktscourse.composeapp.generated.resources.login_screen_textfield_password_label
+import ktscourse.composeapp.generated.resources.login_screen_textfield_password_placeholder
+import ktscourse.composeapp.generated.resources.login_screen_textfield_username_label
+import ktscourse.composeapp.generated.resources.login_screen_textfield_username_placeholder
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(viewModel: ViewModelLoginUiScreen = viewModel()) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val dimensions = LocalDimensions.current
+
+    val usernameState = rememberTextFieldState(uiState.username)
+    LaunchedEffect(usernameState) {
+        snapshotFlow { usernameState.text.toString() }.collectLatest {
+            viewModel.onUsernameChanged(it)
+        }
+    }
+    val passwordState = rememberTextFieldState(uiState.password)
+    LaunchedEffect(passwordState) {
+        snapshotFlow { passwordState.text.toString() }.collectLatest {
+            viewModel.onPasswordChanged(it)
+        }
+    }
 
     Scaffold() { innerPadding ->
         Column(
@@ -41,24 +66,23 @@ fun LoginScreen() {
             verticalArrangement = Arrangement.Center,
         ) {
             TextField(
-                state = rememberTextFieldState(""),
+                state = usernameState,
                 modifier = Modifier
-                    .wrapContentSize()
-                    .padding(horizontal = dimensions.paddingStandard),
-                label = { Text("Email") },
-                lineLimits = TextFieldLineLimits.SingleLine,
+                    .padding(horizontal = dimensions.paddingStandard)
+                    .wrapContentSize(),
+                label = { Res.string.login_screen_textfield_username_label },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                placeholder = { Text("example@gmail.com") }
+                placeholder = { Res.string.login_screen_textfield_username_placeholder }
             )
             SecureTextField(
-                state = rememberTextFieldState(""),
+                state = passwordState,
                 modifier = Modifier
                     .wrapContentSize()
                     .padding(horizontal = dimensions.paddingStandard),
-                label = { Text("Password") },
+                label = { Res.string.login_screen_textfield_password_label },
                 textObfuscationMode = RevealLastTyped,
                 textObfuscationCharacter = Char(42),
-                placeholder = { Text("P@ssw0rd") },
+                placeholder = { Res.string.login_screen_textfield_password_placeholder },
             )
             Button(
                 onClick = { },

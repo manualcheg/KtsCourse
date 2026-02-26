@@ -5,8 +5,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.manualcheg.ktscourse.navigation.Screen
-import com.manualcheg.ktscourse.ui.screens.LoginScreen
-import com.manualcheg.ktscourse.ui.screens.OnboardScreen
+import com.manualcheg.ktscourse.presentation.ui.screens.LoginScreen
+import com.manualcheg.ktscourse.presentation.ui.screens.OnboardScreen
 
 @Composable
 fun AppNavHost() {

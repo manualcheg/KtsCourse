@@ -1,4 +1,4 @@
-package com.manualcheg.ktscourse.ui.screens
+package com.manualcheg.ktscourse.presentation.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,7 +18,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.manualcheg.ktscourse.navigation.Screen
-import com.manualcheg.ktscourse.ui.LocalDimensions
+import com.manualcheg.ktscourse.presentation.LocalDimensions
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.noInternet
 import org.jetbrains.compose.resources.painterResource

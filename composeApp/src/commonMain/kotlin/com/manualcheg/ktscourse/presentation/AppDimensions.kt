@@ -1,4 +1,4 @@
-package com.manualcheg.ktscourse.ui
+package com.manualcheg.ktscourse.presentation
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.Dp
