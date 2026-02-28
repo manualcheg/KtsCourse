@@ -25,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.manualcheg.ktscourse.navigation.Screen
 import com.manualcheg.ktscourse.presentation.LocalDimensions
@@ -36,7 +35,7 @@ import ktscourse.composeapp.generated.resources.Res.*
 
 @Composable
 fun LoginScreen(
-    viewModel: ViewModelLoginUiScreen = viewModel(),
+    viewModel: ViewModelLoginUiScreen,
     navController: NavController
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

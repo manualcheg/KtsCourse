@@ -21,13 +21,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.manualcheg.ktscourse.data.Launch
 import com.manualcheg.ktscourse.presentation.ui.ViewModelMainScreen
 
 @Composable
 fun MainScreen(
-    viewModelMainScreen: ViewModelMainScreen = viewModel()
+    viewModelMainScreen: ViewModelMainScreen
 ) {
     val uiState by viewModelMainScreen.uiState.collectAsStateWithLifecycle()
     viewModelMainScreen.updateData()

@@ -46,10 +46,10 @@ class ViewModelLoginUiScreen : ViewModel() {
     }
 
     fun checkCredentials() {
-            viewModelScope.launch {
-                _events.emit(
-                    LoginUiEvent.LoginSuccessEvent
-                )
-            }
+        viewModelScope.launch {
+            _events.emit(
+                LoginUiEvent.LoginSuccessEvent
+            )
+        }
     }
 }
