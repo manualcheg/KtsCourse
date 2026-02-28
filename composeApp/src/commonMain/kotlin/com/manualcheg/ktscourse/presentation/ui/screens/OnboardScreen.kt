@@ -35,7 +35,7 @@ fun OnboardScreen(navController: NavController) {
             verticalArrangement = Arrangement.Center,
         ) {
             Text(
-                text = "Hello!",
+                text = "SpaceX",
                 fontSize = dimensions.textSizeLarge,
                 modifier = Modifier
                     .wrapContentSize()

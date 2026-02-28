@@ -2,7 +2,7 @@ package com.manualcheg.ktscourse.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.manualcheg.ktscourse.data.LoginUiState
+import com.manualcheg.ktscourse.presentation.ui.screens.LoginUiState
 import com.manualcheg.ktscourse.presentation.ui.LoginUiEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

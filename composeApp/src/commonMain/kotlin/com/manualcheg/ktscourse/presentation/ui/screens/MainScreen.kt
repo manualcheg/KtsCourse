@@ -29,7 +29,6 @@ fun MainScreen(
     viewModelMainScreen: ViewModelMainScreen
 ) {
     val uiState by viewModelMainScreen.uiState.collectAsStateWithLifecycle()
-    viewModelMainScreen.updateData()
 
     Scaffold { innerPadding ->
         Surface(
@@ -37,13 +36,13 @@ fun MainScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            ListOfFlights(uiState.listOfLaunches)
+            ShowListOfLaunches(uiState.listOfLaunches)
         }
     }
 }
 
 @Composable
-fun ListOfFlights(list: List<Launch>) {
+fun ShowListOfLaunches(list: List<Launch>) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = "Launches",

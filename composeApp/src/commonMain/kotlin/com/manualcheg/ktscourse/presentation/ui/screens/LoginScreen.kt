@@ -62,6 +62,7 @@ fun LoginScreen(
                 is LoginUiEvent.LoginSuccessEvent -> {
                     navController.navigate(Screen.Main) {
                         popUpTo(Screen.Onboard) { inclusive = true }
+
                     }
                 }
             }
