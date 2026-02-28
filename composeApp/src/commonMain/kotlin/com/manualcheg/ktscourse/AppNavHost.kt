@@ -5,12 +5,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.manualcheg.ktscourse.navigation.Screen
+import com.manualcheg.ktscourse.presentation.ViewModelLoginUiScreen
 import com.manualcheg.ktscourse.presentation.ui.screens.LoginScreen
+import com.manualcheg.ktscourse.presentation.ui.screens.MainScreen
 import com.manualcheg.ktscourse.presentation.ui.screens.OnboardScreen
 
 @Composable
 fun AppNavHost() {
     val navController = rememberNavController()
+    val viewModelLoginUiScreen = ViewModelLoginUiScreen()
 
     NavHost(
         navController = navController,
@@ -18,6 +21,7 @@ fun AppNavHost() {
     )
     {
         composable<Screen.Onboard> { OnboardScreen(navController) }
-        composable<Screen.Login> { LoginScreen() }
+        composable<Screen.Login> { LoginScreen(viewModelLoginUiScreen, navController) }
+        composable<Screen.Main> { MainScreen() }
     }
 }

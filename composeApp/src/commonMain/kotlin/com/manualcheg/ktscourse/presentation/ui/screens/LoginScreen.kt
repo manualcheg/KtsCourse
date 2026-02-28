@@ -24,20 +24,21 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.manualcheg.ktscourse.navigation.Screen
 import com.manualcheg.ktscourse.presentation.LocalDimensions
 import com.manualcheg.ktscourse.presentation.ViewModelLoginUiScreen
+import com.manualcheg.ktscourse.presentation.ui.LoginUiEvent
 import kotlinx.coroutines.flow.collectLatest
-import ktscourse.composeapp.generated.resources.Res
-import ktscourse.composeapp.generated.resources.login_screen_textfield_password_label
-import ktscourse.composeapp.generated.resources.login_screen_textfield_password_placeholder
-import ktscourse.composeapp.generated.resources.login_screen_textfield_username_label
-import ktscourse.composeapp.generated.resources.login_screen_textfield_username_placeholder
+import ktscourse.composeapp.generated.resources.Res.*
 
 @Composable
-fun LoginScreen(viewModel: ViewModelLoginUiScreen = viewModel()) {
+fun LoginScreen(
+    viewModel: ViewModelLoginUiScreen = viewModel(),
+    navController: NavController
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val dimensions = LocalDimensions.current
 
@@ -45,12 +46,26 @@ fun LoginScreen(viewModel: ViewModelLoginUiScreen = viewModel()) {
     LaunchedEffect(usernameState) {
         snapshotFlow { usernameState.text.toString() }.collectLatest {
             viewModel.onUsernameChanged(it)
+            viewModel.makeButtonLoginActive()
         }
     }
     val passwordState = rememberTextFieldState(uiState.password)
     LaunchedEffect(passwordState) {
         snapshotFlow { passwordState.text.toString() }.collectLatest {
             viewModel.onPasswordChanged(it)
+            viewModel.makeButtonLoginActive()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is LoginUiEvent.LoginSuccessEvent -> {
+                    navController.navigate(Screen.Main) {
+                        popUpTo(Screen.Onboard) { inclusive = true }
+                    }
+                }
+            }
         }
     }
 
@@ -85,17 +100,14 @@ fun LoginScreen(viewModel: ViewModelLoginUiScreen = viewModel()) {
                 placeholder = { Res.string.login_screen_textfield_password_placeholder },
             )
             Button(
-                onClick = { },
-                modifier = Modifier.padding(dimensions.paddingStandard)
+                onClick = {
+                    viewModel.checkCredentials()
+                },
+                modifier = Modifier.padding(dimensions.paddingStandard),
+                enabled = uiState.isLoginButtonActive
             ) {
                 Text("Login")
             }
         }
     }
-}
-
-@Composable
-@Preview
-fun previewLogin() {
-    LoginScreen()
 }

@@ -9,4 +9,7 @@ sealed class Screen {
 
     @Serializable
     object Login : Screen()
+
+    @Serializable
+    object Main : Screen()
 }
