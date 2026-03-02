@@ -32,12 +32,14 @@ import com.manualcheg.ktscourse.navigation.Screen
 import com.manualcheg.ktscourse.presentation.LocalDimensions
 import com.manualcheg.ktscourse.presentation.ViewModelLoginUiScreen
 import com.manualcheg.ktscourse.presentation.ui.LoginUiEvent
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import ktscourse.composeapp.generated.resources.Res.*
 
+@OptIn(FlowPreview::class)
 @Composable
 fun LoginScreen(
     viewModel: ViewModelLoginUiScreen,
