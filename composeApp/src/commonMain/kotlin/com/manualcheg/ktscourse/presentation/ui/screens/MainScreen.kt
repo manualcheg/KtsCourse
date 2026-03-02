@@ -1,13 +1,16 @@
 package com.manualcheg.ktscourse.presentation.ui.screens
 
-import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
@@ -18,11 +21,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.manualcheg.ktscourse.data.Launch
 import com.manualcheg.ktscourse.presentation.ui.ViewModelMainScreen
+import ktscourse.composeapp.generated.resources.Res
+import ktscourse.composeapp.generated.resources.rocket_launch_128
+import org.jetbrains.compose.resources.imageResource
 
 @Composable
 fun MainScreen(
@@ -49,11 +54,14 @@ fun ShowListOfLaunches(list: List<Launch>) {
             color = MaterialTheme.colorScheme.secondary,
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier
-                .padding(start = 12.dp, top = 16.dp, bottom = 16.dp)
+                .padding(start = 24.dp, top = 16.dp, bottom = 16.dp)
         )
         Spacer(modifier = Modifier.height(4.dp))
 
-        LazyColumn {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             items(list, key = { it.id }) {
                 LaunchItem(it)
             }
@@ -63,50 +71,68 @@ fun ShowListOfLaunches(list: List<Launch>) {
 
 @Composable
 fun LaunchItem(launch: Launch) {
-    Column(
+    Surface(
+        shape = MaterialTheme.shapes.medium,
+        shadowElevation = 2.dp,
+        color = MaterialTheme.colorScheme.outline,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(4.dp),
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.Center,
+            .padding(horizontal = 12.dp)
     ) {
-        Surface(
-            shape = MaterialTheme.shapes.medium,
-            shadowElevation = 1.dp,
-            color = Color.Gray,
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .animateContentSize()
-                .padding(1.dp)
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.padding(8.dp)) {
+            Image(
+                imageResource(Res.drawable.rocket_launch_128),
+                contentDescription = "launch icon",
+                modifier = Modifier.size(80.dp)
+            )
+            
+            Spacer(modifier = Modifier.width(16.dp))
+            
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
                 Text(
                     text = launch.name,
-                    color = MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.titleSmall
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.titleMedium
                 )
+                
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
                     text = launch.launchpad,
-                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.onPrimary,
                     style = MaterialTheme.typography.titleSmall
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                
+                if (launch.details.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = launch.details,
+                        modifier = Modifier.fillMaxWidth(),
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 2
+                    )
+                }
 
-                Text(
-                    text = launch.details,
-                    color = MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.titleSmall
-                )
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
                     text = launch.launchDate,
-                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.onPrimary,
                     style = MaterialTheme.typography.titleSmall
                 )
-                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }

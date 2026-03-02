@@ -2,8 +2,8 @@ package com.manualcheg.ktscourse.presentation.ui
 
 import androidx.lifecycle.ViewModel
 import com.manualcheg.ktscourse.data.Launch
-import com.manualcheg.ktscourse.presentation.ui.screens.MainUiState
 import com.manualcheg.ktscourse.data.SampleData
+import com.manualcheg.ktscourse.presentation.ui.screens.MainUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

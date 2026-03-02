@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.TextObfuscationMode.Companion.RevealLastTyped
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
@@ -20,6 +21,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +33,9 @@ import com.manualcheg.ktscourse.presentation.LocalDimensions
 import com.manualcheg.ktscourse.presentation.ViewModelLoginUiScreen
 import com.manualcheg.ktscourse.presentation.ui.LoginUiEvent
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import ktscourse.composeapp.generated.resources.Res.*
 
 @Composable
@@ -40,20 +45,29 @@ fun LoginScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val dimensions = LocalDimensions.current
+    val usernameState = rememberTextFieldState(remember { viewModel.uiState.value.username })
+    val passwordState = rememberTextFieldState(remember { viewModel.uiState.value.password })
 
-    val usernameState = rememberTextFieldState(uiState.username)
+    val isLoginButtonActive by remember(viewModel) {
+        viewModel.uiState
+            .map { it.isLoginButtonActive }
+            .distinctUntilChanged()
+    }.collectAsStateWithLifecycle(viewModel.uiState.value.isLoginButtonActive)
+
     LaunchedEffect(usernameState) {
-        snapshotFlow { usernameState.text.toString() }.collectLatest {
-            viewModel.onUsernameChanged(it)
-            viewModel.makeButtonLoginActive()
-        }
+        snapshotFlow { usernameState.text.toString() }
+            .debounce(500L)
+            .collectLatest {
+                viewModel.onUsernameChanged(it)
+            }
     }
-    val passwordState = rememberTextFieldState(uiState.password)
+
     LaunchedEffect(passwordState) {
-        snapshotFlow { passwordState.text.toString() }.collectLatest {
-            viewModel.onPasswordChanged(it)
-            viewModel.makeButtonLoginActive()
-        }
+        snapshotFlow { passwordState.text.toString() }
+            .debounce(500L)
+            .collectLatest {
+                viewModel.onPasswordChanged(it)
+            }
     }
 
     LaunchedEffect(Unit) {
@@ -62,14 +76,24 @@ fun LoginScreen(
                 is LoginUiEvent.LoginSuccessEvent -> {
                     navController.navigate(Screen.Main) {
                         popUpTo(Screen.Onboard) { inclusive = true }
-
                     }
                 }
             }
         }
     }
 
-    Scaffold() { innerPadding ->
+    InputFields(usernameState, passwordState, viewModel, isLoginButtonActive)
+}
+
+@Composable
+fun InputFields(
+    usernameState: TextFieldState,
+    passwordState: TextFieldState,
+    viewModel: ViewModelLoginUiScreen,
+    isLoginButtonActive: Boolean
+) {
+    val dimensions = LocalDimensions.current
+    Scaffold { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -80,34 +104,46 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            TextField(
-                state = usernameState,
-                modifier = Modifier
-                    .padding(horizontal = dimensions.paddingStandard)
-                    .wrapContentSize(),
-                label = { Res.string.login_screen_textfield_username_label },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                placeholder = { Res.string.login_screen_textfield_username_placeholder }
-            )
-            SecureTextField(
-                state = passwordState,
-                modifier = Modifier
-                    .wrapContentSize()
-                    .padding(horizontal = dimensions.paddingStandard),
-                label = { Res.string.login_screen_textfield_password_label },
-                textObfuscationMode = RevealLastTyped,
-                textObfuscationCharacter = Char(42),
-                placeholder = { Res.string.login_screen_textfield_password_placeholder },
-            )
+            UsernameTextField(usernameState)
+            PasswordSecureTextField(passwordState)
             Button(
                 onClick = {
                     viewModel.checkCredentials()
                 },
                 modifier = Modifier.padding(dimensions.paddingStandard),
-                enabled = uiState.isLoginButtonActive
+                enabled = isLoginButtonActive
             ) {
                 Text("Login")
             }
         }
     }
+}
+
+@Composable
+fun UsernameTextField(usernameState: TextFieldState) {
+    val dimensions = LocalDimensions.current
+    TextField(
+        state = usernameState,
+        modifier = Modifier
+            .padding(horizontal = dimensions.paddingStandard)
+            .wrapContentSize(),
+        label = { Res.string.login_screen_textfield_username_label },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+        placeholder = { Res.string.login_screen_textfield_username_placeholder }
+    )
+}
+
+@Composable
+fun PasswordSecureTextField(passwordState: TextFieldState) {
+    val dimensions = LocalDimensions.current
+    SecureTextField(
+        state = passwordState,
+        modifier = Modifier
+            .wrapContentSize()
+            .padding(horizontal = dimensions.paddingStandard),
+        label = { Res.string.login_screen_textfield_password_label },
+        textObfuscationMode = RevealLastTyped,
+        textObfuscationCharacter = Char(42),
+        placeholder = { Res.string.login_screen_textfield_password_placeholder },
+    )
 }

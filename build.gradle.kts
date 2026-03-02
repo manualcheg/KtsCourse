@@ -8,4 +8,5 @@ plugins {
     alias(libs.plugins.composeCompiler) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.kotlinSerialization) apply false
+    id("ru.ivk1800.riflesso") version "2.2.21-0.0.3" apply false
 }

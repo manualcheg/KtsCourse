@@ -2,8 +2,8 @@ package com.manualcheg.ktscourse.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.manualcheg.ktscourse.presentation.ui.screens.LoginUiState
 import com.manualcheg.ktscourse.presentation.ui.LoginUiEvent
+import com.manualcheg.ktscourse.presentation.ui.screens.LoginUiState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,6 +25,7 @@ class ViewModelLoginUiScreen : ViewModel() {
                 username = username
             )
         }
+        makeButtonLoginActive()
     }
 
     fun onPasswordChanged(password: String) {
@@ -33,6 +34,7 @@ class ViewModelLoginUiScreen : ViewModel() {
                 password = password
             )
         }
+        makeButtonLoginActive()
     }
 
     fun makeButtonLoginActive() {
@@ -40,6 +42,12 @@ class ViewModelLoginUiScreen : ViewModel() {
             _uiState.update {
                 it.copy(
                     isLoginButtonActive = true
+                )
+            }
+        } else {
+            _uiState.update {
+                it.copy(
+                    isLoginButtonActive = false
                 )
             }
         }

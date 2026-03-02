@@ -1,3 +1,4 @@
+/*
 package com.manualcheg.ktscourse.presentation.ui
 
 import androidx.compose.runtime.Composable
@@ -25,4 +26,4 @@ fun AppEnvironment(content: @Composable () -> Unit) {
             content()
         }
     }
-}
+}*/
