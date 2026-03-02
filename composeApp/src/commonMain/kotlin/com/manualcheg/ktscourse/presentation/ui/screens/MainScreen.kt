@@ -26,8 +26,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.manualcheg.ktscourse.data.Launch
 import com.manualcheg.ktscourse.presentation.ui.ViewModelMainScreen
 import ktscourse.composeapp.generated.resources.Res
+import ktscourse.composeapp.generated.resources.main_screen_image_cont_descript_launch
+import ktscourse.composeapp.generated.resources.main_screen_main_text_launches
 import ktscourse.composeapp.generated.resources.rocket_launch_128
 import org.jetbrains.compose.resources.imageResource
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun MainScreen(
@@ -50,7 +53,7 @@ fun MainScreen(
 fun ShowListOfLaunches(list: List<Launch>) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = "Launches",
+            text = stringResource(Res.string.main_screen_main_text_launches),
             color = MaterialTheme.colorScheme.secondary,
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier
@@ -87,12 +90,12 @@ fun LaunchItem(launch: Launch) {
         ) {
             Image(
                 imageResource(Res.drawable.rocket_launch_128),
-                contentDescription = "launch icon",
+                contentDescription = stringResource(Res.string.main_screen_image_cont_descript_launch),
                 modifier = Modifier.size(80.dp)
             )
-            
+
             Spacer(modifier = Modifier.width(16.dp))
-            
+
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -104,7 +107,7 @@ fun LaunchItem(launch: Launch) {
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.titleMedium
                 )
-                
+
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
@@ -113,7 +116,7 @@ fun LaunchItem(launch: Launch) {
                     color = MaterialTheme.colorScheme.onPrimary,
                     style = MaterialTheme.typography.titleSmall
                 )
-                
+
                 if (launch.details.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(

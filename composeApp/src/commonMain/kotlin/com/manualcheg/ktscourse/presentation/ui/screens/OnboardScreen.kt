@@ -20,7 +20,11 @@ import com.manualcheg.ktscourse.navigation.Screen
 import com.manualcheg.ktscourse.presentation.LocalDimensions
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.noInternet
+import ktscourse.composeapp.generated.resources.onboard_screen_button_login_text
+import ktscourse.composeapp.generated.resources.onboard_screen_main_text
+import ktscourse.composeapp.generated.resources.onboarding_image
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun OnboardScreen(navController: NavController) {
@@ -34,7 +38,7 @@ fun OnboardScreen(navController: NavController) {
             verticalArrangement = Arrangement.Center,
         ) {
             Text(
-                text = "SpaceX",
+                text = stringResource(Res.string.onboard_screen_main_text),
                 fontSize = dimensions.textSizeLarge,
                 modifier = Modifier
                     .wrapContentSize()
@@ -43,7 +47,7 @@ fun OnboardScreen(navController: NavController) {
             )
             AsyncImage(
                 model = "https://art.pixilart.com/f4e56bb7d6.png",
-                contentDescription = "space invider",
+                contentDescription = stringResource(Res.string.onboarding_image),
                 placeholder = painterResource(Res.drawable.noInternet),
                 error = painterResource(Res.drawable.noInternet),
                 contentScale = ContentScale.FillHeight,
@@ -58,7 +62,7 @@ fun OnboardScreen(navController: NavController) {
                     .padding(dimensions.paddingSmall)
                     .wrapContentSize()
             ) {
-                Text("Next screen")
+                Text(stringResource(Res.string.onboard_screen_button_login_text))
             }
         }
     }

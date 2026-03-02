@@ -1,3 +1,13 @@
 <resources>
-    <string name="hello">😊 Hello world!</string>
+    <string name="onboarding_image">space invader</string>
+    <string name="onboard_screen_main_text">SpaceX</string>
+    <string name="onboard_screen_button_login_text">Next screen</string>
+    <string name="login_screen_button_login_text">Login</string>
+    <string name="login_screen_textfield_username_label">Email</string>
+    <string name="login_screen_textfield_username_placeholder">example@gmail.com</string>
+    <string name="login_screen_textfield_password_label">Password</string>
+    <string name="login_screen_textfield_password_placeholder">P@ssw0rd</string>
+    <string name="main_screen_image_cont_descript_launch">launch icon</string>
+    <string name="main_screen_main_text_launches">Launches</string>
+
 </resources>

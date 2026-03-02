@@ -38,6 +38,13 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import ktscourse.composeapp.generated.resources.Res.*
+import ktscourse.composeapp.generated.resources.Res
+import ktscourse.composeapp.generated.resources.login_screen_button_login_text
+import ktscourse.composeapp.generated.resources.login_screen_textfield_password_label
+import ktscourse.composeapp.generated.resources.login_screen_textfield_password_placeholder
+import ktscourse.composeapp.generated.resources.login_screen_textfield_username_label
+import ktscourse.composeapp.generated.resources.login_screen_textfield_username_placeholder
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(FlowPreview::class)
 @Composable
@@ -45,7 +52,6 @@ fun LoginScreen(
     viewModel: ViewModelLoginUiScreen,
     navController: NavController
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val dimensions = LocalDimensions.current
     val usernameState = rememberTextFieldState(remember { viewModel.uiState.value.username })
     val passwordState = rememberTextFieldState(remember { viewModel.uiState.value.password })
@@ -115,7 +121,7 @@ fun InputFields(
                 modifier = Modifier.padding(dimensions.paddingStandard),
                 enabled = isLoginButtonActive
             ) {
-                Text("Login")
+                Text(stringResource(Res.string.login_screen_button_login_text))
             }
         }
     }
