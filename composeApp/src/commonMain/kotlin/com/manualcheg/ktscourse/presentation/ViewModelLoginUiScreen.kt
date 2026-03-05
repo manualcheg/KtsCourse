@@ -22,7 +22,7 @@ class ViewModelLoginUiScreen : ViewModel() {
     fun onUsernameChanged(username: String) {
         _uiState.update {
             it.copy(
-                username = username
+                username = username.trim()
             )
         }
         makeButtonLoginActive()
@@ -31,7 +31,7 @@ class ViewModelLoginUiScreen : ViewModel() {
     fun onPasswordChanged(password: String) {
         _uiState.update {
             it.copy(
-                password = password
+                password = password.trim()
             )
         }
         makeButtonLoginActive()

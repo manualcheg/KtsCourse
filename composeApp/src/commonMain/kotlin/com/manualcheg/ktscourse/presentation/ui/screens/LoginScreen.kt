@@ -29,6 +29,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.manualcheg.ktscourse.navigation.Screen
+import com.manualcheg.ktscourse.presentation.AppDimensions
 import com.manualcheg.ktscourse.presentation.LocalDimensions
 import com.manualcheg.ktscourse.presentation.ViewModelLoginUiScreen
 import com.manualcheg.ktscourse.presentation.ui.LoginUiEvent
@@ -37,7 +38,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import ktscourse.composeapp.generated.resources.Res.*
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.login_screen_button_login_text
 import ktscourse.composeapp.generated.resources.login_screen_textfield_password_label
@@ -90,7 +90,7 @@ fun LoginScreen(
         }
     }
 
-    InputFields(usernameState, passwordState, viewModel, isLoginButtonActive)
+    InputFields(usernameState, passwordState, viewModel, isLoginButtonActive, dimensions)
 }
 
 @Composable
@@ -98,9 +98,9 @@ fun InputFields(
     usernameState: TextFieldState,
     passwordState: TextFieldState,
     viewModel: ViewModelLoginUiScreen,
-    isLoginButtonActive: Boolean
+    isLoginButtonActive: Boolean,
+    dimensions: AppDimensions
 ) {
-    val dimensions = LocalDimensions.current
     Scaffold { innerPadding ->
         Column(
             modifier = Modifier
@@ -112,8 +112,8 @@ fun InputFields(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            UsernameTextField(usernameState)
-            PasswordSecureTextField(passwordState)
+            UsernameTextField(usernameState, dimensions)
+            PasswordSecureTextField(passwordState, dimensions)
             Button(
                 onClick = {
                     viewModel.checkCredentials()
@@ -121,7 +121,6 @@ fun InputFields(
                 modifier = Modifier.padding(dimensions.paddingStandard),
                 enabled = isLoginButtonActive
             ) {
-//                Text(stringResource(Res.string.))
                 Text(stringResource(Res.string.login_screen_button_login_text))
             }
         }
@@ -129,30 +128,28 @@ fun InputFields(
 }
 
 @Composable
-fun UsernameTextField(usernameState: TextFieldState) {
-    val dimensions = LocalDimensions.current
+fun UsernameTextField(usernameState: TextFieldState, dimensions: AppDimensions) {
     TextField(
         state = usernameState,
         modifier = Modifier
             .padding(horizontal = dimensions.paddingStandard)
             .wrapContentSize(),
-        label = { Res.string.login_screen_textfield_username_label },
+        label = { Text(stringResource(Res.string.login_screen_textfield_username_label)) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-        placeholder = { Res.string.login_screen_textfield_username_placeholder }
+        placeholder = { Text(stringResource(Res.string.login_screen_textfield_username_placeholder)) }
     )
 }
 
 @Composable
-fun PasswordSecureTextField(passwordState: TextFieldState) {
-    val dimensions = LocalDimensions.current
+fun PasswordSecureTextField(passwordState: TextFieldState, dimensions: AppDimensions) {
     SecureTextField(
         state = passwordState,
         modifier = Modifier
             .wrapContentSize()
             .padding(horizontal = dimensions.paddingStandard),
-        label = { Res.string.login_screen_textfield_password_label },
+        label = { Text(stringResource(Res.string.login_screen_textfield_password_label)) },
         textObfuscationMode = RevealLastTyped,
         textObfuscationCharacter = Char(42),
-        placeholder = { Res.string.login_screen_textfield_password_placeholder },
+        placeholder = { Text(stringResource(Res.string.login_screen_textfield_password_placeholder)) },
     )
 }

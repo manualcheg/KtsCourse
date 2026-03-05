@@ -9,5 +9,4 @@
     <string name="login_screen_textfield_password_placeholder">P@ssw0rd</string>
     <string name="main_screen_image_cont_descript_launch">launch icon</string>
     <string name="main_screen_main_text_launches">Launches</string>
-    <string name="app_name">KtsCourse</string>
 </resources>
