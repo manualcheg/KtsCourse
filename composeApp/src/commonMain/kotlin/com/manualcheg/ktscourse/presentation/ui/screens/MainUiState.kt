@@ -4,5 +4,5 @@ import com.manualcheg.ktscourse.data.Launch
 
 data class MainUiState(
     val name: String = "",
-    val listOfLaunches:List<Launch> = listOf()
+    val listOfLaunches: List<Launch> = listOf()
 )
