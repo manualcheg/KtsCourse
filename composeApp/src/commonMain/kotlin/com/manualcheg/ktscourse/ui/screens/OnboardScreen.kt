@@ -15,17 +15,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.manualcheg.ktscourse.navigation.Screen
+import com.manualcheg.ktscourse.ui.LocalDimensions
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.noInternet
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun OnboardScreen(navController: NavController) {
+    val dimensions = LocalDimensions.current
     MaterialTheme {
         Column(
             modifier = Modifier
@@ -36,10 +36,10 @@ fun OnboardScreen(navController: NavController) {
         ) {
             Text(
                 text = "Hello!",
-                fontSize = 20.sp,
+                fontSize = dimensions.textSizeLarge,
                 modifier = Modifier
                     .wrapContentSize()
-                    .padding(vertical = 40.dp)
+                    .padding(vertical = dimensions.paddingStandard)
                     .weight(1f)
             )
             AsyncImage(
@@ -56,7 +56,7 @@ fun OnboardScreen(navController: NavController) {
                 onClick = { navController.navigate(Screen.Login) },
                 modifier = Modifier
                     .weight(1f)
-                    .padding(8.dp)
+                    .padding(dimensions.paddingSmall)
                     .wrapContentSize()
             ) {
                 Text("Next screen")
