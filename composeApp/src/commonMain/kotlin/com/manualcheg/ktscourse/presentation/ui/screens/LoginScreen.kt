@@ -33,6 +33,7 @@ import com.manualcheg.ktscourse.presentation.AppDimensions
 import com.manualcheg.ktscourse.presentation.LocalDimensions
 import com.manualcheg.ktscourse.presentation.ViewModelLoginUiScreen
 import com.manualcheg.ktscourse.presentation.ui.LoginUiEvent
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
@@ -117,6 +118,7 @@ fun InputFields(
             Button(
                 onClick = {
                     viewModel.checkCredentials()
+                    Napier.v("Button was pushed")
                 },
                 modifier = Modifier.padding(dimensions.paddingStandard),
                 enabled = isLoginButtonActive

@@ -48,6 +48,10 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor3)
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.ktor.client.serialization)
+//            implementation("io.github.aakira:napier:2.7.1")
+            implementation(libs.napier)
         }
 
         val iosMain by creating {
