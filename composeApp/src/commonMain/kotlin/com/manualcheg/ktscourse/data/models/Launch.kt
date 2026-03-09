@@ -6,5 +6,6 @@ data class Launch(
     val flightNumber: Int = 0,
     val launchDate: String = "",
     val details: String = "",
-    val imageUrl: String = ""
+    val imageUrl: String = "",
+    val status: LaunchStatus = LaunchStatus.UPCOMING
 )
