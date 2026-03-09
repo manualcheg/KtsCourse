@@ -6,8 +6,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.manualcheg.ktscourse.navigation.Screen
-import com.manualcheg.ktscourse.presentation.ViewModelLoginUiScreen
-import com.manualcheg.ktscourse.presentation.ui.ViewModelMainScreen
+import com.manualcheg.ktscourse.presentation.viewmodels.ViewModelLoginUiScreen
+import com.manualcheg.ktscourse.presentation.viewmodels.ViewModelMainScreen
 import com.manualcheg.ktscourse.presentation.ui.screens.LoginScreen
 import com.manualcheg.ktscourse.presentation.ui.screens.MainScreen
 import com.manualcheg.ktscourse.presentation.ui.screens.OnboardScreen

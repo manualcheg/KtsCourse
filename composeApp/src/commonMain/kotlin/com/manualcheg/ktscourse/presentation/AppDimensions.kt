@@ -10,7 +10,13 @@ data class AppDimensions(
     val paddingSmall: Dp = 8.dp,
     val paddingMedium: Dp = 16.dp,
     val paddingStandard: Dp = 40.dp,
-    val textSizeLarge: TextUnit = 20.sp
+    val paddingLarge: Dp = 12.dp,
+    val textSizeSmall: TextUnit = 18.sp,
+    val textSizeLarge: TextUnit = 20.sp,
+    val debounceDuration: Long = 500L,
+    val shadowElevation: Dp = 2.dp,
+    val spacerHeight: Dp = 4.dp,
+    val imageSize: Dp = 64.dp,
 )
 
 val LocalDimensions = staticCompositionLocalOf { AppDimensions() }

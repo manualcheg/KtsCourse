@@ -1,9 +1,10 @@
-package com.manualcheg.ktscourse.data
+package com.manualcheg.ktscourse.data.models
 
 data class Launch(
     val id: String = "",
     val name: String = "",
-    val launchpad: String = "",
+    val flightNumber: Int = 0,
     val launchDate: String = "",
     val details: String = "",
+    val imageUrl: String = ""
 )

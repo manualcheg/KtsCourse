@@ -8,5 +8,10 @@
     <string name="login_screen_textfield_password_label">Password</string>
     <string name="login_screen_textfield_password_placeholder">P@ssw0rd</string>
     <string name="main_screen_image_cont_descript_launch">launch icon</string>
-    <string name="main_screen_main_text_launches">Launches</string>
+    <string name="main_screen_main_text_launches">SpaceX Launches</string>
+    <string name="main_screen_mission_image_cont_descript_launch">launch mission image</string>
+    <string name="nothing_found_content_description">Nothing found</string>
+    <string name="nothing_found_text">Nothing found</string>
+    <string name="main_screen_button_retry_text">Retry</string>
+    <string name="main_screen_error_text">Error: %1$s</string>
 </resources>

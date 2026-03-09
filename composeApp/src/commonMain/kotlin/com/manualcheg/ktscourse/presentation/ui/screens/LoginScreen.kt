@@ -31,7 +31,7 @@ import androidx.navigation.NavController
 import com.manualcheg.ktscourse.navigation.Screen
 import com.manualcheg.ktscourse.presentation.AppDimensions
 import com.manualcheg.ktscourse.presentation.LocalDimensions
-import com.manualcheg.ktscourse.presentation.ViewModelLoginUiScreen
+import com.manualcheg.ktscourse.presentation.viewmodels.ViewModelLoginUiScreen
 import com.manualcheg.ktscourse.presentation.ui.LoginUiEvent
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.FlowPreview
@@ -65,7 +65,7 @@ fun LoginScreen(
 
     LaunchedEffect(usernameState) {
         snapshotFlow { usernameState.text.toString() }
-            .debounce(500L)
+            .debounce(dimensions.debounceDuration)
             .collectLatest {
                 viewModel.onUsernameChanged(it)
             }
@@ -73,7 +73,7 @@ fun LoginScreen(
 
     LaunchedEffect(passwordState) {
         snapshotFlow { passwordState.text.toString() }
-            .debounce(500L)
+            .debounce(dimensions.debounceDuration)
             .collectLatest {
                 viewModel.onPasswordChanged(it)
             }

@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
-    id("ru.ivk1800.riflesso")
+//    id("ru.ivk1800.riflesso")
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
 }
@@ -31,7 +31,7 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.android)
-            implementation("ru.ivk1800.riflesso:client:2.2.21-0.0.3")
+//            implementation("ru.ivk1800.riflesso:client:2.2.21-0.0.3")
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -46,11 +46,10 @@ kotlin {
             implementation(libs.navigation.compose)
             implementation(libs.coil.compose)
             implementation(libs.ktor.client.core)
-            implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor3)
             implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.ktor.client.serialization)
-//            implementation("io.github.aakira:napier:2.7.1")
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.napier)
         }
 

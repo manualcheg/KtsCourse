@@ -2,6 +2,7 @@ package com.manualcheg.ktscourse.presentation.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,59 +14,120 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.manualcheg.ktscourse.data.Launch
-import com.manualcheg.ktscourse.presentation.ui.ViewModelMainScreen
+import coil3.compose.AsyncImage
+import com.manualcheg.ktscourse.data.models.Launch
+import com.manualcheg.ktscourse.presentation.LocalDimensions
+import com.manualcheg.ktscourse.presentation.ui.screens.UIStates.MainUiState
+import com.manualcheg.ktscourse.presentation.viewmodels.ViewModelMainScreen
 import ktscourse.composeapp.generated.resources.Res
-import ktscourse.composeapp.generated.resources.main_screen_image_cont_descript_launch
+import ktscourse.composeapp.generated.resources.main_screen_button_retry_text
+import ktscourse.composeapp.generated.resources.main_screen_error_text
 import ktscourse.composeapp.generated.resources.main_screen_main_text_launches
+import ktscourse.composeapp.generated.resources.main_screen_mission_image_cont_descript_launch
+import ktscourse.composeapp.generated.resources.nothingFound
+import ktscourse.composeapp.generated.resources.nothing_found_content_description
+import ktscourse.composeapp.generated.resources.nothing_found_text
 import ktscourse.composeapp.generated.resources.rocket_launch_128
 import org.jetbrains.compose.resources.imageResource
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     viewModelMainScreen: ViewModelMainScreen
 ) {
-    val uiState by viewModelMainScreen.uiState.collectAsStateWithLifecycle()
-
-    Scaffold { innerPadding ->
+    val dimensions = LocalDimensions.current
+    Scaffold(
+        topBar = {
+            TopAppBar(title = {
+                Text(
+                    stringResource(Res.string.main_screen_main_text_launches),
+                    fontSize = dimensions.textSizeSmall,
+                )
+            })
+        }
+    ) { innerPadding ->
         Surface(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            ShowListOfLaunches(uiState.listOfLaunches)
+            ShowListOfLaunches(viewModelMainScreen)
         }
     }
 }
 
 @Composable
-fun ShowListOfLaunches(list: List<Launch>) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = stringResource(Res.string.main_screen_main_text_launches),
-            color = MaterialTheme.colorScheme.secondary,
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier
-                .padding(start = 24.dp, top = 16.dp, bottom = 16.dp)
-        )
-        Spacer(modifier = Modifier.height(4.dp))
+fun ShowListOfLaunches(viewModelMainScreen: ViewModelMainScreen) {
+    val uiState = viewModelMainScreen.uiState
 
+    Box(modifier = Modifier.fillMaxSize()) {
+        when (uiState) {
+            is MainUiState.Loading -> {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+
+            is MainUiState.Success -> {
+                LaunchList(uiState.launches)
+            }
+
+            is MainUiState.Error -> {
+                Column(
+                    modifier = Modifier.align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        text = stringResource(Res.string.main_screen_error_text, uiState.message),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                    Button(onClick = { viewModelMainScreen.updateData() }) {
+                        Text(stringResource(Res.string.main_screen_button_retry_text))
+                    }
+                }
+            }
+
+            is MainUiState.Empty -> {
+                Column(
+                    modifier = Modifier.align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        imageResource(Res.drawable.nothingFound),
+                        contentDescription = stringResource(Res.string.nothing_found_content_description)
+                    )
+                    Text(
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        text = stringResource(Res.string.nothing_found_text),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun LaunchList(launches: List<Launch>) {
+    val dimensions = LocalDimensions.current
+    Column(modifier = Modifier.fillMaxWidth()) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(dimensions.paddingSmall)
         ) {
-            items(list, key = { it.id }) {
+            items(launches, key = { it.id }) {
                 LaunchItem(it)
             }
         }
@@ -74,27 +136,33 @@ fun ShowListOfLaunches(list: List<Launch>) {
 
 @Composable
 fun LaunchItem(launch: Launch) {
+    val dimensions = LocalDimensions.current
     Surface(
         shape = MaterialTheme.shapes.medium,
-        shadowElevation = 2.dp,
+        shadowElevation = dimensions.shadowElevation,
         color = MaterialTheme.colorScheme.outline,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp)
+            .padding(horizontal = dimensions.paddingLarge)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(dimensions.paddingLarge),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                imageResource(Res.drawable.rocket_launch_128),
-                contentDescription = stringResource(Res.string.main_screen_image_cont_descript_launch),
-                modifier = Modifier.size(80.dp)
-            )
+            if (launch.imageUrl != "") {
+                AsyncImage(
+                    model = launch.imageUrl,
+                    contentDescription = stringResource(Res.string.main_screen_mission_image_cont_descript_launch),
+                    placeholder = painterResource(Res.drawable.rocket_launch_128),
+                    error = painterResource(Res.drawable.rocket_launch_128),
+                    modifier = Modifier
+                        .size(dimensions.imageSize)
+                )
+            }
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(dimensions.paddingMedium))
 
             Column(
                 modifier = Modifier
@@ -108,17 +176,17 @@ fun LaunchItem(launch: Launch) {
                     style = MaterialTheme.typography.titleMedium
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(dimensions.spacerHeight))
 
                 Text(
-                    text = launch.launchpad,
+                    text = launch.flightNumber.toString(),
                     modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colorScheme.onPrimary,
                     style = MaterialTheme.typography.titleSmall
                 )
 
                 if (launch.details.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(dimensions.spacerHeight))
                     Text(
                         text = launch.details,
                         modifier = Modifier.fillMaxWidth(),
@@ -128,7 +196,7 @@ fun LaunchItem(launch: Launch) {
                     )
                 }
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(dimensions.spacerHeight))
 
                 Text(
                     text = launch.launchDate,
