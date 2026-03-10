@@ -14,4 +14,8 @@
     <string name="nothing_found_text">Nothing found</string>
     <string name="main_screen_button_retry_text">Retry</string>
     <string name="main_screen_error_text">Error: %1$s</string>
+    <string name="main_screen_icon_search_content_description">Search icon</string>
+    <string name="main_screen_icon_clear_field_content_description">Clear field icon</string>
+
+
 </resources>

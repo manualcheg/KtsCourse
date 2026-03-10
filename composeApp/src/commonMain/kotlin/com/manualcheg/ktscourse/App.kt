@@ -1,6 +1,7 @@
 package com.manualcheg.ktscourse
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.tooling.preview.Preview
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
@@ -9,5 +10,7 @@ import io.github.aakira.napier.Napier
 @Preview
 fun App() {
     AppNavHost()
-    Napier.base(DebugAntilog())
+    LaunchedEffect(Unit) {
+        Napier.base(DebugAntilog())
+    }
 }

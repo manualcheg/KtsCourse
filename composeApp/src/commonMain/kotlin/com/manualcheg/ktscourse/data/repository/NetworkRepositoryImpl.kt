@@ -22,7 +22,6 @@ class NetworkRepositoryImpl : NetworkRepository {
 
     override suspend fun getAllLaunches(): Result<List<Launch>> {
         return try {
-            Napier.v { Result.toString() }
             val response: List<LaunchDto> =
                 httpClient.get("https://api.spacexdata.com/v4/launches").body()
             Result.success(response.map { dto ->
