@@ -11,6 +11,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
@@ -21,7 +22,9 @@ import kotlinx.coroutines.launch
 
 class ViewModelMainScreen : ViewModel() {
     private val repository = NetworkRepositoryImpl()
-    private var allLaunches: List<Launch> = emptyList()
+    private var allLaunches: MutableList<Launch> = mutableListOf()
+    private var currentPage = 1
+    private var isLastPage = false
 
     private val _uiState = MutableStateFlow<MainUiState>(MainUiState.Loading)
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
@@ -29,53 +32,78 @@ class ViewModelMainScreen : ViewModel() {
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
+    private val _isNextPageLoading = MutableStateFlow(false)
+    val isNextPageLoading: StateFlow<Boolean> = _isNextPageLoading.asStateFlow()
+
     init {
-        searchWithDebounce()
-        updateData()
+        search()
     }
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    private fun searchWithDebounce() {
+    private fun search() {
         _searchQuery
             .debounce(1000L)
             .distinctUntilChanged()
-            .flatMapLatest { query ->
-                flow {
-                    val filtered = if (query.isBlank()) {
-                        allLaunches
-                    } else {
-                        allLaunches.filter {
-                            it.name.contains(query, ignoreCase = true) ||
-                                    it.details.contains(query, ignoreCase = true)
-                        }
-                    }
-                    emit(filtered)
-                }
+            .onEach {
+                resetPagination()
             }
-            .onEach { filtered ->
-                if (_uiState.value is MainUiState.Loading) return@onEach
-
-                _uiState.value = when {
-                    filtered.isEmpty() && allLaunches.isNotEmpty() -> MainUiState.Empty
-                    allLaunches.isEmpty() && _uiState.value !is MainUiState.Error -> MainUiState.Empty
-                    else -> MainUiState.Success(filtered)
-                }
-            }
+            .flatMapLatest { query -> loadPage(query, 1) }
             .launchIn(viewModelScope)
     }
 
-    fun updateData() {
-        viewModelScope.launch {
+    private fun loadPage(query: String, page: Int) = flow<MainUiState> {
+        if (page == 1) {
             _uiState.value = MainUiState.Loading
-            repository.getAllLaunches()
-                .onSuccess {
-                    allLaunches = it
-                    _uiState.value = MainUiState.Success(it)
-                    onSearchQueryChange(_searchQuery.value)
-                }.onFailure {
-                    Napier.e("Search error", it, tag = "Network")
+        } else {
+            _isNextPageLoading.value = true
+        }
+
+        repository.getAllLaunches(query, page)
+            .onSuccess { response ->
+                isLastPage = !response.hasNextPage
+                if (page == 1) {
+                    allLaunches = response.docs.toMutableList()
+                } else {
+                    allLaunches.addAll(response.docs)
+                }
+
+                if (allLaunches.isEmpty()) {
+                    _uiState.value = MainUiState.Empty
+                } else {
+                    _uiState.value = MainUiState.Success(allLaunches.toList())
+                }
+                _isNextPageLoading.value = false
+            }
+            .onFailure {
+                if (page == 1) {
+                    Napier.e(it.message.toString(), it, "NetworkError")
                     _uiState.value = MainUiState.Error(it.message ?: "Unknown error")
                 }
+                _isNextPageLoading.value = false
+            }
+    }
+
+    fun loadNextPage() {
+        if (isLastPage || _isNextPageLoading.value || _uiState.value is MainUiState.Loading) return
+
+        currentPage++
+
+        viewModelScope.launch {
+            loadPage(_searchQuery.value, currentPage).collect()
+        }
+    }
+
+    private fun resetPagination() {
+        currentPage = 1
+        isLastPage = false
+        allLaunches.clear()
+        _isNextPageLoading.value = false
+    }
+
+    fun updateData() {
+        resetPagination()
+        viewModelScope.launch {
+            loadPage(_searchQuery.value, 1).collect()
         }
     }
 

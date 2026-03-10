@@ -16,7 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
@@ -102,7 +102,11 @@ fun ShowListOfLaunches(viewModelMainScreen: ViewModelMainScreen) {
             }
 
             is MainUiState.Success -> {
-                LaunchList((uiState as MainUiState.Success).launches, listState)
+                LaunchList(
+                    (uiState as MainUiState.Success).launches,
+                    listState,
+                    viewModelMainScreen
+                )
             }
 
             is MainUiState.Error -> {
@@ -145,16 +149,34 @@ fun ShowListOfLaunches(viewModelMainScreen: ViewModelMainScreen) {
 }
 
 @Composable
-fun LaunchList(launches: List<Launch>, listState: LazyListState) {
+fun LaunchList(
+    launches: List<Launch>,
+    listState: LazyListState,
+    viewModelMainScreen: ViewModelMainScreen
+) {
     val dimensions = LocalDimensions.current
-    Column(modifier = Modifier.fillMaxWidth()) {
-        LazyColumn(
-            state = listState,
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(dimensions.paddingSmall)
-        ) {
-            items(launches, key = { it.id }) {
-                LaunchItem(it)
+    val isNextPageLoading by viewModelMainScreen.isNextPageLoading.collectAsState()
+    LazyColumn(
+        state = listState,
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(dimensions.paddingSmall)
+    ) {
+        itemsIndexed(launches, key = { _, item -> item.id }) { index, launch ->
+            LaunchItem(launch)
+            if (index == launches.lastIndex) {
+                viewModelMainScreen.loadNextPage()
+            }
+        }
+        if (isNextPageLoading) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(dimensions.paddingMedium),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                }
             }
         }
     }

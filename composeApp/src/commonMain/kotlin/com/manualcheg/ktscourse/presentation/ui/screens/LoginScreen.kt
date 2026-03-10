@@ -118,7 +118,6 @@ fun InputFields(
             Button(
                 onClick = {
                     viewModel.checkCredentials()
-                    Napier.v("Button was pushed")
                 },
                 modifier = Modifier.padding(dimensions.paddingStandard),
                 enabled = isLoginButtonActive
