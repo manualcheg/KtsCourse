@@ -11,13 +11,12 @@ data class SpaceXQueryDto(
 
 @Serializable
 data class SpaceXQueryInnerDto(
-    val name: SpaceXSearchNameDto? = null
+    @SerialName("\$text") val text: SpaceXTextSearchDto? = null
 )
 
 @Serializable
-data class SpaceXSearchNameDto(
-    @SerialName("\$regex") val regex: String,
-    @SerialName("\$options") val options: String = "i"
+data class SpaceXTextSearchDto(
+    @SerialName("\$search") val search: String
 )
 
 @Serializable

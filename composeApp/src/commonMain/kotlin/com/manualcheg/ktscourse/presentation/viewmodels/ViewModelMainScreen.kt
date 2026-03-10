@@ -24,7 +24,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.network_error
-import kotlin.coroutines.coroutineContext
 
 class ViewModelMainScreen : ViewModel() {
     private val repository = NetworkRepositoryImpl()
@@ -96,7 +95,7 @@ class ViewModelMainScreen : ViewModel() {
 
     fun loadNextPage() {
         if (isLastPage || _isNextPageLoading.value || _uiState.value is MainUiState.Loading) return
-//        currentPage++
+        currentPage++
         nextPageJob = viewModelScope.launch {
             loadPage(_searchQuery.value, currentPage).collect()
         }

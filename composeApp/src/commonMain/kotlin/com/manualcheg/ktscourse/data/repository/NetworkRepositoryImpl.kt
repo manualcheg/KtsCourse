@@ -7,7 +7,7 @@ import com.manualcheg.ktscourse.data.models.SpaceXOptionsDto
 import com.manualcheg.ktscourse.data.models.SpaceXQueryDto
 import com.manualcheg.ktscourse.data.models.SpaceXQueryInnerDto
 import com.manualcheg.ktscourse.data.models.SpaceXResponseDto
-import com.manualcheg.ktscourse.data.models.SpaceXSearchNameDto
+import com.manualcheg.ktscourse.data.models.SpaceXTextSearchDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -34,7 +34,8 @@ class NetworkRepositoryImpl : NetworkRepository {
         return try {
             val requestBody = SpaceXQueryDto(
                 query = SpaceXQueryInnerDto(
-                    name = if (query.isBlank()) null else SpaceXSearchNameDto(regex = query)
+//                    name = if (query.isBlank()) null else SpaceXSearchNameDto(regex = query)
+                    text = if (query.isBlank()) null else SpaceXTextSearchDto(search = query)
                 ),
                 options = SpaceXOptionsDto(page = page, limit = 10)
             )
