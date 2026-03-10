@@ -27,31 +27,6 @@ class NetworkRepositoryImpl : NetworkRepository {
         }
     }
 
-    /*suspend fun getAllLaunches(query: String, page: Int): Result<List<Launch>> {
-        return try {
-            val response: List<LaunchDto> =
-                httpClient.get("https://api.spacexdata.com/v4/launches/query").body()
-            Result.success(response.map { dto ->
-                val status = when {
-                    dto.upcoming == true -> LaunchStatus.UPCOMING
-                    dto.success == true -> LaunchStatus.SUCCESS
-                    else -> LaunchStatus.FAILURE
-                }
-                Launch(
-                    id = dto.id,
-                    name = dto.name ?: "",
-                    flightNumber = dto.flightNumber,
-                    launchDate = dto.dateUtc ?: "",
-                    details = dto.details ?: "",
-                    imageUrl = dto.links?.patch?.small ?: "",
-                    status = status
-                )
-            })
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }*/
-
     override suspend fun getAllLaunches(
         query: String,
         page: Int

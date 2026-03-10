@@ -31,9 +31,8 @@ import androidx.navigation.NavController
 import com.manualcheg.ktscourse.navigation.Screen
 import com.manualcheg.ktscourse.presentation.AppDimensions
 import com.manualcheg.ktscourse.presentation.LocalDimensions
-import com.manualcheg.ktscourse.presentation.viewmodels.ViewModelLoginUiScreen
 import com.manualcheg.ktscourse.presentation.ui.LoginUiEvent
-import io.github.aakira.napier.Napier
+import com.manualcheg.ktscourse.presentation.viewmodels.ViewModelLoginUiScreen
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce

@@ -39,20 +39,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.manualcheg.ktscourse.data.models.Launch
 import com.manualcheg.ktscourse.data.models.LaunchStatus
 import com.manualcheg.ktscourse.presentation.LocalDimensions
-import com.manualcheg.ktscourse.presentation.ui.screens.UIStates.MainUiState
+import com.manualcheg.ktscourse.presentation.ui.screens.uistates.MainUiState
 import com.manualcheg.ktscourse.presentation.viewmodels.ViewModelMainScreen
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.ic_close_24dp
 import ktscourse.composeapp.generated.resources.ic_search_24dp
 import ktscourse.composeapp.generated.resources.main_screen_button_retry_text
+import ktscourse.composeapp.generated.resources.main_screen_docked_search_bar_placeholder
 import ktscourse.composeapp.generated.resources.main_screen_error_text
 import ktscourse.composeapp.generated.resources.main_screen_icon_clear_field_content_description
 import ktscourse.composeapp.generated.resources.main_screen_icon_search_content_description
+import ktscourse.composeapp.generated.resources.main_screen_launch_status_failed_text
+import ktscourse.composeapp.generated.resources.main_screen_launch_status_success_text
+import ktscourse.composeapp.generated.resources.main_screen_launch_status_upcoming_text
 import ktscourse.composeapp.generated.resources.main_screen_mission_image_cont_descript_launch
 import ktscourse.composeapp.generated.resources.nothingFound
 import ktscourse.composeapp.generated.resources.nothing_found_content_description
@@ -66,11 +69,11 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    viewModelMainScreen: ViewModelMainScreen
+    viewModel: ViewModelMainScreen
 ) {
     Scaffold(
         topBar = {
-            MainTopAppBar(viewModelMainScreen)
+            MainTopAppBar(viewModel)
         }
     ) { innerPadding ->
         Surface(
@@ -78,15 +81,15 @@ fun MainScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            ShowListOfLaunches(viewModelMainScreen)
+            ShowListOfLaunches(viewModel)
         }
     }
 }
 
 @Composable
-fun ShowListOfLaunches(viewModelMainScreen: ViewModelMainScreen) {
-    val uiState by viewModelMainScreen.uiState.collectAsState()
-    val searchQuery by viewModelMainScreen.searchQuery.collectAsState()
+fun ShowListOfLaunches(viewModel: ViewModelMainScreen) {
+    val uiState by viewModel.uiState.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
     val listState = rememberLazyListState()
 
     LaunchedEffect(searchQuery) {
@@ -105,7 +108,7 @@ fun ShowListOfLaunches(viewModelMainScreen: ViewModelMainScreen) {
                 LaunchList(
                     (uiState as MainUiState.Success).launches,
                     listState,
-                    viewModelMainScreen
+                    viewModel
                 )
             }
 
@@ -122,7 +125,7 @@ fun ShowListOfLaunches(viewModelMainScreen: ViewModelMainScreen) {
                         ),
                         color = MaterialTheme.colorScheme.error
                     )
-                    Button(onClick = { viewModelMainScreen.updateData() }) {
+                    Button(onClick = { viewModel.updateData() }) {
                         Text(stringResource(Res.string.main_screen_button_retry_text))
                     }
                 }
@@ -152,10 +155,10 @@ fun ShowListOfLaunches(viewModelMainScreen: ViewModelMainScreen) {
 fun LaunchList(
     launches: List<Launch>,
     listState: LazyListState,
-    viewModelMainScreen: ViewModelMainScreen
+    viewModel: ViewModelMainScreen
 ) {
     val dimensions = LocalDimensions.current
-    val isNextPageLoading by viewModelMainScreen.isNextPageLoading.collectAsState()
+    val isNextPageLoading by viewModel.isNextPageLoading.collectAsState()
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxSize(),
@@ -164,7 +167,7 @@ fun LaunchList(
         itemsIndexed(launches, key = { _, item -> item.id }) { index, launch ->
             LaunchItem(launch)
             if (index == launches.lastIndex) {
-                viewModelMainScreen.loadNextPage()
+                viewModel.loadNextPage()
             }
         }
         if (isNextPageLoading) {
@@ -175,7 +178,7 @@ fun LaunchList(
                         .padding(dimensions.paddingMedium),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                    CircularProgressIndicator(modifier = Modifier.size(dimensions.circularProgressIndicatorSize))
                 }
             }
         }
@@ -186,15 +189,15 @@ fun LaunchList(
 fun LaunchItem(launch: Launch) {
     val dimensions = LocalDimensions.current
     val statusColor = when (launch.status) {
-        LaunchStatus.SUCCESS -> Color(0xFF4CAF50)
+        LaunchStatus.SUCCESS -> Color(dimensions.successColor)
         LaunchStatus.FAILURE -> MaterialTheme.colorScheme.error
-        LaunchStatus.UPCOMING -> Color(0xFF2196F3)
+        LaunchStatus.UPCOMING -> Color(dimensions.upcomingColor)
     }
 
     val statusText = when (launch.status) {
-        LaunchStatus.SUCCESS -> "Success"
-        LaunchStatus.FAILURE -> "Failed"
-        LaunchStatus.UPCOMING -> "Upcoming"
+        LaunchStatus.SUCCESS -> stringResource(Res.string.main_screen_launch_status_success_text)
+        LaunchStatus.FAILURE -> stringResource(Res.string.main_screen_launch_status_failed_text)
+        LaunchStatus.UPCOMING -> stringResource(Res.string.main_screen_launch_status_upcoming_text)
     }
 
     Surface(
@@ -287,9 +290,10 @@ fun LaunchItem(launch: Launch) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainTopAppBar(viewModelMainScreen: ViewModelMainScreen) {
-    val searchQuery by viewModelMainScreen.searchQuery.collectAsState()
+fun MainTopAppBar(viewModel: ViewModelMainScreen) {
+    val searchQuery by viewModel.searchQuery.collectAsState()
     val focusManager = LocalFocusManager.current
+    val dimensions = LocalDimensions.current
 
     TopAppBar(
         title = {
@@ -297,28 +301,29 @@ fun MainTopAppBar(viewModelMainScreen: ViewModelMainScreen) {
                 inputField = {
                     SearchBarDefaults.InputField(
                         query = searchQuery,
-                        onQueryChange = { viewModelMainScreen.onSearchQueryChange(it) },
+                        onQueryChange = { viewModel.onSearchQueryChange(it) },
                         onSearch = { focusManager.clearFocus() },
                         expanded = false,
                         onExpandedChange = { },
-                        modifier = Modifier.fillMaxWidth().wrapContentHeight().padding(end = 16.dp),
-                        placeholder = { Text("Search launches...") },
+                        modifier = Modifier.fillMaxWidth().wrapContentHeight()
+                            .padding(end = dimensions.paddingMedium),
+                        placeholder = { Text(stringResource(Res.string.main_screen_docked_search_bar_placeholder)) },
                         leadingIcon = {
                             Icon(
                                 painterResource(Res.drawable.ic_search_24dp),
                                 contentDescription = stringResource(Res.string.main_screen_icon_search_content_description),
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(dimensions.iconSize)
                             )
                         },
                         trailingIcon = {
                             if (searchQuery.isNotEmpty()) {
                                 IconButton(onClick = {
-                                    viewModelMainScreen.onSearchQueryChange("")
+                                    viewModel.onSearchQueryChange("")
                                 }) {
                                     Icon(
                                         painterResource(Res.drawable.ic_close_24dp),
                                         contentDescription = stringResource(Res.string.main_screen_icon_clear_field_content_description),
-                                        modifier = Modifier.size(24.dp)
+                                        modifier = Modifier.size(dimensions.iconSize)
                                     )
                                 }
                             }
@@ -327,64 +332,9 @@ fun MainTopAppBar(viewModelMainScreen: ViewModelMainScreen) {
                 },
                 expanded = false,
                 onExpandedChange = { },
-                modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
+                modifier = Modifier.fillMaxWidth().padding(end = dimensions.paddingMedium),
                 content = { },
             )
         }
     )
 }
-
-
-/*@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SimpleSearchBar(
-    textFieldState: TextFieldState,
-    onSearch: (String) -> Unit,
-    searchResults: List<String>,
-    modifier: Modifier = Modifier
-) {
-    // Controls expansion state of the search bar
-    var expanded by rememberSaveable { mutableStateOf(false) }
-
-    Box(
-        modifier
-            .fillMaxSize()
-            .semantics { isTraversalGroup = true }
-    ) {
-        SearchBar(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .semantics { traversalIndex = 0f },
-            inputField = {
-                SearchBarDefaults.InputField(
-                    query = textFieldState.text.toString(),
-                    onQueryChange = { textFieldState.edit { replace(0, length, it) } },
-                    onSearch = {
-                        onSearch(textFieldState.text.toString())
-                        expanded = false
-                    },
-                    expanded = expanded,
-                    onExpandedChange = { expanded = it },
-                    placeholder = { Text("Search") }
-                )
-            },
-            expanded = expanded,
-            onExpandedChange = { expanded = it },
-        ) {
-            // Display search results in a scrollable column
-            Column(Modifier.verticalScroll(rememberScrollState())) {
-                searchResults.forEach { result ->
-                    ListItem(
-                        headlineContent = { Text(result) },
-                        modifier = Modifier
-                            .clickable {
-                                textFieldState.edit { replace(0, length, result) }
-                                expanded = false
-                            }
-                            .fillMaxWidth()
-                    )
-                }
-            }
-        }
-    }
-}*/

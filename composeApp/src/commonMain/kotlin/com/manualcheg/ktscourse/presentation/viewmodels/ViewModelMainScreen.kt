@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.manualcheg.ktscourse.data.models.Launch
 import com.manualcheg.ktscourse.data.repository.NetworkRepositoryImpl
-import com.manualcheg.ktscourse.presentation.ui.screens.UIStates.MainUiState
+import com.manualcheg.ktscourse.presentation.ui.screens.uistates.MainUiState
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -19,6 +19,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import ktscourse.composeapp.generated.resources.Res
+import ktscourse.composeapp.generated.resources.network_error
 
 class ViewModelMainScreen : ViewModel() {
     private val repository = NetworkRepositoryImpl()
@@ -76,8 +78,8 @@ class ViewModelMainScreen : ViewModel() {
             }
             .onFailure {
                 if (page == 1) {
-                    Napier.e(it.message.toString(), it, "NetworkError")
-                    _uiState.value = MainUiState.Error(it.message ?: "Unknown error")
+                    Napier.e(it.message.toString(), it, Res.string.network_error.toString())
+                    _uiState.value = MainUiState.Error(it.message ?: Res.string.network_error.toString())
                 }
                 _isNextPageLoading.value = false
             }

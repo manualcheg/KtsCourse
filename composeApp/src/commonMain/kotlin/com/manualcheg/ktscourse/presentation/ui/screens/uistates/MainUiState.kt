@@ -1,4 +1,4 @@
-package com.manualcheg.ktscourse.presentation.ui.screens.UIStates
+package com.manualcheg.ktscourse.presentation.ui.screens.uistates
 
 import com.manualcheg.ktscourse.data.models.Launch
 

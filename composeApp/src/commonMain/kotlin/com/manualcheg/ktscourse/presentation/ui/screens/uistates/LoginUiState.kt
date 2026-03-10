@@ -1,4 +1,4 @@
-package com.manualcheg.ktscourse.presentation.ui.screens.UIStates
+package com.manualcheg.ktscourse.presentation.ui.screens.uistates
 
 data class LoginUiState(
     val username: String = "",

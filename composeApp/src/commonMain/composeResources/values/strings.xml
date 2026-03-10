@@ -7,8 +7,6 @@
     <string name="login_screen_textfield_username_placeholder">example@gmail.com</string>
     <string name="login_screen_textfield_password_label">Password</string>
     <string name="login_screen_textfield_password_placeholder">P@ssw0rd</string>
-    <string name="main_screen_image_cont_descript_launch">launch icon</string>
-    <string name="main_screen_main_text_launches">SpaceX Launches</string>
     <string name="main_screen_mission_image_cont_descript_launch">launch mission image</string>
     <string name="nothing_found_content_description">Nothing found</string>
     <string name="nothing_found_text">Nothing found</string>
@@ -16,6 +14,11 @@
     <string name="main_screen_error_text">Error: %1$s</string>
     <string name="main_screen_icon_search_content_description">Search icon</string>
     <string name="main_screen_icon_clear_field_content_description">Clear field icon</string>
-
-
+    <string name="main_screen_launch_status_success_text">Success</string>
+    <string name="main_screen_launch_status_failed_text">Failed</string>
+    <string name="main_screen_launch_status_upcoming_text">Upcoming</string>
+    <string name="main_screen_docked_search_bar_placeholder">Search launches...</string>
+    <string name="noInternet">no internet</string>
+    <string name="network_error">Network Error</string>
+    <string name="unknown_error">Unknown error</string>
 </resources>

@@ -18,7 +18,13 @@ data class AppDimensions(
     val shadowElevation: Dp = 2.dp,
     val spacerHeight: Dp = 4.dp,
     val imageSize: Dp = 64.dp,
+    val iconSize: Dp = 24.dp,
     val successIndicatorSize: Dp = 8.dp,
+    val circularProgressIndicatorSize: Dp = 32.dp,
+
+    //Colors
+    val upcomingColor: Long = 0xFF2196F3,
+    val successColor: Long = 0xFF4CAF50,
 )
 
 val LocalDimensions = staticCompositionLocalOf { AppDimensions() }
