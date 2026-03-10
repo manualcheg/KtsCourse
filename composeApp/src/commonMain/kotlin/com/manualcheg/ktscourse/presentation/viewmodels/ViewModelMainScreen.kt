@@ -9,6 +9,7 @@ import io.github.aakira.napier.Napier
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -67,7 +68,7 @@ class ViewModelMainScreen : ViewModel() {
 
         repository.getAllLaunches(query, page)
             .onSuccess { response ->
-                if (!coroutineContext.isActive) return@onSuccess
+                if (!currentCoroutineContext().isActive) return@onSuccess
                 isLastPage = !response.hasNextPage
                 if (page == 1) {
                     allLaunches = response.docs.toMutableList()
@@ -83,7 +84,7 @@ class ViewModelMainScreen : ViewModel() {
                 _isNextPageLoading.value = false
             }
             .onFailure {
-                if (!coroutineContext.isActive) return@onFailure
+                if (!currentCoroutineContext().isActive) return@onFailure
                 if (page == 1) {
                     Napier.e(it.message.toString(), it, Res.string.network_error.toString())
                     _uiState.value =
