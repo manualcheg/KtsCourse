@@ -1,5 +1,6 @@
 package com.manualcheg.ktscourse.data.models
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -15,8 +16,8 @@ data class SpaceXQueryInnerDto(
 
 @Serializable
 data class SpaceXSearchNameDto(
-    val regex: String,
-    val options: String = "i"
+    @SerialName("\$regex") val regex: String,
+    @SerialName("\$options") val options: String = "i"
 )
 
 @Serializable
