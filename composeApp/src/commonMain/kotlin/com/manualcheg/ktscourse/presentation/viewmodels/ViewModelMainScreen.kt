@@ -8,6 +8,7 @@ import com.manualcheg.ktscourse.presentation.ui.screens.uistates.MainUiState
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,15 +19,18 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.network_error
+import kotlin.coroutines.coroutineContext
 
 class ViewModelMainScreen : ViewModel() {
     private val repository = NetworkRepositoryImpl()
     private var allLaunches: MutableList<Launch> = mutableListOf()
     private var currentPage = 1
     private var isLastPage = false
+    private var nextPageJob: Job? = null
 
     private val _uiState = MutableStateFlow<MainUiState>(MainUiState.Loading)
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
@@ -47,13 +51,14 @@ class ViewModelMainScreen : ViewModel() {
             .debounce(1000L)
             .distinctUntilChanged()
             .onEach {
+                nextPageJob?.cancel()
                 resetPagination()
             }
             .flatMapLatest { query -> loadPage(query, 1) }
             .launchIn(viewModelScope)
     }
 
-    private fun loadPage(query: String, page: Int) = flow<MainUiState> {
+    private fun loadPage(query: String, page: Int) = flow<Unit> {
         if (page == 1) {
             _uiState.value = MainUiState.Loading
         } else {
@@ -62,6 +67,7 @@ class ViewModelMainScreen : ViewModel() {
 
         repository.getAllLaunches(query, page)
             .onSuccess { response ->
+                if (!coroutineContext.isActive) return@onSuccess
                 isLastPage = !response.hasNextPage
                 if (page == 1) {
                     allLaunches = response.docs.toMutableList()
@@ -77,9 +83,11 @@ class ViewModelMainScreen : ViewModel() {
                 _isNextPageLoading.value = false
             }
             .onFailure {
+                if (!coroutineContext.isActive) return@onFailure
                 if (page == 1) {
                     Napier.e(it.message.toString(), it, Res.string.network_error.toString())
-                    _uiState.value = MainUiState.Error(it.message ?: Res.string.network_error.toString())
+                    _uiState.value =
+                        MainUiState.Error(it.message ?: Res.string.network_error.toString())
                 }
                 _isNextPageLoading.value = false
             }
@@ -87,10 +95,8 @@ class ViewModelMainScreen : ViewModel() {
 
     fun loadNextPage() {
         if (isLastPage || _isNextPageLoading.value || _uiState.value is MainUiState.Loading) return
-
-        currentPage++
-
-        viewModelScope.launch {
+//        currentPage++
+        nextPageJob = viewModelScope.launch {
             loadPage(_searchQuery.value, currentPage).collect()
         }
     }
@@ -103,6 +109,7 @@ class ViewModelMainScreen : ViewModel() {
     }
 
     fun updateData() {
+        nextPageJob?.cancel()
         resetPagination()
         viewModelScope.launch {
             loadPage(_searchQuery.value, 1).collect()
