@@ -23,5 +23,5 @@ data class SpaceXTextSearchDto(
 data class SpaceXOptionsDto(
     val page: Int,
     val limit: Int = 10,
-    val sort: Map<String, Int> = mapOf("date_utc" to 1)
+    val sort: Map<String, Int> = mapOf("flight_number" to 1) // 1 = ASC, -1 = DESC
 )

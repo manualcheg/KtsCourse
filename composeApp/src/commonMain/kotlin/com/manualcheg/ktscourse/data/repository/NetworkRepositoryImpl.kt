@@ -37,7 +37,11 @@ class NetworkRepositoryImpl : NetworkRepository {
 //                    name = if (query.isBlank()) null else SpaceXSearchNameDto(regex = query)
                     text = if (query.isBlank()) null else SpaceXTextSearchDto(search = query)
                 ),
-                options = SpaceXOptionsDto(page = page, limit = 10)
+                options = SpaceXOptionsDto(
+                    page = page,
+                    limit = 10,
+                    sort = mapOf("flight_number" to 1)
+                )
             )
             val response: SpaceXResponseDto<LaunchDto> =
                 httpClient.post("https://api.spacexdata.com/v4/launches/query") {
