@@ -34,7 +34,6 @@ class NetworkRepositoryImpl : NetworkRepository {
         return try {
             val requestBody = SpaceXQueryDto(
                 query = SpaceXQueryInnerDto(
-//                    name = if (query.isBlank()) null else SpaceXSearchNameDto(regex = query)
                     text = if (query.isBlank()) null else SpaceXTextSearchDto(search = query)
                 ),
                 options = SpaceXOptionsDto(

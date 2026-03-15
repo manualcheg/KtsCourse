@@ -21,4 +21,13 @@
     <string name="noInternet">no internet</string>
     <string name="network_error">Network Error</string>
     <string name="unknown_error">Unknown error</string>
+    <string name="onboarding_favourites_title">Favourites</string>
+    <string name="onboarding_favourites_desc">You may add launch, rocket to Favourites and show it without network</string>
+    <string name="onboarding_stat_title">Statistics</string>
+    <string name="onboarding_stat_desc">There is the statistic of launches</string>
+    <string name="onboarding_notification_title">Notifications</string>
+    <string name="onboarding_notification_desc">You may activate notifications for new launches</string>
+    <string name="login_screen_error_text">Login error</string>
+    <string name="login_screen_wrong_password_text">or wrong password</string>
+    <string name="login_screen_wrong_username_text">Wrong login</string>
 </resources>

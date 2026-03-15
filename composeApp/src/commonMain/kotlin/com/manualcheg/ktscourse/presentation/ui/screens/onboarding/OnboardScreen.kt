@@ -1,4 +1,5 @@
-package com.manualcheg.ktscourse.presentation.ui.screens
+/*
+package com.manualcheg.ktscourse.presentation.ui.screens.onboarding
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -67,3 +68,4 @@ fun OnboardScreen(navController: NavController) {
         }
     }
 }
+*/

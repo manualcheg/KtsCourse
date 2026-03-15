@@ -6,6 +6,7 @@ import com.manualcheg.ktscourse.presentation.ui.LoginUiEvent
 import com.manualcheg.ktscourse.presentation.ui.screens.uistates.LoginUiState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +18,7 @@ class ViewModelLoginUiScreen : ViewModel() {
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
     private val _events: MutableSharedFlow<LoginUiEvent> = MutableSharedFlow()
-    val events = _events.asSharedFlow()
+    val events: SharedFlow<LoginUiEvent> = _events.asSharedFlow()
 
     fun onUsernameChanged(username: String) {
         _uiState.update {
@@ -26,6 +27,7 @@ class ViewModelLoginUiScreen : ViewModel() {
             )
         }
         makeButtonLoginActive()
+        makeTextInputInNormalState()
     }
 
     fun onPasswordChanged(password: String) {
@@ -35,28 +37,43 @@ class ViewModelLoginUiScreen : ViewModel() {
             )
         }
         makeButtonLoginActive()
+        makeTextInputInNormalState()
     }
 
     fun makeButtonLoginActive() {
-        if (uiState.value.username == "user" && uiState.value.password == "P@ssw0rd") {
-            _uiState.update {
-                it.copy(
-                    isLoginButtonActive = true
-                )
-            }
-        } else {
-            _uiState.update {
-                it.copy(
-                    isLoginButtonActive = false
-                )
-            }
+        _uiState.update {
+            it.copy(
+                isLoginButtonActive = it.username.isNotEmpty() && it.password.isNotEmpty(),
+                error = false
+            )
         }
     }
 
     fun checkCredentials() {
         viewModelScope.launch {
-            _events.emit(
-                LoginUiEvent.LoginSuccessEvent
+            if (_uiState.value.username == "user" && _uiState.value.password == "P@ssw0rd") {
+                _events.emit(
+                    LoginUiEvent.LoginSuccessEvent
+                )
+            } else {
+                _events.emit(LoginUiEvent.LoginErrorEvent)
+                makeTextInputInErrorState()
+            }
+        }
+    }
+
+    fun makeTextInputInErrorState() {
+        _uiState.update {
+            it.copy(
+                error = true
+            )
+        }
+    }
+
+    fun makeTextInputInNormalState() {
+        _uiState.update {
+            it.copy(
+                error = false
             )
         }
     }

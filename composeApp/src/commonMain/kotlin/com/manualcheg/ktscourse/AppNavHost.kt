@@ -10,7 +10,7 @@ import com.manualcheg.ktscourse.presentation.viewmodels.ViewModelLoginUiScreen
 import com.manualcheg.ktscourse.presentation.viewmodels.ViewModelMainScreen
 import com.manualcheg.ktscourse.presentation.ui.screens.LoginScreen
 import com.manualcheg.ktscourse.presentation.ui.screens.MainScreen
-import com.manualcheg.ktscourse.presentation.ui.screens.OnboardScreen
+import com.manualcheg.ktscourse.presentation.ui.screens.onboarding.Onboarding
 
 @Composable
 fun AppNavHost() {
@@ -21,14 +21,22 @@ fun AppNavHost() {
         startDestination = Screen.Onboard
     )
     {
-        composable<Screen.Onboard> { OnboardScreen(navController) }
+        composable<Screen.Onboard> {
+            Onboarding {
+                navController.navigate(Screen.Login) {
+                    popUpTo(Screen.Onboard)
+                }
+            }
+        }
         composable<Screen.Login> {
-            val viewModel: ViewModelLoginUiScreen = viewModel()
-            LoginScreen(viewModel, navController)
+            LoginScreen({
+                navController.navigate(Screen.Main) {
+                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                }
+            })
         }
         composable<Screen.Main> {
-            val viewModel: ViewModelMainScreen = viewModel()
-            MainScreen(viewModel)
+            MainScreen()
         }
     }
 }
