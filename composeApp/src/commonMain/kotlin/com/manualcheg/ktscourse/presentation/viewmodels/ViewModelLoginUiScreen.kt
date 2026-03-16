@@ -2,6 +2,8 @@ package com.manualcheg.ktscourse.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.manualcheg.ktscourse.data.local_storage.DataStorePreferencesProvider
+import com.manualcheg.ktscourse.data.repository.UserPreferencesRepository
 import com.manualcheg.ktscourse.presentation.ui.LoginUiEvent
 import com.manualcheg.ktscourse.presentation.ui.screens.uistates.LoginUiState
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -13,7 +15,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class ViewModelLoginUiScreen : ViewModel() {
+class ViewModelLoginUiScreen(private val userPreferencesRepository: UserPreferencesRepository) :
+    ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
@@ -55,6 +58,10 @@ class ViewModelLoginUiScreen : ViewModel() {
                 _events.emit(
                     LoginUiEvent.LoginSuccessEvent
                 )
+                userPreferencesRepository.apply {
+                    setLoggedInVar(true)
+                    updateUsername("user")
+                }
             } else {
                 _events.emit(LoginUiEvent.LoginErrorEvent)
                 makeTextInputInErrorState()

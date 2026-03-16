@@ -50,6 +50,8 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.napier)
             implementation(libs.material.icons.extended)
+            implementation(libs.androidx.datastore.preferences.core)
+            implementation(libs.androidx.datastore.core)
         }
 
         val iosMain by creating {

@@ -26,6 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import com.manualcheg.ktscourse.data.local_storage.DataStorePreferencesProvider
+import com.manualcheg.ktscourse.data.repository.UserPreferencesRepository
 import com.manualcheg.ktscourse.presentation.LocalDimensions
 import com.manualcheg.ktscourse.presentation.ui.LoginUiEvent
 import com.manualcheg.ktscourse.presentation.viewmodels.ViewModelLoginUiScreen
@@ -43,7 +45,9 @@ import org.jetbrains.compose.resources.stringResource
 fun LoginScreen(
     moveToMainScreen: () -> Unit
 ) {
-    val viewModel = ViewModelLoginUiScreen()
+    val viewModel = ViewModelLoginUiScreen(
+        userPreferencesRepository = UserPreferencesRepository(DataStorePreferencesProvider.datastore)
+    )
     val dimensions = LocalDimensions.current
     val uiState by viewModel.uiState.collectAsState()
 

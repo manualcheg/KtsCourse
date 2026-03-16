@@ -7,12 +7,17 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.manualcheg.ktscourse.data.createDataStore
+import com.manualcheg.ktscourse.data.local_storage.DataStorePreferencesProvider
 import com.manualcheg.ktscourse.presentation.theme.AppThemeMaterial
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
+        DataStorePreferencesProvider.datastore = createDataStore(context = this)
 
         setContent {
             AppThemeMaterial() {

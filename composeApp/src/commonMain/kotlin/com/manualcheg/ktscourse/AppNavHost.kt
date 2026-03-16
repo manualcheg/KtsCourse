@@ -1,9 +1,14 @@
 package com.manualcheg.ktscourse
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.manualcheg.ktscourse.data.local_storage.DataStorePreferencesProvider
+import com.manualcheg.ktscourse.data.repository.UserPreferencesRepository
 import com.manualcheg.ktscourse.navigation.Screen
 import com.manualcheg.ktscourse.presentation.ui.screens.LoginScreen
 import com.manualcheg.ktscourse.presentation.ui.screens.MainScreen
@@ -12,10 +17,17 @@ import com.manualcheg.ktscourse.presentation.ui.screens.onboarding.Onboarding
 @Composable
 fun AppNavHost() {
     val navController = rememberNavController()
+    val userPreferencesRepository = remember {
+        UserPreferencesRepository(DataStorePreferencesProvider.datastore)
+    }
+    val userData by userPreferencesRepository.userData.collectAsState(initial = null)
+
+    val user = userData ?: return
+    val startScreen = if (user.isLoggedIn) Screen.Main else Screen.Onboard
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Onboard
+        startDestination = startScreen
     )
     {
         composable<Screen.Onboard> {
