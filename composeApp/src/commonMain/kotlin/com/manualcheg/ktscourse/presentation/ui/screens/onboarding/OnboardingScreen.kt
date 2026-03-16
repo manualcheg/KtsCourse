@@ -34,7 +34,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,29 +48,37 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.launch
+import com.manualcheg.ktscourse.data.local_storage.DataStorePreferencesProvider
+import com.manualcheg.ktscourse.data.repository.UserPreferencesRepository
+import com.manualcheg.ktscourse.presentation.viewmodels.OnboardingEvent
+import com.manualcheg.ktscourse.presentation.viewmodels.ViewModelOnboardingScreen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun Onboarding(moveToLoginScreen: () -> Unit) {
-    val items = OnboardingItems.getData()
-    val scope = rememberCoroutineScope()
+    val viewModel = ViewModelOnboardingScreen(
+        userPreferencesRepository = UserPreferencesRepository(DataStorePreferencesProvider.datastore)
+    )
+
+    val items by viewModel.items.collectAsState()
     val pageState = rememberPagerState(pageCount = { items.size })
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                OnboardingEvent.NextPage -> pageState.scrollToPage(pageState.currentPage + 1)
+                OnboardingEvent.BackPage -> pageState.scrollToPage(pageState.currentPage - 1)
+                OnboardingEvent.MoveToLogin -> moveToLoginScreen.invoke()
+            }
+        }
+    }
 
     Scaffold { innerPadding ->
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             TopSection(
-                onBackClick = {
-                    if (pageState.currentPage + 1 > 1) scope.launch {
-                        pageState.scrollToPage(pageState.currentPage - 1)
-                    }
-                },
-                onSkipClick = {
-                    scope.launch {
-                        moveToLoginScreen()
-                    }
-                }
+                onBackClick = { viewModel.onBackClick(pageState.currentPage) },
+                onSkipClick = { viewModel.onSkipClick() }
             )
 
             HorizontalPager(
@@ -76,17 +86,10 @@ fun Onboarding(moveToLoginScreen: () -> Unit) {
                 modifier = Modifier
                     .fillMaxHeight(0.9f)
                     .fillMaxWidth()
-            ) { page ->
-                OnboardingItem(item = items[page])
-            }
+            ) { page -> OnboardingItem(item = items[page]) }
+
             BottomSection(size = items.size, index = pageState.currentPage) {
-                if (pageState.currentPage + 1 < items.size) scope.launch {
-                    pageState.scrollToPage(pageState.currentPage + 1)
-                } else {
-                    scope.launch {
-                        moveToLoginScreen()
-                    }
-                }
+                viewModel.onNextClick(pageState.currentPage)
             }
         }
     }
@@ -214,5 +217,5 @@ fun OnboardingItem(item: OnboardingItems) {
 @Preview
 @Composable
 fun PreviewScreen() {
-    Onboarding({ println() })
+    Onboarding({ println("Login") })
 }

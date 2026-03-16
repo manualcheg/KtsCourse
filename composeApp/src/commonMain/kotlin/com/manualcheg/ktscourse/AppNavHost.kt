@@ -23,7 +23,12 @@ fun AppNavHost() {
     val userData by userPreferencesRepository.userData.collectAsState(initial = null)
 
     val user = userData ?: return
-    val startScreen = if (user.isLoggedIn) Screen.Main else Screen.Onboard
+
+    val startScreen = when {
+        user.isLoggedIn -> Screen.Main
+        user.firstStart -> Screen.Onboard
+        else -> Screen.Login
+    }
 
     NavHost(
         navController = navController,

@@ -20,7 +20,6 @@ class OnboardingItems(
     val desc: StringResource
 ) {
     companion object {
-        @Composable
         fun getData(): List<OnboardingItems> {
             return listOf(
                 OnboardingItems(

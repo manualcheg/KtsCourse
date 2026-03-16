@@ -2,7 +2,6 @@ package com.manualcheg.ktscourse.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.manualcheg.ktscourse.data.local_storage.DataStorePreferencesProvider
 import com.manualcheg.ktscourse.data.repository.UserPreferencesRepository
 import com.manualcheg.ktscourse.presentation.ui.LoginUiEvent
 import com.manualcheg.ktscourse.presentation.ui.screens.uistates.LoginUiState

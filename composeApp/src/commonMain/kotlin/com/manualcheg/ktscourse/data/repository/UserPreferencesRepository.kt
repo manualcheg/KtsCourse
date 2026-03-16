@@ -14,6 +14,7 @@ class UserPreferencesRepository(private val dataStore: DataStore<Preferences>) :
         val USERNAME = stringPreferencesKey("username")
         val EMAIL = stringPreferencesKey("email")
         val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
+        val IS_FIRST_START = booleanPreferencesKey("is_first_start")
     }
 
     override val userData: Flow<UserData>
@@ -21,13 +22,14 @@ class UserPreferencesRepository(private val dataStore: DataStore<Preferences>) :
             UserData(
                 username = prefs[PreferenceKeys.USERNAME] ?: "",
                 email = prefs[PreferenceKeys.EMAIL] ?: "",
-                isLoggedIn = prefs[PreferenceKeys.IS_LOGGED_IN] ?: false
+                isLoggedIn = prefs[PreferenceKeys.IS_LOGGED_IN] ?: false,
+                firstStart = prefs[PreferenceKeys.IS_FIRST_START] ?: true
             )
         }
 
     override suspend fun updateUsername(name: String) {
         dataStore.updateData { prefs ->
-            prefs.toMutablePreferences().apply{
+            prefs.toMutablePreferences().apply {
                 this[PreferenceKeys.USERNAME] = name
             }
         }
@@ -35,7 +37,7 @@ class UserPreferencesRepository(private val dataStore: DataStore<Preferences>) :
 
     override suspend fun updateEmail(email: String) {
         dataStore.updateData { prefs ->
-            prefs.toMutablePreferences().apply{
+            prefs.toMutablePreferences().apply {
                 this[PreferenceKeys.EMAIL] = email
             }
         }
@@ -43,18 +45,27 @@ class UserPreferencesRepository(private val dataStore: DataStore<Preferences>) :
 
     override suspend fun setLoggedInVar(isLoggedIn: Boolean) {
         dataStore.updateData { prefs ->
-            prefs.toMutablePreferences().apply{
+            prefs.toMutablePreferences().apply {
                 this[PreferenceKeys.IS_LOGGED_IN] = isLoggedIn
+            }
+        }
+    }
+
+    override suspend fun updateFirstStartVar(isFirstStart: Boolean) {
+        dataStore.updateData { prefs ->
+            prefs.toMutablePreferences().apply {
+                this[PreferenceKeys.IS_FIRST_START] = isFirstStart
             }
         }
     }
 
     override suspend fun clearData() {
         dataStore.updateData { prefs ->
-            prefs.toMutablePreferences().apply{
+            prefs.toMutablePreferences().apply {
                 remove(PreferenceKeys.USERNAME)
                 remove(PreferenceKeys.EMAIL)
                 remove(PreferenceKeys.IS_LOGGED_IN)
+                remove(PreferenceKeys.IS_FIRST_START)
             }
         }
     }

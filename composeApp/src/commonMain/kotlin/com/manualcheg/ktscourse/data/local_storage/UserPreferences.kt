@@ -8,5 +8,6 @@ interface UserPreferences {
     suspend fun updateUsername(name: String)
     suspend fun updateEmail(email: String)
     suspend fun setLoggedInVar(isLoggedIn: Boolean)
+    suspend fun updateFirstStartVar(isFirstStart: Boolean)
     suspend fun clearData()
 }
