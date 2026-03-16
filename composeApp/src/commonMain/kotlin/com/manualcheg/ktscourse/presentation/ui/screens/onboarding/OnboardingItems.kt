@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.ic_favourites_100
 import ktscourse.composeapp.generated.resources.ic_notification
-import ktscourse.composeapp.generated.resources.ic_stat
 import ktscourse.composeapp.generated.resources.ic_stat_black
 import ktscourse.composeapp.generated.resources.onboarding_favourites_desc
 import ktscourse.composeapp.generated.resources.onboarding_favourites_title

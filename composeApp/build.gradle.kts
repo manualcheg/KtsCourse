@@ -49,7 +49,7 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.napier)
-            implementation(compose.materialIconsExtended)
+            implementation(libs.material.icons.extended)
         }
 
         val iosMain by creating {
