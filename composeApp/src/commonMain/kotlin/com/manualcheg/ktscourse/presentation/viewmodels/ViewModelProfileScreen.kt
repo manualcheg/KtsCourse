@@ -2,6 +2,7 @@ package com.manualcheg.ktscourse.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.manualcheg.ktscourse.data.database.DatabaseHolder
 import com.manualcheg.ktscourse.data.local_storage.DataStorePreferencesProvider
 import com.manualcheg.ktscourse.data.repository.UserPreferencesRepository
 import com.manualcheg.ktscourse.presentation.ui.ProfileUiEvent
@@ -24,6 +25,8 @@ class ViewModelProfileScreen : ViewModel() {
 
     val userPreferencesRepository =
         UserPreferencesRepository(DataStorePreferencesProvider.datastore)
+    val launchDao = DatabaseHolder.database.launchDao()
+
 
     init {
         viewModelScope.launch {
@@ -45,6 +48,7 @@ class ViewModelProfileScreen : ViewModel() {
         viewModelScope.launch {
             _events.emit(ProfileUiEvent.Logout)
             userPreferencesRepository.clearUserData()
+            launchDao.deleteAllLaunches()
         }
     }
 }
