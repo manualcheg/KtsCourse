@@ -6,6 +6,8 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.androidx.room)
 }
 
 kotlin {
@@ -52,6 +54,8 @@ kotlin {
             implementation(libs.material.icons.extended)
             implementation(libs.androidx.datastore.preferences.core)
             implementation(libs.androidx.datastore.core)
+            implementation(libs.androidx.room.runtime)
+            implementation(libs.androidx.sqlite.bundled)
         }
 
         val iosMain by creating {
@@ -68,6 +72,10 @@ kotlin {
             implementation(libs.kotlin.test)
         }
     }
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 android {
@@ -99,4 +107,5 @@ android {
 
 dependencies {
     debugImplementation(libs.compose.uiTooling)
+    add("ksp", libs.androidx.room.compiler)
 }

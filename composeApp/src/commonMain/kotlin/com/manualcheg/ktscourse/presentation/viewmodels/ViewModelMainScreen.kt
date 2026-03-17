@@ -2,14 +2,15 @@ package com.manualcheg.ktscourse.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.manualcheg.ktscourse.data.database.DatabaseHolder
 import com.manualcheg.ktscourse.data.models.Launch
+import com.manualcheg.ktscourse.data.repository.LaunchRepository
 import com.manualcheg.ktscourse.data.repository.NetworkRepositoryImpl
 import com.manualcheg.ktscourse.presentation.ui.screens.uistates.MainUiState
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,13 +21,15 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import ktscourse.composeapp.generated.resources.Res
-import ktscourse.composeapp.generated.resources.network_error
 
 class ViewModelMainScreen : ViewModel() {
-    private val repository = NetworkRepositoryImpl()
+    private val networkRepository = NetworkRepositoryImpl()
+    private val launchRepository = LaunchRepository(
+        networkRepository = networkRepository,
+        launchDao = DatabaseHolder.database.launchDao()
+    )
+
     private var allLaunches: MutableList<Launch> = mutableListOf()
     private var currentPage = 1
     private var isLastPage = false
@@ -40,6 +43,11 @@ class ViewModelMainScreen : ViewModel() {
 
     private val _isNextPageLoading = MutableStateFlow(false)
     val isNextPageLoading: StateFlow<Boolean> = _isNextPageLoading.asStateFlow()
+
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+
+    private val PAGE_SIZE = 10
 
     init {
         search()
@@ -59,38 +67,57 @@ class ViewModelMainScreen : ViewModel() {
     }
 
     private fun loadPage(query: String, page: Int) = flow<Unit> {
-        if (page == 1) {
-            _uiState.value = MainUiState.Loading
-        } else {
-            _isNextPageLoading.value = true
-        }
+        try {
+            if (page == 1 && !_isRefreshing.value) {
+                _uiState.value = MainUiState.Loading
+            } else if (page > 1) {
+                _isNextPageLoading.value = true
+            }
 
-        repository.getAllLaunches(query, page)
-            .onSuccess { response ->
-                if (!currentCoroutineContext().isActive) return@onSuccess
-                isLastPage = !response.hasNextPage
+            val result = launchRepository.fetchAndSaveLaunches(query, page)
+
+            if (result.isSuccess) {
+                val pagedData = launchRepository.getPagedLaunchesFromDb(query, page, PAGE_SIZE)
                 if (page == 1) {
-                    allLaunches = response.docs.toMutableList()
+                    allLaunches = pagedData.toMutableList()
                 } else {
-                    allLaunches.addAll(response.docs)
+                    allLaunches.addAll(pagedData)
                 }
 
-                if (allLaunches.isEmpty()) {
-                    _uiState.value = MainUiState.Empty
-                } else {
+                isLastPage = pagedData.size < PAGE_SIZE
+
+                _uiState.value = if (allLaunches.isEmpty()) MainUiState.Empty
+                else MainUiState.Success(allLaunches.toList())
+            } else {
+                val cachedPage = launchRepository.getPagedLaunchesFromDb(query, page, PAGE_SIZE)
+                if (cachedPage.isNotEmpty()) {
+                    if (page == 1) allLaunches = cachedPage.toMutableList()
+                    else allLaunches.addAll(cachedPage)
+
+                    isLastPage = cachedPage.size < PAGE_SIZE
                     _uiState.value = MainUiState.Success(allLaunches.toList())
+                } else {
+                    if (page == 1) {
+                        _uiState.value = MainUiState.Error(result.exceptionOrNull()?.message ?: "Unknown error")
+                    } else {
+                        isLastPage = true // Останавливаем пагинацию, если в кеше больше ничего нет
+                    }
                 }
-                _isNextPageLoading.value = false
+                Napier.e("Fetch error, using cache", result.exceptionOrNull())
             }
-            .onFailure {
-                if (!currentCoroutineContext().isActive) return@onFailure
-                if (page == 1) {
-                    Napier.e(it.message.toString(), it, Res.string.network_error.toString())
-                    _uiState.value =
-                        MainUiState.Error(it.message ?: Res.string.network_error.toString())
-                }
-                _isNextPageLoading.value = false
-            }
+        } finally {
+            _isNextPageLoading.value = false
+            _isRefreshing.value = false
+        }
+    }
+
+    fun refresh() {
+        nextPageJob?.cancel()
+        resetPagination()
+        _isRefreshing.value = true // Устанавливаем флаг перед загрузкой
+        viewModelScope.launch {
+            loadPage(_searchQuery.value, 1).collect()
+        }
     }
 
     fun loadNextPage() {

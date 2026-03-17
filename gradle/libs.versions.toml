@@ -2,7 +2,7 @@
 agp = "8.11.2"
 android-compileSdk = "36"
 android-minSdk = "26"
-android-targetSdk = "36"
+android-targetSdk = "35"
 androidx-activity = "1.12.2"
 androidx-appcompat = "1.7.1"
 androidx-core = "1.17.0"
@@ -14,7 +14,7 @@ coilNetworkKtor3 = "3.3.0"
 composeMultiplatform = "1.10.0"
 datastorePreferencesCore = "1.2.1"
 junit = "4.13.2"
-kotlin = "2.3.0"
+kotlin = "2.1.0"
 ktorClientAndroid = "3.1.1"
 material3 = "1.10.0-alpha05"
 kotlinx-serialization = "1.8.0"
@@ -24,6 +24,9 @@ ktorVersion = "3.1.1"
 navigationComposeVersion = "2.9.7"
 napierVersion = "2.7.1"
 coroutinesVersion = "1.10.1"
+room = "2.7.0-alpha11"
+sqlite = "2.5.0-alpha11"
+ksp = "2.1.0-1.0.29"
 
 [libraries]
 androidx-datastore-core = { module = "androidx.datastore:datastore-core", version.ref = "datastorePreferencesCore" }
@@ -58,6 +61,10 @@ material-icons-extended = { module = "org.jetbrains.compose.material:material-ic
 navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 napier = { module = "io.github.aakira:napier", version.ref = "napierVersion" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutinesVersion" }
+#Room
+androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -67,3 +74,6 @@ composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "k
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 androidMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
+#Room
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+androidx-room = { id = "androidx.room", version.ref = "room" }
