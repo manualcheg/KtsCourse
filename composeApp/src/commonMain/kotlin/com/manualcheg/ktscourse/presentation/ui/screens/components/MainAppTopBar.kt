@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -27,7 +29,11 @@ import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainTopAppBar(searchQuery: String, onSearchQueryChange: (String) -> Unit) {
+fun MainTopAppBar(
+    searchQuery: String, 
+    onSearchQueryChange: (String) -> Unit,
+    onProfileClick: () -> Unit
+) {
     val focusManager = LocalFocusManager.current
     val dimensions = LocalDimensions.current
 
@@ -71,6 +77,15 @@ fun MainTopAppBar(searchQuery: String, onSearchQueryChange: (String) -> Unit) {
                 modifier = Modifier.fillMaxWidth().padding(end = dimensions.paddingMedium),
                 content = { },
             )
+        },
+        actions = {
+            IconButton(onClick = onProfileClick) {
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = "Profile",
+                    modifier = Modifier.size(dimensions.iconSize)
+                )
+            }
         }
     )
 }
@@ -78,5 +93,5 @@ fun MainTopAppBar(searchQuery: String, onSearchQueryChange: (String) -> Unit) {
 @Preview
 @Composable
 fun PreviewMainAppTopBar() {
-    MainTopAppBar("", {})
+    MainTopAppBar("", {}, {})
 }

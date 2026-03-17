@@ -1,6 +1,5 @@
 package com.manualcheg.ktscourse.presentation.ui.screens.onboarding
 
-import androidx.compose.runtime.Composable
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.ic_favourites_100
 import ktscourse.composeapp.generated.resources.ic_notification

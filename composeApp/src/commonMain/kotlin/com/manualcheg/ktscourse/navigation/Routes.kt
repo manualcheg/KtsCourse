@@ -12,4 +12,7 @@ sealed class Screen {
 
     @Serializable
     object Main : Screen()
+
+    @Serializable
+    object Profile : Screen()
 }

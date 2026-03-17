@@ -59,13 +59,12 @@ class UserPreferencesRepository(private val dataStore: DataStore<Preferences>) :
         }
     }
 
-    override suspend fun clearData() {
+    override suspend fun clearUserData() {
         dataStore.updateData { prefs ->
             prefs.toMutablePreferences().apply {
                 remove(PreferenceKeys.USERNAME)
                 remove(PreferenceKeys.EMAIL)
                 remove(PreferenceKeys.IS_LOGGED_IN)
-                remove(PreferenceKeys.IS_FIRST_START)
             }
         }
     }

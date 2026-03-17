@@ -43,7 +43,7 @@ import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(onProfileClick: () -> Unit = {}) {
     val viewModel = ViewModelMainScreen()
     val uiState by viewModel.uiState.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
@@ -53,7 +53,8 @@ fun MainScreen() {
         topBar = {
             MainTopAppBar(
                 searchQuery = searchQuery,
-                onSearchQueryChange = { viewModel.onSearchQueryChange(it) }
+                onSearchQueryChange = { viewModel.onSearchQueryChange(it) },
+                onProfileClick = onProfileClick
             )
         }
     ) { innerPadding ->

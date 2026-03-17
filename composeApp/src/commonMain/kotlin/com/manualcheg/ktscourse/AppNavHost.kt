@@ -12,6 +12,7 @@ import com.manualcheg.ktscourse.data.repository.UserPreferencesRepository
 import com.manualcheg.ktscourse.navigation.Screen
 import com.manualcheg.ktscourse.presentation.ui.screens.LoginScreen
 import com.manualcheg.ktscourse.presentation.ui.screens.MainScreen
+import com.manualcheg.ktscourse.presentation.ui.screens.ProfileScreen
 import com.manualcheg.ktscourse.presentation.ui.screens.onboarding.Onboarding
 
 @Composable
@@ -50,7 +51,19 @@ fun AppNavHost() {
             })
         }
         composable<Screen.Main> {
-            MainScreen()
+            MainScreen(onProfileClick = {
+                navController.navigate(Screen.Profile)
+            })
+        }
+
+        composable<Screen.Profile> {
+            ProfileScreen({
+                navController.navigate(Screen.Login) {
+                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                }
+            }, {
+                navController.navigateUp()
+            })
         }
     }
 }

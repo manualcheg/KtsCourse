@@ -40,7 +40,6 @@ class ViewModelOnboardingScreen(private val userPreferencesRepository: UserPrefe
     fun onSkipClick() {
         viewModelScope.launch {
             _events.emit(OnboardingEvent.MoveToLogin)
-//            changeFirstStartVar()
             userPreferencesRepository.updateFirstStartVar(false)
         }
     }

@@ -30,4 +30,9 @@
     <string name="login_screen_error_text">Login error</string>
     <string name="login_screen_wrong_password_text">or wrong password</string>
     <string name="login_screen_wrong_username_text">Wrong login</string>
+    <string name="profile_screen_back_arrow_text">back</string>
+    <string name="profile_screen_icon_content_descript">Profile icon</string>
+    <string name="profile_screen_username_text">Name: %1$s</string>
+    <string name="profile_screen_button_logout_text">Logout</string>
+
 </resources>

@@ -21,6 +21,7 @@ data class AppDimensions(
     val iconSize: Dp = 24.dp,
     val successIndicatorSize: Dp = 8.dp,
     val circularProgressIndicatorSize: Dp = 32.dp,
+    val profileScreenIconSize: Dp = 120.dp,
 
     //Colors
     val upcomingColor: Long = 0xFF2196F3,
