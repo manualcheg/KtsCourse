@@ -47,6 +47,9 @@ class ViewModelMainScreen : ViewModel() {
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
+    private val _isLastPageFlow = MutableStateFlow(false)
+    val isLastPageFlow: StateFlow<Boolean> = _isLastPageFlow.asStateFlow()
+
     private val PAGE_SIZE = 10
 
     init {
@@ -67,45 +70,45 @@ class ViewModelMainScreen : ViewModel() {
     }
 
     private fun loadPage(query: String, page: Int) = flow<Unit> {
+        if (page == 1 && !_isRefreshing.value) {
+            _uiState.value = MainUiState.Loading
+        } else if (page > 1) {
+            _isNextPageLoading.value = true
+        }
+
         try {
-            if (page == 1 && !_isRefreshing.value) {
-                _uiState.value = MainUiState.Loading
-            } else if (page > 1) {
-                _isNextPageLoading.value = true
+            val networkResult = launchRepository.fetchAndSaveLaunches(query, page)
+            if (networkResult.isSuccess) {
+                isLastPage = !networkResult.getOrThrow()
             }
 
-            val result = launchRepository.fetchAndSaveLaunches(query, page)
+            val pagedData = launchRepository.getPagedLaunchesFromDb(query, page, PAGE_SIZE)
 
-            if (result.isSuccess) {
-                val pagedData = launchRepository.getPagedLaunchesFromDb(query, page, PAGE_SIZE)
-                if (page == 1) {
-                    allLaunches = pagedData.toMutableList()
-                } else {
-                    allLaunches.addAll(pagedData)
-                }
-
-                isLastPage = pagedData.size < PAGE_SIZE
-
-                _uiState.value = if (allLaunches.isEmpty()) MainUiState.Empty
-                else MainUiState.Success(allLaunches.toList())
+            if (page == 1) {
+                allLaunches = pagedData.toMutableList()
             } else {
-                val cachedPage = launchRepository.getPagedLaunchesFromDb(query, page, PAGE_SIZE)
-                if (cachedPage.isNotEmpty()) {
-                    if (page == 1) allLaunches = cachedPage.toMutableList()
-                    else allLaunches.addAll(cachedPage)
-
-                    isLastPage = cachedPage.size < PAGE_SIZE
-                    _uiState.value = MainUiState.Success(allLaunches.toList())
-                } else {
-                    if (page == 1) {
-                        _uiState.value = MainUiState.Error(result.exceptionOrNull()?.message ?: "Unknown error")
-                    } else {
-                        isLastPage = true // Останавливаем пагинацию, если в кеше больше ничего нет
-                    }
-                }
-                Napier.e("Fetch error, using cache", result.exceptionOrNull())
+                allLaunches.addAll(pagedData)
             }
+
+            if (pagedData.size < PAGE_SIZE) {
+                isLastPage = true
+            }
+
+            if (allLaunches.isEmpty()) {
+                if (networkResult.isFailure && page == 1) {
+                    _uiState.value = MainUiState.Error("No internet and cache is empty")
+                } else {
+                    _uiState.value = MainUiState.Empty
+                }
+            } else {
+                _uiState.value = MainUiState.Success(allLaunches.toList())
+            }
+
+        } catch (e: Exception) {
+            Napier.e("Load error", e)
+            if (page == 1) _uiState.value = MainUiState.Error(e.message ?: "Unknown error")
         } finally {
+            _isLastPageFlow.value = isLastPage
             _isNextPageLoading.value = false
             _isRefreshing.value = false
         }
@@ -114,7 +117,7 @@ class ViewModelMainScreen : ViewModel() {
     fun refresh() {
         nextPageJob?.cancel()
         resetPagination()
-        _isRefreshing.value = true // Устанавливаем флаг перед загрузкой
+        _isRefreshing.value = true
         viewModelScope.launch {
             loadPage(_searchQuery.value, 1).collect()
         }
@@ -131,16 +134,13 @@ class ViewModelMainScreen : ViewModel() {
     private fun resetPagination() {
         currentPage = 1
         isLastPage = false
+        _isLastPageFlow.value = false
         allLaunches.clear()
         _isNextPageLoading.value = false
     }
 
     fun updateData() {
-        nextPageJob?.cancel()
-        resetPagination()
-        viewModelScope.launch {
-            loadPage(_searchQuery.value, 1).collect()
-        }
+        refresh()
     }
 
     fun onSearchQueryChange(newQuery: String) {

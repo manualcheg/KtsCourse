@@ -24,9 +24,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.manualcheg.ktscourse.data.models.Launch
 import com.manualcheg.ktscourse.presentation.LocalDimensions
 import com.manualcheg.ktscourse.presentation.ui.screens.components.LaunchItem
@@ -44,13 +50,15 @@ import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(onProfileClick: () -> Unit = {}) {
-    val viewModel = ViewModelMainScreen()
+fun MainScreen(
+    onProfileClick: () -> Unit = {},
+    viewModel: ViewModelMainScreen = viewModel { ViewModelMainScreen() }
+) {
     val uiState by viewModel.uiState.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
     val isNextPageLoading by viewModel.isNextPageLoading.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
-
+    val isLastPage by viewModel.isLastPageFlow.collectAsState()
 
     Scaffold(
         topBar = {
@@ -68,12 +76,13 @@ fun MainScreen(onProfileClick: () -> Unit = {}) {
         ) {
             PullToRefreshBox(
                 isRefreshing = isRefreshing,
-                onRefresh = {viewModel.refresh()}
-            ){
+                onRefresh = { viewModel.refresh() }
+            ) {
                 ShowListOfLaunches(
                     uiState,
                     searchQuery,
                     isNextPageLoading,
+                    isLastPage = isLastPage,
                     { viewModel.updateData() },
                     { viewModel.loadNextPage() }
                 )
@@ -93,14 +102,17 @@ fun ShowListOfLaunches(
     uiState: MainUiState,
     searchQuery: String,
     isNextPageLoading: Boolean,
+    isLastPage: Boolean ,
     updateData: () -> Unit,
     loadNextPage: () -> Unit
 ) {
     val listState = rememberLazyListState()
+    var lastScrolledQuery by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(searchQuery) {
-        if (searchQuery.isEmpty()) {
+    LaunchedEffect(uiState) {
+        if (uiState is MainUiState.Success && searchQuery != lastScrolledQuery) {
             listState.scrollToItem(0)
+            lastScrolledQuery = searchQuery
         }
     }
 
@@ -115,6 +127,7 @@ fun ShowListOfLaunches(
                     uiState.launches,
                     listState,
                     isNextPageLoading,
+                    isLastPage,
                     { loadNextPage() }
                 )
             }
@@ -161,7 +174,14 @@ fun ShowListOfLaunches(
 @Preview
 @Composable
 fun PreviewListOfLaunches() {
-    ShowListOfLaunches(MainUiState.Success(emptyList()), "Hi", false, {}, {})
+        ShowListOfLaunches(
+            MainUiState.Success(emptyList()),
+            "",
+            false,
+            false,
+            {},
+            {}
+        )
 }
 
 @Composable
@@ -169,6 +189,7 @@ fun LaunchList(
     launches: List<Launch>,
     listState: LazyListState,
     isNextPageLoading: Boolean,
+    isLastPage: Boolean,
     loadNextPage: () -> Unit
 ) {
     val dimensions = LocalDimensions.current
@@ -195,11 +216,15 @@ fun LaunchList(
                 }
             }
         }
+        if (isLastPage && launches.isNotEmpty()) {
+            item {
+                Text(
+                    text = "All launches loaded",
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
     }
-}
-
-@Preview
-@Composable
-fun ShowLaunchList() {
-    LaunchList(emptyList(), rememberLazyListState(), false, {})
 }
