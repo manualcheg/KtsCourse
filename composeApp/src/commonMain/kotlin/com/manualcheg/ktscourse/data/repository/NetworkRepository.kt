@@ -1,6 +1,6 @@
 package com.manualcheg.ktscourse.data.repository
 
-import com.manualcheg.ktscourse.data.models.Launch
+import com.manualcheg.ktscourse.screenMain.domain.models.Launch
 import com.manualcheg.ktscourse.data.models.SpaceXResponseDto
 
 interface NetworkRepository {

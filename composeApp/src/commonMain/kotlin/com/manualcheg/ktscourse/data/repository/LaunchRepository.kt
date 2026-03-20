@@ -3,7 +3,7 @@ package com.manualcheg.ktscourse.data.repository
 import com.manualcheg.ktscourse.data.database.LaunchDao
 import com.manualcheg.ktscourse.data.database.toDomain
 import com.manualcheg.ktscourse.data.database.toEntity
-import com.manualcheg.ktscourse.data.models.Launch
+import com.manualcheg.ktscourse.screenMain.domain.models.Launch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext

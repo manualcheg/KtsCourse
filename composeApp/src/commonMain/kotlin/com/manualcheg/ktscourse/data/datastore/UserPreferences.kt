@@ -1,6 +1,6 @@
-package com.manualcheg.ktscourse.data.local_storage
+package com.manualcheg.ktscourse.data.datastore
 
-import com.manualcheg.ktscourse.data.models.UserData
+import com.manualcheg.ktscourse.screenLogin.domain.model.UserData
 import kotlinx.coroutines.flow.Flow
 
 interface UserPreferences {

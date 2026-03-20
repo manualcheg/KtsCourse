@@ -2,7 +2,7 @@ package com.manualcheg.ktscourse.data.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.manualcheg.ktscourse.data.models.LaunchStatus
+import com.manualcheg.ktscourse.screenMain.domain.models.LaunchStatus
 
 @Entity(tableName = "launches")
 data class LaunchEntity(

@@ -4,8 +4,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.manualcheg.ktscourse.data.local_storage.UserPreferences
-import com.manualcheg.ktscourse.data.models.UserData
+import com.manualcheg.ktscourse.data.datastore.UserPreferences
+import com.manualcheg.ktscourse.screenLogin.domain.model.UserData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

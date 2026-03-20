@@ -1,6 +1,6 @@
 package com.manualcheg.ktscourse.data.database
 
-import com.manualcheg.ktscourse.data.models.Launch
+import com.manualcheg.ktscourse.screenMain.domain.models.Launch
 
 fun LaunchEntity.toDomain() = Launch(
     id = id,

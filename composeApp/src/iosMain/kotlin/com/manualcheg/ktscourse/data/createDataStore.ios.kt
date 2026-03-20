@@ -2,8 +2,8 @@ package com.manualcheg.ktscourse.data
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import com.manualcheg.ktscourse.data.local_storage.DATA_STORE_FILE_NAME
-import com.manualcheg.ktscourse.data.local_storage.createDataStore
+import com.manualcheg.ktscourse.data.datastore.DATA_STORE_FILE_NAME
+import com.manualcheg.ktscourse.data.datastore.createDataStore
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager

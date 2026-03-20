@@ -1,4 +1,4 @@
-package com.manualcheg.ktscourse.data.local_storage
+package com.manualcheg.ktscourse.data.datastore
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
