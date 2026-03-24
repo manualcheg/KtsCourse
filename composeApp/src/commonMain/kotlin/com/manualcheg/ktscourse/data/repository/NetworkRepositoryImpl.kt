@@ -1,8 +1,6 @@
 package com.manualcheg.ktscourse.data.repository
 
-import com.manualcheg.ktscourse.screenMain.domain.model.Launch
 import com.manualcheg.ktscourse.data.models.LaunchDto
-import com.manualcheg.ktscourse.screenMain.domain.model.LaunchStatus
 import com.manualcheg.ktscourse.data.models.SpaceXOptionsDto
 import com.manualcheg.ktscourse.data.models.SpaceXQueryDto
 import com.manualcheg.ktscourse.data.models.SpaceXQueryInnerDto
@@ -30,7 +28,7 @@ class NetworkRepositoryImpl : NetworkRepository {
     override suspend fun getAllLaunches(
         query: String,
         page: Int
-    ): Result<SpaceXResponseDto<Launch>> {
+    ): Result<SpaceXResponseDto<LaunchDto>> {
         return try {
             val requestBody = SpaceXQueryDto(
                 query = SpaceXQueryInnerDto(
@@ -38,7 +36,7 @@ class NetworkRepositoryImpl : NetworkRepository {
                 ),
                 options = SpaceXOptionsDto(
                     page = page,
-                    limit = 10 ,
+                    limit = 10,
                     sort = mapOf("flight_number" to 1)
                 )
             )
@@ -48,22 +46,7 @@ class NetworkRepositoryImpl : NetworkRepository {
                     contentType(ContentType.Application.Json)
                 }.body()
 
-            Result.success(response.map { dto ->
-                val status = when {
-                    dto.upcoming == true -> LaunchStatus.UPCOMING
-                    dto.success == true -> LaunchStatus.SUCCESS
-                    else -> LaunchStatus.FAILURE
-                }
-                Launch(
-                    id = dto.id,
-                    name = dto.name ?: "",
-                    flightNumber = dto.flightNumber,
-                    launchDate = dto.dateUtc ?: "",
-                    details = dto.details ?: "",
-                    imageUrl = dto.links?.patch?.small ?: "",
-                    status = status
-                )
-            })
+            Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
         }

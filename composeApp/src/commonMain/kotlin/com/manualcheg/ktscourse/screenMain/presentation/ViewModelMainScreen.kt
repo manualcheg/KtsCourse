@@ -38,7 +38,7 @@ class ViewModelMainScreen(
             .map { it.searchQuery }
             .distinctUntilChanged()
             .debounce(1000L)
-            .onEach { query ->
+            .onEach {
                 resetPagination()
                 loadNextPage()
             }

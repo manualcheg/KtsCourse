@@ -1,6 +1,6 @@
 package com.manualcheg.ktscourse.common.di.modules
 
-import com.manualcheg.ktscourse.data.repository.LaunchRepositoryImpl
+import com.manualcheg.ktscourse.screenMain.data.LaunchRepositoryImpl
 import com.manualcheg.ktscourse.screenMain.domain.repository.LaunchRepository
 import com.manualcheg.ktscourse.screenMain.domain.useCase.GetLaunchesUseCase
 import com.manualcheg.ktscourse.screenMain.domain.useCase.GetLaunchesUseCaseImpl

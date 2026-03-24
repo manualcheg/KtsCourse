@@ -6,7 +6,7 @@ import com.manualcheg.ktscourse.data.database.LaunchEntity
 import com.manualcheg.ktscourse.data.database.toDomain
 import com.manualcheg.ktscourse.screenMain.domain.model.Launch
 
-class DatabaseRepositoryImpl(private val database: AppDatabase) : DatabaseRepository {
+class DatabaseRepositoryImpl(database: AppDatabase) : DatabaseRepository {
     val launchDao: LaunchDao = database.launchDao()
     override suspend fun getPagedLaunchesFromDb(
         query: String,
