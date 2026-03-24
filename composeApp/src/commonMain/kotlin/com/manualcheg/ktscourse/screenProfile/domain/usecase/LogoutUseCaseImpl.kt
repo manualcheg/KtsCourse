@@ -1,14 +1,11 @@
 package com.manualcheg.ktscourse.screenProfile.domain.usecase
 
-import com.manualcheg.ktscourse.common.repository.UserPreferencesRepository
-import com.manualcheg.ktscourse.data.repository.DatabaseRepository
+import com.manualcheg.ktscourse.screenProfile.domain.repository.ProfileRepository
 
 class LogoutUseCaseImpl(
-    private val userPreferencesRepository: UserPreferencesRepository,
-    private val databaseRepository: DatabaseRepository
+    private val profileRepository: ProfileRepository,
 ) : LogoutUseCase {
     override suspend fun execute() {
-        userPreferencesRepository.clearUserData()
-        databaseRepository.deleteAllLaunches()
+        profileRepository.logout()
     }
 }
