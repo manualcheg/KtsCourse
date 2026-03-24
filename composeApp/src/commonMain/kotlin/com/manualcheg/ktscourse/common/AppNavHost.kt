@@ -3,24 +3,21 @@ package com.manualcheg.ktscourse.common
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.manualcheg.ktscourse.data.datastore.DataStorePreferencesProvider
-import com.manualcheg.ktscourse.data.repository.UserPreferencesRepository
 import com.manualcheg.ktscourse.common.navigation.Screen
+import com.manualcheg.ktscourse.common.repository.UserPreferencesRepository
 import com.manualcheg.ktscourse.screenLogin.presentation.LoginScreen
 import com.manualcheg.ktscourse.screenMain.presentation.MainScreen
-import com.manualcheg.ktscourse.screenProfile.presentation.ProfileScreen
 import com.manualcheg.ktscourse.screenOnboarding.presentation.Onboarding
+import com.manualcheg.ktscourse.screenProfile.presentation.ProfileScreen
+import org.koin.compose.koinInject
 
 @Composable
 fun AppNavHost() {
     val navController = rememberNavController()
-    val userPreferencesRepository = remember {
-        UserPreferencesRepository(DataStorePreferencesProvider.datastore)
-    }
+    val userPreferencesRepository: UserPreferencesRepository = koinInject()
     val userData by userPreferencesRepository.userData.collectAsState(initial = null)
 
     val user = userData ?: return
@@ -37,11 +34,11 @@ fun AppNavHost() {
     )
     {
         composable<Screen.Onboard> {
-            Onboarding {
+            Onboarding({
                 navController.navigate(Screen.Login) {
                     popUpTo(Screen.Onboard)
                 }
-            }
+            })
         }
         composable<Screen.Login> {
             LoginScreen({

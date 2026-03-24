@@ -26,8 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
-import com.manualcheg.ktscourse.data.datastore.DataStorePreferencesProvider
-import com.manualcheg.ktscourse.data.repository.UserPreferencesRepository
 import com.manualcheg.ktscourse.common.LocalDimensions
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.login_screen_button_login_text
@@ -38,14 +36,13 @@ import ktscourse.composeapp.generated.resources.login_screen_textfield_username_
 import ktscourse.composeapp.generated.resources.login_screen_wrong_password_text
 import ktscourse.composeapp.generated.resources.login_screen_wrong_username_text
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun LoginScreen(
-    moveToMainScreen: () -> Unit
+    moveToMainScreen: () -> Unit,
+    viewModel: ViewModelLoginUiScreen = koinViewModel()
 ) {
-    val viewModel = ViewModelLoginUiScreen(
-        userPreferencesRepository = UserPreferencesRepository(DataStorePreferencesProvider.datastore)
-    )
     val dimensions = LocalDimensions.current
     val uiState by viewModel.uiState.collectAsState()
 

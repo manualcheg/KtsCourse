@@ -2,50 +2,74 @@ package com.manualcheg.ktscourse.screenOnboarding.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.manualcheg.ktscourse.data.repository.UserPreferencesRepository
+import com.manualcheg.ktscourse.screenOnboarding.domain.usecase.FirstStartUseCase
+import com.manualcheg.ktscourse.screenOnboarding.domain.usecase.GetOnboardingItemsUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 sealed class OnboardingEvent {
-    object NextPage : OnboardingEvent()
-    object MoveToLogin : OnboardingEvent()
-    object BackPage : OnboardingEvent()
+    data object NextPage : OnboardingEvent()
+    data object MoveToLogin : OnboardingEvent()
+    data object BackPage : OnboardingEvent()
 }
 
-class ViewModelOnboardingScreen(private val userPreferencesRepository: UserPreferencesRepository) :
+class ViewModelOnboardingScreen(
+    private val firstStartUseCase: FirstStartUseCase,
+    getOnboardingItemsUseCase: GetOnboardingItemsUseCase
+) :
     ViewModel() {
-    private val _items = MutableStateFlow(OnboardingItems.getData())
-    val items: StateFlow<List<OnboardingItems>> = _items.asStateFlow()
+    private val _uiState = MutableStateFlow(OnboardingUiState())
+    val uiState: StateFlow<OnboardingUiState> = _uiState.asStateFlow()
 
     private val _events = MutableSharedFlow<OnboardingEvent>()
     val events: SharedFlow<OnboardingEvent> = _events.asSharedFlow()
 
-    fun onNextClick(currentPage: Int) {
-        if (currentPage < _items.value.size - 1) {
-            viewModelScope.launch { _events.emit(OnboardingEvent.NextPage) }
+    init {
+        val items = getOnboardingItemsUseCase()
+        _uiState.update {
+            it.copy(items = items)
+        }
+    }
+
+    fun onPageChanged(page: Int) {
+        _uiState.update {
+            it.copy(currentPage = page)
+        }
+    }
+
+    fun onNextClick() {
+        val state = _uiState.value
+        if (state.isLastPage) {
+            completeOnboarding()
         } else {
-            viewModelScope.launch {
-                _events.emit(OnboardingEvent.MoveToLogin)
-                userPreferencesRepository.updateFirstStartVar(false)
-            }
+            sendEvent(OnboardingEvent.NextPage)
         }
     }
 
     fun onSkipClick() {
-        viewModelScope.launch {
-            _events.emit(OnboardingEvent.MoveToLogin)
-            userPreferencesRepository.updateFirstStartVar(false)
-        }
+        completeOnboarding()
     }
 
-    fun onBackClick(currentPage: Int) {
-        if (currentPage + 1 > 1) viewModelScope.launch {
-            _events.emit(OnboardingEvent.BackPage)
+    fun onBackClick() {
+        val state = _uiState.value
+        if (state.canGoBack)
+            sendEvent(OnboardingEvent.BackPage)
+    }
+
+    private fun sendEvent(event: OnboardingEvent) {
+        viewModelScope.launch { _events.emit(event) }
+    }
+
+    private fun completeOnboarding() {
+        viewModelScope.launch {
+            _events.emit(OnboardingEvent.MoveToLogin)
+            firstStartUseCase()
         }
     }
 }

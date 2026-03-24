@@ -1,10 +1,17 @@
 package com.manualcheg.ktscourse.screenMain.presentation
 
-import com.manualcheg.ktscourse.screenMain.domain.models.Launch
+import com.manualcheg.ktscourse.screenMain.domain.model.Launch
 
-sealed class MainUiState {
-    object Loading : MainUiState()
-    data class Success(val launches: List<Launch>) : MainUiState()
-    data class Error(val message: String) : MainUiState()
-    object Empty : MainUiState()
+data class MainUiState(
+    val launches: List<Launch> = emptyList(),
+    val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
+    val isNextPageLoading: Boolean = false,
+    val error: String? = null,
+    val searchQuery: String = "",
+    val isLastPage: Boolean = false
+) {
+    val showLoading = isLoading && launches.isEmpty()
+    val showErrorState = error != null && launches.isEmpty()
+    val showEmptyState = !isLoading && launches.isEmpty() && error == null
 }

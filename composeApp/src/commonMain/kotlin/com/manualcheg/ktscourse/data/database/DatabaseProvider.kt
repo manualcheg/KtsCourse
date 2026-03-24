@@ -10,7 +10,3 @@ fun getAppDatabase(builder: RoomDatabase.Builder<AppDatabase>): AppDatabase {
         .setDriver(BundledSQLiteDriver())
         .build()
 }
-
-object DatabaseHolder {
-    lateinit var database: AppDatabase
-}

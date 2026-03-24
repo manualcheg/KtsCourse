@@ -1,13 +1,12 @@
-package com.manualcheg.ktscourse.data.datastore
+package com.manualcheg.ktscourse.common.repository
 
 import com.manualcheg.ktscourse.screenLogin.domain.model.UserData
 import kotlinx.coroutines.flow.Flow
 
-interface UserPreferences {
+interface UserPreferencesRepository {
     val userData: Flow<UserData>
     suspend fun updateUsername(name: String)
-    suspend fun updateEmail(email: String)
-    suspend fun setLoggedInVar(isLoggedIn: Boolean)
+    suspend fun saveLoginStatus(isLoggedIn: Boolean)
     suspend fun updateFirstStartVar(isFirstStart: Boolean)
     suspend fun clearUserData()
 }

@@ -1,4 +1,4 @@
-package com.manualcheg.ktscourse.screenMain.domain.models
+package com.manualcheg.ktscourse.screenMain.domain.model
 
 data class Launch(
     val id: String,

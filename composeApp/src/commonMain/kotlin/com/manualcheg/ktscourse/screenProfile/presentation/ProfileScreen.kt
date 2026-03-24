@@ -35,14 +35,15 @@ import ktscourse.composeapp.generated.resources.profile_screen_button_logout_tex
 import ktscourse.composeapp.generated.resources.profile_screen_icon_content_descript
 import ktscourse.composeapp.generated.resources.profile_screen_username_text
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ProfileScreen(
     moveToLoginScreen: () -> Unit,
-    onNavigateUp: () -> Unit
+    onNavigateUp: () -> Unit,
+    viewModel: ViewModelProfileScreen = koinViewModel()
 ) {
-    val viewModel = ViewModelProfileScreen()
     val uiState by viewModel.uiState.collectAsState()
     val dimensions = LocalDimensions.current
 
@@ -106,5 +107,8 @@ fun ProfileScreen(
 @Composable
 @Preview
 fun PreviewProfileScreen() {
-    ProfileScreen(moveToLoginScreen = {}, onNavigateUp = {})
+    ProfileScreen(
+        moveToLoginScreen = {},
+        onNavigateUp = {}
+    )
 }

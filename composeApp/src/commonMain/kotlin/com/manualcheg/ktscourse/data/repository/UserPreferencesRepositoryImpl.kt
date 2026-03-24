@@ -4,12 +4,12 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.manualcheg.ktscourse.data.datastore.UserPreferences
+import com.manualcheg.ktscourse.common.repository.UserPreferencesRepository
 import com.manualcheg.ktscourse.screenLogin.domain.model.UserData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class UserPreferencesRepository(private val dataStore: DataStore<Preferences>) : UserPreferences {
+class UserPreferencesRepositoryImpl(private val dataStore: DataStore<Preferences>) : UserPreferencesRepository {
     private object PreferenceKeys {
         val USERNAME = stringPreferencesKey("username")
         val EMAIL = stringPreferencesKey("email")
@@ -35,15 +35,7 @@ class UserPreferencesRepository(private val dataStore: DataStore<Preferences>) :
         }
     }
 
-    override suspend fun updateEmail(email: String) {
-        dataStore.updateData { prefs ->
-            prefs.toMutablePreferences().apply {
-                this[PreferenceKeys.EMAIL] = email
-            }
-        }
-    }
-
-    override suspend fun setLoggedInVar(isLoggedIn: Boolean) {
+    override suspend fun saveLoginStatus(isLoggedIn: Boolean) {
         dataStore.updateData { prefs ->
             prefs.toMutablePreferences().apply {
                 this[PreferenceKeys.IS_LOGGED_IN] = isLoggedIn

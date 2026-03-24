@@ -56,6 +56,11 @@ kotlin {
             implementation(libs.androidx.datastore.core)
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
+            implementation(libs.koin.core)
+            implementation(libs.koin.android)
+            implementation(project.dependencies.platform(libs.koin.bom))
+            implementation(libs.koin.compose)
+            implementation(libs.insert.koin.koin.compose.viewmodel)
         }
 
         val iosMain by creating {

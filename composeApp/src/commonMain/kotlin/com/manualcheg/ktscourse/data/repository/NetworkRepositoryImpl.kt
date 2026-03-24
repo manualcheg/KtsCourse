@@ -1,8 +1,8 @@
 package com.manualcheg.ktscourse.data.repository
 
-import com.manualcheg.ktscourse.screenMain.domain.models.Launch
+import com.manualcheg.ktscourse.screenMain.domain.model.Launch
 import com.manualcheg.ktscourse.data.models.LaunchDto
-import com.manualcheg.ktscourse.screenMain.domain.models.LaunchStatus
+import com.manualcheg.ktscourse.screenMain.domain.model.LaunchStatus
 import com.manualcheg.ktscourse.data.models.SpaceXOptionsDto
 import com.manualcheg.ktscourse.data.models.SpaceXQueryDto
 import com.manualcheg.ktscourse.data.models.SpaceXQueryInnerDto
@@ -38,7 +38,7 @@ class NetworkRepositoryImpl : NetworkRepository {
                 ),
                 options = SpaceXOptionsDto(
                     page = page,
-                    limit = 10,
+                    limit = 10 ,
                     sort = mapOf("flight_number" to 1)
                 )
             )

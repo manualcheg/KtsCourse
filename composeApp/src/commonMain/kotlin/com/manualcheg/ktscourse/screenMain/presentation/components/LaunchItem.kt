@@ -21,8 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
-import com.manualcheg.ktscourse.screenMain.domain.models.Launch
-import com.manualcheg.ktscourse.screenMain.domain.models.LaunchStatus
+import com.manualcheg.ktscourse.screenMain.domain.model.Launch
+import com.manualcheg.ktscourse.screenMain.domain.model.LaunchStatus
 import com.manualcheg.ktscourse.common.LocalDimensions
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.main_screen_launch_status_failed_text

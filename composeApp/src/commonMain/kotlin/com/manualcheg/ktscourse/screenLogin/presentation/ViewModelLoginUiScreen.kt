@@ -2,7 +2,8 @@ package com.manualcheg.ktscourse.screenLogin.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.manualcheg.ktscourse.data.repository.UserPreferencesRepository
+import com.manualcheg.ktscourse.screenLogin.domain.model.UserCredentials
+import com.manualcheg.ktscourse.screenLogin.domain.useCase.LoginUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -12,7 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class ViewModelLoginUiScreen(private val userPreferencesRepository: UserPreferencesRepository) :
+class ViewModelLoginUiScreen(private val loginUseCase: LoginUseCase) :
     ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
@@ -50,15 +51,12 @@ class ViewModelLoginUiScreen(private val userPreferencesRepository: UserPreferen
     }
 
     fun checkCredentials() {
+        val credentials = UserCredentials(_uiState.value.username, _uiState.value.password)
         viewModelScope.launch {
-            if (_uiState.value.username == "user" && _uiState.value.password == "P@ssw0rd") {
-                _events.emit(
-                    LoginUiEvent.LoginSuccessEvent
-                )
-                userPreferencesRepository.apply {
-                    setLoggedInVar(true)
-                    updateUsername("user")
-                }
+            val isSuccess =
+                loginUseCase(credentials)
+            if (isSuccess) {
+                _events.emit(LoginUiEvent.LoginSuccessEvent)
             } else {
                 _events.emit(LoginUiEvent.LoginErrorEvent)
                 makeTextInputInErrorState()

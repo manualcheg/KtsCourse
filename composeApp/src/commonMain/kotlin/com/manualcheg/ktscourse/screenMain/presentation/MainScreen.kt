@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
@@ -32,9 +31,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.manualcheg.ktscourse.screenMain.domain.models.Launch
 import com.manualcheg.ktscourse.common.LocalDimensions
+import com.manualcheg.ktscourse.screenMain.domain.model.Launch
 import com.manualcheg.ktscourse.screenMain.presentation.components.LaunchItem
 import com.manualcheg.ktscourse.screenMain.presentation.components.MainTopAppBar
 import ktscourse.composeapp.generated.resources.Res
@@ -45,24 +43,41 @@ import ktscourse.composeapp.generated.resources.nothing_found_content_descriptio
 import ktscourse.composeapp.generated.resources.nothing_found_text
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     onProfileClick: () -> Unit = {},
-    viewModel: ViewModelMainScreen = viewModel { ViewModelMainScreen() }
+    viewModel: ViewModelMainScreen = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val searchQuery by viewModel.searchQuery.collectAsState()
-    val isNextPageLoading by viewModel.isNextPageLoading.collectAsState()
-    val isRefreshing by viewModel.isRefreshing.collectAsState()
-    val isLastPage by viewModel.isLastPageFlow.collectAsState()
 
+    MainContent(
+        uiState = uiState,
+        onSearchQueryChange = viewModel::onSearchQueryChange,
+        onProfileClick = onProfileClick,
+        onRefresh = viewModel::updateData,
+        onLoadNextPage = viewModel::loadNextPage,
+        onRetry = viewModel::updateData
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainContent(
+    uiState: MainUiState,
+    onSearchQueryChange: (String) -> Unit,
+    onProfileClick: () -> Unit,
+    onRefresh: () -> Unit,
+    onLoadNextPage: () -> Unit,
+    onRetry: () -> Unit
+) {
     Scaffold(
         topBar = {
             MainTopAppBar(
-                searchQuery = searchQuery,
-                onSearchQueryChange = { viewModel.onSearchQueryChange(it) },
+                searchQuery = uiState.searchQuery,
+                onSearchQueryChange = onSearchQueryChange,
                 onProfileClick = onProfileClick
             )
         }
@@ -73,124 +88,60 @@ fun MainScreen(
                 .padding(innerPadding)
         ) {
             PullToRefreshBox(
-                isRefreshing = isRefreshing,
-                onRefresh = { viewModel.refresh() }
+                isRefreshing = uiState.isRefreshing,
+                onRefresh = onRefresh
             ) {
-                ShowListOfLaunches(
-                    uiState,
-                    searchQuery,
-                    isNextPageLoading,
-                    isLastPage = isLastPage,
-                    { viewModel.updateData() },
-                    { viewModel.loadNextPage() }
-                )
-            }
-        }
-    }
-}
+                Box(modifier = Modifier.fillMaxSize()) {
+                    if (uiState.launches.isNotEmpty()) {
+                        LaunchList(
+                            launches = uiState.launches,
+                            isNextPageLoading = uiState.isNextPageLoading,
+                            isLastPage = uiState.isLastPage,
+                            loadNextPage = onLoadNextPage,
+                            searchQuery = uiState.searchQuery
+                        )
+                    }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewMainScreen() {
-    MainScreen()
-}
+                    if (uiState.showLoading) {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
 
-@Composable
-fun ShowListOfLaunches(
-    uiState: MainUiState,
-    searchQuery: String,
-    isNextPageLoading: Boolean,
-    isLastPage: Boolean ,
-    updateData: () -> Unit,
-    loadNextPage: () -> Unit
-) {
-    val listState = rememberLazyListState()
-    var lastScrolledQuery by remember { mutableStateOf<String?>(null) }
+                    if (uiState.showErrorState) {
+                        ErrorState(
+                            message = uiState.error!!,
+                            onRetry = onRetry,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
 
-    LaunchedEffect(uiState) {
-        if (uiState is MainUiState.Success && searchQuery != lastScrolledQuery) {
-            listState.scrollToItem(0)
-            lastScrolledQuery = searchQuery
-        }
-    }
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        when (uiState) {
-            is MainUiState.Loading -> {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
-
-            is MainUiState.Success -> {
-                LaunchList(
-                    uiState.launches,
-                    listState,
-                    isNextPageLoading,
-                    isLastPage,
-                    { loadNextPage() }
-                )
-            }
-
-            is MainUiState.Error -> {
-                Column(
-                    modifier = Modifier.align(Alignment.Center),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        text = stringResource(
-                            Res.string.main_screen_error_text,
-                            uiState.message
-                        ),
-                        color = MaterialTheme.colorScheme.error
-                    )
-                    Button(onClick = { updateData() }) {
-                        Text(stringResource(Res.string.main_screen_button_retry_text))
+                    if (uiState.showEmptyState) {
+                        EmptyState(modifier = Modifier.align(Alignment.Center))
                     }
                 }
             }
-
-            is MainUiState.Empty -> {
-                Column(
-                    modifier = Modifier.align(Alignment.Center),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Image(
-                        imageResource(Res.drawable.nothingFound),
-                        contentDescription = stringResource(Res.string.nothing_found_content_description)
-                    )
-                    Text(
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        text = stringResource(Res.string.nothing_found_text),
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
         }
     }
-}
-
-@Preview
-@Composable
-fun PreviewListOfLaunches() {
-        ShowListOfLaunches(
-            MainUiState.Success(emptyList()),
-            "",
-            false,
-            false,
-            {},
-            {}
-        )
 }
 
 @Composable
 fun LaunchList(
     launches: List<Launch>,
-    listState: LazyListState,
     isNextPageLoading: Boolean,
     isLastPage: Boolean,
-    loadNextPage: () -> Unit
+    loadNextPage: () -> Unit,
+    searchQuery: String
 ) {
+    val listState = rememberLazyListState()
     val dimensions = LocalDimensions.current
+    var lastQuery by remember { mutableStateOf("") }
+
+    LaunchedEffect(searchQuery) {
+        if (searchQuery != lastQuery && lastQuery.isNotEmpty()) {
+            listState.animateScrollToItem(0)
+        }
+        lastQuery = searchQuery
+    }
+
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxSize(),
@@ -198,10 +149,13 @@ fun LaunchList(
     ) {
         itemsIndexed(launches, key = { _, item -> item.id }) { index, launch ->
             LaunchItem(launch)
-            if (index == launches.lastIndex) {
-                loadNextPage()
+            if (index >= launches.size - 2 && !isLastPage && !isNextPageLoading) {
+                LaunchedEffect(launches.size) {
+                    loadNextPage()
+                }
             }
         }
+
         if (isNextPageLoading) {
             item {
                 Box(
@@ -214,15 +168,67 @@ fun LaunchList(
                 }
             }
         }
+
         if (isLastPage && launches.isNotEmpty()) {
             item {
                 Text(
                     text = "All launches loaded",
                     modifier = Modifier.fillMaxWidth().padding(16.dp),
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.outline
                 )
             }
         }
     }
+}
+
+@Composable
+fun ErrorState(message: String, onRetry: () -> Unit, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(Res.string.main_screen_error_text, message),
+            color = MaterialTheme.colorScheme.error,
+            textAlign = TextAlign.Center
+        )
+        Button(onClick = onRetry, modifier = Modifier.padding(top = 8.dp)) {
+            Text(stringResource(Res.string.main_screen_button_retry_text))
+        }
+    }
+}
+
+@Composable
+fun EmptyState(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            imageResource(Res.drawable.nothingFound),
+            contentDescription = stringResource(Res.string.nothing_found_content_description),
+            modifier = Modifier.size(150.dp)
+        )
+        Text(
+            text = stringResource(Res.string.nothing_found_text),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewMainScreen() {
+    MainContent(
+        uiState = MainUiState(launches = emptyList(), isLoading = false),
+        onSearchQueryChange = {},
+        onProfileClick = {},
+        onRefresh = {},
+        onLoadNextPage = {},
+        onRetry = {}
+    )
 }

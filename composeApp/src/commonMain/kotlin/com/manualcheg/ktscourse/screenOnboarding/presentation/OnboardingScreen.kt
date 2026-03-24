@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,103 +41,156 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.manualcheg.ktscourse.data.datastore.DataStorePreferencesProvider
-import com.manualcheg.ktscourse.data.repository.UserPreferencesRepository
+import com.manualcheg.ktscourse.common.LocalDimensions
+import com.manualcheg.ktscourse.screenOnboarding.domain.model.OnboardingItem
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import ktscourse.composeapp.generated.resources.Res
+import ktscourse.composeapp.generated.resources.ic_stat_black
+import ktscourse.composeapp.generated.resources.onboard_screen_button_next_text
+import ktscourse.composeapp.generated.resources.onboarding_skip_text
+import ktscourse.composeapp.generated.resources.onboarding_stat_desc
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun Onboarding(moveToLoginScreen: () -> Unit) {
-    val viewModel = ViewModelOnboardingScreen(
-        userPreferencesRepository = UserPreferencesRepository(DataStorePreferencesProvider.datastore)
+fun Onboarding(
+    moveToLoginScreen: () -> Unit,
+    viewModel: ViewModelOnboardingScreen = koinViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    OnboardingContent(
+        uiState = uiState,
+        events = viewModel.events,
+        onPageChanged = viewModel::onPageChanged,
+        onNextClick = viewModel::onNextClick,
+        onBackClick = viewModel::onBackClick,
+        onSkipClick = viewModel::onSkipClick,
+        moveToLoginScreen = moveToLoginScreen
     )
+}
 
-    val items by viewModel.items.collectAsState()
-    val pageState = rememberPagerState(pageCount = { items.size })
+@Composable
+fun OnboardingContent(
+    uiState: OnboardingUiState,
+    onPageChanged: (Int) -> Unit,
+    events: SharedFlow<OnboardingEvent>,
+    onNextClick: () -> Unit,
+    onBackClick: () -> Unit,
+    onSkipClick: () -> Unit,
+    moveToLoginScreen: () -> Unit
+) {
+    val pageState = rememberPagerState(pageCount = { uiState.items.size })
+    val dimensions = LocalDimensions.current
 
     LaunchedEffect(Unit) {
-        viewModel.events.collect { event ->
+        events.collect { event ->
             when (event) {
-                OnboardingEvent.NextPage -> pageState.scrollToPage(pageState.currentPage + 1)
-                OnboardingEvent.BackPage -> pageState.scrollToPage(pageState.currentPage - 1)
+                OnboardingEvent.NextPage -> pageState.animateScrollToPage(pageState.currentPage + 1)
+                OnboardingEvent.BackPage -> pageState.animateScrollToPage(pageState.currentPage - 1)
                 OnboardingEvent.MoveToLogin -> moveToLoginScreen.invoke()
             }
         }
     }
 
+    LaunchedEffect(pageState.currentPage) {
+        onPageChanged(pageState.currentPage)
+    }
+
     Scaffold { innerPadding ->
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             TopSection(
-                onBackClick = { viewModel.onBackClick(pageState.currentPage) },
-                onSkipClick = { viewModel.onSkipClick() }
+                onBackClick = { onBackClick() },
+                onSkipClick = { onSkipClick() },
+                showBackButton = uiState.canGoBack
             )
 
             HorizontalPager(
                 state = pageState,
                 modifier = Modifier
-                    .fillMaxHeight(0.9f)
+                    .fillMaxHeight(dimensions.onboardingPagerMaxHeight)
                     .fillMaxWidth()
-            ) { page -> OnboardingItem(item = items[page]) }
+            ) { page -> OnboardingItem(item = uiState.items[page]) }
 
-            BottomSection(size = items.size, index = pageState.currentPage) {
-                viewModel.onNextClick(pageState.currentPage)
-            }
+            BottomSection(
+                size = uiState.items.size,
+                index = uiState.currentPage,
+                onButtonClick = { onNextClick() },
+                isLastPage = uiState.isLastPage,
+            )
         }
     }
 }
 
 @Composable
-fun TopSection(onBackClick: () -> Unit = {}, onSkipClick: () -> Unit = {}) {
+fun TopSection(
+    onBackClick: () -> Unit,
+    onSkipClick: () -> Unit,
+    showBackButton: Boolean
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp)
+            .padding(LocalDimensions.current.paddingLarge)
     ) {
-        IconButton(onClick = onBackClick, modifier = Modifier.align(Alignment.CenterStart)) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowLeft,
-                contentDescription = null
-            )
+        if (showBackButton) {
+            IconButton(onClick = onBackClick, modifier = Modifier.align(Alignment.CenterStart)) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowLeft,
+                    contentDescription = null
+                )
+            }
         }
 
         TextButton(
             onClick = onSkipClick,
             modifier = Modifier.align(Alignment.CenterEnd),
-            contentPadding = PaddingValues(0.dp)
+            contentPadding = PaddingValues(LocalDimensions.current.zeroPadding)
         ) {
-            Text(text = "Skip", color = MaterialTheme.colorScheme.onBackground)
+            Text(
+                text = stringResource(Res.string.onboarding_skip_text),
+                color = MaterialTheme.colorScheme.primary/*MaterialTheme.colorScheme.onBackground*/
+            )
         }
     }
 }
 
 @Composable
-fun BottomSection(size: Int, index: Int, onButtonClick: () -> Unit = {}) {
+fun BottomSection(
+    size: Int,
+    index: Int,
+    onButtonClick: () -> Unit = {},
+    isLastPage: Boolean
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp)
+            .padding(LocalDimensions.current.paddingLarge)
     ) {
         Indicators(size, index)
 
         FloatingActionButton(
             onClick = onButtonClick,
-            containerColor = Color.Black,
+            containerColor = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .align(Alignment.CenterEnd)
-                .clip(RoundedCornerShape(15.dp))
+                .clip(RoundedCornerShape(LocalDimensions.current.roundCornerSize))
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
-                tint = Color.White,
-                contentDescription = "Next"
+                imageVector = if (isLastPage) {
+                    Icons.Default.Done
+                } else {
+                    Icons.AutoMirrored.Outlined.KeyboardArrowRight
+                },
+                tint = MaterialTheme.colorScheme.onPrimary,
+                contentDescription = stringResource(Res.string.onboard_screen_button_next_text)
             )
         }
     }
@@ -146,7 +200,7 @@ fun BottomSection(size: Int, index: Int, onButtonClick: () -> Unit = {}) {
 fun BoxScope.Indicators(size: Int, index: Int) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(LocalDimensions.current.boxScopeArrangementSize),
         modifier = Modifier.align(Alignment.CenterStart)
     ) {
         repeat(size) {
@@ -157,24 +211,26 @@ fun BoxScope.Indicators(size: Int, index: Int) {
 
 @Composable
 fun Indicator(isSelected: Boolean) {
+    val dimensions = LocalDimensions.current
     val width = animateDpAsState(
-        targetValue = if (isSelected) 25.dp else 10.dp,
+        targetValue = if (isSelected) dimensions.targetSelectedSize else dimensions.targetSize,
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
     )
 
     Box(
         modifier = Modifier
-            .height(10.dp)
+            .height(dimensions.boxIndicatorSize)
             .width(width.value)
             .clip(CircleShape)
             .background(
-                color = if (isSelected) MaterialTheme.colorScheme.primary else Color(0XFFF8E2E7)
+                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
             )
     )
 }
 
 @Composable
-fun OnboardingItem(item: OnboardingItems) {
+fun OnboardingItem(item: OnboardingItem) {
+    val dimensions = LocalDimensions.current
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -185,10 +241,11 @@ fun OnboardingItem(item: OnboardingItems) {
             contentDescription = null,
             contentScale = ContentScale.Fit,
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground),
-            modifier = Modifier.size(200.dp).padding(horizontal = 50.dp)
+            modifier = Modifier.size(dimensions.onboardingImageSize)
+                .padding(horizontal = dimensions.onboardingImageHorizontalPadding)
         )
 
-        Spacer(modifier = Modifier.height(25.dp))
+        Spacer(modifier = Modifier.height(dimensions.onboardingBigSpacerHeight))
 
         Text(
             text = stringResource(item.title),
@@ -196,9 +253,9 @@ fun OnboardingItem(item: OnboardingItems) {
             color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
-            letterSpacing = 1.sp,
+            letterSpacing = dimensions.onboardingLetterSpacing,
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(dimensions.onboardingSmallSpacerHeight))
 
         Text(
             text = stringResource(item.desc),
@@ -206,8 +263,8 @@ fun OnboardingItem(item: OnboardingItems) {
             color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.Light,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(10.dp),
-            letterSpacing = 1.sp,
+            modifier = Modifier.padding(dimensions.onboardingTextPadding),
+            letterSpacing = dimensions.onboardingLetterSpacing,
         )
     }
 }
@@ -215,5 +272,21 @@ fun OnboardingItem(item: OnboardingItems) {
 @Preview
 @Composable
 fun PreviewScreen() {
-    Onboarding({ println("Login") })
+    OnboardingContent(
+        uiState = OnboardingUiState(
+            items = listOf(
+                OnboardingItem(
+                    Res.drawable.ic_stat_black,
+                    Res.string.onboarding_skip_text,
+                    Res.string.onboarding_stat_desc
+                )
+            ), 0
+        ),
+        onPageChanged = {},
+        events = MutableSharedFlow<OnboardingEvent>().asSharedFlow(),
+        onNextClick = {},
+        onBackClick = {},
+        onSkipClick = {},
+        moveToLoginScreen = {}
+    )
 }

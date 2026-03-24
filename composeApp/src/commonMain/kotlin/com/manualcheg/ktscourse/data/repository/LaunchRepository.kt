@@ -1,39 +1,33 @@
 package com.manualcheg.ktscourse.data.repository
 
-import com.manualcheg.ktscourse.data.database.LaunchDao
-import com.manualcheg.ktscourse.data.database.toDomain
 import com.manualcheg.ktscourse.data.database.toEntity
-import com.manualcheg.ktscourse.screenMain.domain.models.Launch
+import com.manualcheg.ktscourse.screenMain.domain.model.Launch
+import com.manualcheg.ktscourse.screenMain.domain.repository.LaunchRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 
-class LaunchRepository(
+class LaunchRepositoryImpl(
     private val networkRepository: NetworkRepository,
-    private val launchDao: LaunchDao
-) {
-    suspend fun getPagedLaunchesFromDb(query: String, page: Int, limit: Int): List<Launch> {
-        val offset = (page - 1) * limit
-        val entities = if (query.isBlank()) {
-            launchDao.getLaunchesPaged(limit, offset)
-        } else {
-            launchDao.searchLaunchesPaged(query, limit, offset)
-        }
-        return entities.map { it.toDomain() }
+    private val databaseRepository: DatabaseRepository
+): LaunchRepository {
+    override suspend fun getPagedLaunchesFromDb(query: String, page: Int, limit: Int): List<Launch> {
+        return databaseRepository.getPagedLaunchesFromDb(query, page, limit)
     }
 
-    suspend fun fetchAndSaveLaunches(query: String, page: Int): Result<Boolean> = withContext(
+    override suspend fun fetchAndSaveLaunches(query: String, page: Int): Result<Boolean> = withContext(
         Dispatchers.IO
     ) {
         val result = networkRepository.getAllLaunches(query, page)
         return@withContext if (result.isSuccess) {
+
             val response = result.getOrThrow()
             val entities = response.docs.map { it.toEntity() }
 
             if (page == 1 && query.isBlank()) {
-                launchDao.fetchAndSaveLaunchesTransaction(entities)
+                databaseRepository.fetchAndSaveLaunchesTransaction(entities)
             } else {
-                launchDao.insertLaunches(entities)
+                databaseRepository.insertLaunches(entities)
             }
 
             Result.success(response.hasNextPage)

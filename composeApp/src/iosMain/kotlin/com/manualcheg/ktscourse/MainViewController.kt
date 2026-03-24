@@ -2,11 +2,9 @@ package com.manualcheg.ktscourse
 
 import androidx.compose.ui.window.ComposeUIViewController
 import com.manualcheg.ktscourse.common.App
-import com.manualcheg.ktscourse.data.createDataStore
-import com.manualcheg.ktscourse.data.datastore.DataStorePreferencesProvider
+import com.manualcheg.ktscourse.common.di.initKoin
 
 fun MainViewController() = ComposeUIViewController {
-
-    DataStorePreferencesProvider.datastore = createDataStore()
+    initKoin()
     App()
 }
