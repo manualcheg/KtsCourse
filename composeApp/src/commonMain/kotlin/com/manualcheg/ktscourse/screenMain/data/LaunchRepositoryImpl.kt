@@ -1,6 +1,5 @@
 package com.manualcheg.ktscourse.screenMain.data
 
-import com.manualcheg.ktscourse.data.database.toEntity
 import com.manualcheg.ktscourse.data.repository.DatabaseRepository
 import com.manualcheg.ktscourse.data.repository.NetworkRepository
 import com.manualcheg.ktscourse.screenMain.domain.model.Launch
@@ -12,8 +11,12 @@ import kotlinx.coroutines.withContext
 class LaunchRepositoryImpl(
     private val networkRepository: NetworkRepository,
     private val databaseRepository: DatabaseRepository
-): LaunchRepository {
-    override suspend fun getPagedLaunchesFromDb(query: String, page: Int, limit: Int): List<Launch> {
+) : LaunchRepository {
+    override suspend fun getPagedLaunchesFromDb(
+        query: String,
+        page: Int,
+        limit: Int
+    ): List<Launch> {
         return databaseRepository.getPagedLaunchesFromDb(query, page, limit)
     }
 
