@@ -1,3 +1,5 @@
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+
 package com.manualcheg.ktscourse.data.database
 
 import androidx.room.ConstructedBy
@@ -13,7 +15,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun launchDao(): LaunchDao
 }
 
-// The Room compiler generates the `actual` implementations.
 @Suppress("KotlinNoActualForExpect")
 expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
     override fun initialize(): AppDatabase

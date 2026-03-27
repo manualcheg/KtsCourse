@@ -22,7 +22,7 @@ class LaunchRepositoryImpl(
 
     override suspend fun fetchAndSaveLaunches(query: String, page: Int): Result<Boolean> =
         withContext(
-            Dispatchers.IO
+            Dispatchers.IO,
         ) {
             val result = networkRepository.getAllLaunches(query, page)
             return@withContext if (result.isSuccess) {

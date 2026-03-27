@@ -10,8 +10,9 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-val onboardingModule = module {
-    viewModelOf(::ViewModelOnboardingScreen)
-    factory { FirstStartUseCaseImpl(get()) } bind FirstStartUseCase::class
-    factoryOf(::GetOnboardingItemsUseCaseImpl) bind GetOnboardingItemsUseCase::class
-}
+val onboardingModule =
+    module {
+        viewModelOf(::ViewModelOnboardingScreen)
+        factory { FirstStartUseCaseImpl(get()) } bind FirstStartUseCase::class
+        factoryOf(::GetOnboardingItemsUseCaseImpl) bind GetOnboardingItemsUseCase::class
+    }

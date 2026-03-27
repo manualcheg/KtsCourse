@@ -19,9 +19,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ViewModelMainScreen(
-    private val getLaunchesUseCase: GetLaunchesUseCase
+    private val getLaunchesUseCase: GetLaunchesUseCase,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(MainUiState())
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
@@ -41,11 +40,10 @@ class ViewModelMainScreen(
             .onEach {
                 resetPagination()
                 loadNextPage()
-            }
-            .launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
     }
 
-    fun loadNextPage(isRefresh:Boolean = false) {
+    fun loadNextPage(isRefresh: Boolean = false) {
         val state = _uiState.value
         if (!isRefresh && (state.isLastPage || state.isNextPageLoading || state.isLoading || state.isRefreshing)) return
 
@@ -55,16 +53,21 @@ class ViewModelMainScreen(
         updateLoadingStatus(isFirstPage, isRefresh)
 
         loadingJob?.cancel()
-        loadingJob = viewModelScope.launch {
-            getLaunchesUseCase.execute(state.searchQuery, pageToLoad)
-                .onSuccess { result ->
-                    handleSuccess(result, isFirstPage, pageToLoad)
-                }
-                .onFailure { handleFailure(it) }
-        }
+        loadingJob =
+            viewModelScope.launch {
+                getLaunchesUseCase
+                    .execute(state.searchQuery, pageToLoad)
+                    .onSuccess { result ->
+                        handleSuccess(result, isFirstPage, pageToLoad)
+                    }.onFailure { handleFailure(it) }
+            }
     }
 
-    private fun handleSuccess(result: LaunchesPageResult, isFirstPage: Boolean, pageLoaded: Int) {
+    private fun handleSuccess(
+        result: LaunchesPageResult,
+        isFirstPage: Boolean,
+        pageLoaded: Int,
+    ) {
         _uiState.update { state ->
             state.copy(
                 launches = if (isFirstPage) result.launches else state.launches + result.launches,
@@ -72,7 +75,7 @@ class ViewModelMainScreen(
                 isNextPageLoading = false,
                 isRefreshing = false,
                 isLastPage = result.isLastPage,
-                error = null
+                error = null,
             )
         }
         currentPage = pageLoaded
@@ -84,28 +87,26 @@ class ViewModelMainScreen(
                 error = error.message ?: "Unknown error",
                 isLoading = false,
                 isNextPageLoading = false,
-                isRefreshing = false
+                isRefreshing = false,
             )
         }
     }
 
-    private fun updateLoadingStatus(isFirstPage: Boolean, isRefresh: Boolean) {
+    private fun updateLoadingStatus(
+        isFirstPage: Boolean,
+        isRefresh: Boolean,
+    ) {
         _uiState.update {
-            when{
+            when {
                 isRefresh -> it.copy(isRefreshing = true, error = null)
                 isFirstPage -> it.copy(isLoading = true, error = null)
                 else -> it.copy(isNextPageLoading = true, error = null)
             }
-            /*if (isFirstPage) it.copy(isLoading = isLoading)
-            else it.copy(isNextPageLoading = isLoading)*/
         }
     }
 
     fun updateData() {
         loadNextPage(isRefresh = true)
-        /*loadNextPage()
-        _uiState.update { it.copy(isRefreshing = true) }
-        currentPage = 1*/
     }
 
     fun onSearchQueryChange(newQuery: String) {

@@ -30,7 +30,7 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainTopAppBar(
-    searchQuery: String, 
+    searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
     onProfileClick: () -> Unit
 ) {
@@ -54,18 +54,20 @@ fun MainTopAppBar(
                             Icon(
                                 painterResource(Res.drawable.ic_search_24dp),
                                 contentDescription = stringResource(Res.string.main_screen_icon_search_content_description),
-                                modifier = Modifier.size(dimensions.iconSize)
+                                modifier = Modifier.size(dimensions.iconSize),
                             )
                         },
                         trailingIcon = {
                             if (searchQuery.isNotEmpty()) {
-                                IconButton(onClick = {
-                                    onSearchQueryChange("")
-                                }) {
+                                IconButton(
+                                    onClick = {
+                                        onSearchQueryChange("")
+                                    },
+                                ) {
                                     Icon(
                                         painterResource(Res.drawable.ic_close_24dp),
                                         contentDescription = stringResource(Res.string.main_screen_icon_clear_field_content_description),
-                                        modifier = Modifier.size(dimensions.iconSize)
+                                        modifier = Modifier.size(dimensions.iconSize),
                                     )
                                 }
                             }
@@ -83,10 +85,10 @@ fun MainTopAppBar(
                 Icon(
                     imageVector = Icons.Default.AccountCircle,
                     contentDescription = "Profile",
-                    modifier = Modifier.size(dimensions.iconSize)
+                    modifier = Modifier.size(dimensions.iconSize),
                 )
             }
-        }
+        },
     )
 }
 

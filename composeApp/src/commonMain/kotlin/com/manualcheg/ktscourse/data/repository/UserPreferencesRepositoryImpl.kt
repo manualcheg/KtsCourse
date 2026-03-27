@@ -9,7 +9,8 @@ import com.manualcheg.ktscourse.screenLogin.domain.model.UserData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class UserPreferencesRepositoryImpl(private val dataStore: DataStore<Preferences>) : UserPreferencesRepository {
+class UserPreferencesRepositoryImpl(private val dataStore: DataStore<Preferences>) :
+    UserPreferencesRepository {
     private object PreferenceKeys {
         val USERNAME = stringPreferencesKey("username")
         val EMAIL = stringPreferencesKey("email")
@@ -23,7 +24,7 @@ class UserPreferencesRepositoryImpl(private val dataStore: DataStore<Preferences
                 username = prefs[PreferenceKeys.USERNAME] ?: "",
                 email = prefs[PreferenceKeys.EMAIL] ?: "",
                 isLoggedIn = prefs[PreferenceKeys.IS_LOGGED_IN] ?: false,
-                firstStart = prefs[PreferenceKeys.IS_FIRST_START] ?: true
+                firstStart = prefs[PreferenceKeys.IS_FIRST_START] ?: true,
             )
         }
 

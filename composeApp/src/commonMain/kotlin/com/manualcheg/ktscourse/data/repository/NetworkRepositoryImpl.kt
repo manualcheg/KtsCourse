@@ -19,9 +19,11 @@ import kotlinx.serialization.json.Json
 class NetworkRepositoryImpl : NetworkRepository {
     private val httpClient = HttpClient {
         install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-            })
+            json(
+                Json {
+                    ignoreUnknownKeys = true
+                },
+            )
         }
     }
 
@@ -32,13 +34,13 @@ class NetworkRepositoryImpl : NetworkRepository {
         return try {
             val requestBody = SpaceXQueryDto(
                 query = SpaceXQueryInnerDto(
-                    text = if (query.isBlank()) null else SpaceXTextSearchDto(search = query)
+                    text = if (query.isBlank()) null else SpaceXTextSearchDto(search = query),
                 ),
                 options = SpaceXOptionsDto(
                     page = page,
                     limit = 10,
-                    sort = mapOf("flight_number" to 1)
-                )
+                    sort = mapOf("flight_number" to 1),
+                ),
             )
             val response: SpaceXResponseDto<LaunchDto> =
                 httpClient.post("https://api.spacexdata.com/v4/launches/query") {

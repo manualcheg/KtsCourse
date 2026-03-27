@@ -28,7 +28,7 @@ data class SpaceXResponseDto<T>(
             hasPrevPage = hasPrevPage,
             hasNextPage = hasNextPage,
             prevPage = prevPage,
-            nextPage = nextPage
+            nextPage = nextPage,
         )
     }
 }

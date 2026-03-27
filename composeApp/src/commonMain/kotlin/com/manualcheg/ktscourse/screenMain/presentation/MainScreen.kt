@@ -49,7 +49,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun MainScreen(
     onProfileClick: () -> Unit = {},
-    viewModel: ViewModelMainScreen = koinViewModel()
+    viewModel: ViewModelMainScreen = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -59,7 +59,7 @@ fun MainScreen(
         onProfileClick = onProfileClick,
         onRefresh = viewModel::updateData,
         onLoadNextPage = viewModel::loadNextPage,
-        onRetry = viewModel::updateData
+        onRetry = viewModel::updateData,
     )
 }
 
@@ -71,25 +71,26 @@ fun MainContent(
     onProfileClick: () -> Unit,
     onRefresh: () -> Unit,
     onLoadNextPage: () -> Unit,
-    onRetry: () -> Unit
+    onRetry: () -> Unit,
 ) {
     Scaffold(
         topBar = {
             MainTopAppBar(
                 searchQuery = uiState.searchQuery,
                 onSearchQueryChange = onSearchQueryChange,
-                onProfileClick = onProfileClick
+                onProfileClick = onProfileClick,
             )
-        }
+        },
     ) { innerPadding ->
         Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
         ) {
             PullToRefreshBox(
                 isRefreshing = uiState.isRefreshing,
-                onRefresh = onRefresh
+                onRefresh = onRefresh,
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     if (uiState.launches.isNotEmpty()) {
@@ -98,7 +99,7 @@ fun MainContent(
                             isNextPageLoading = uiState.isNextPageLoading,
                             isLastPage = uiState.isLastPage,
                             loadNextPage = onLoadNextPage,
-                            searchQuery = uiState.searchQuery
+                            searchQuery = uiState.searchQuery,
                         )
                     }
 
@@ -110,7 +111,7 @@ fun MainContent(
                         ErrorState(
                             message = uiState.error!!,
                             onRetry = onRetry,
-                            modifier = Modifier.align(Alignment.Center)
+                            modifier = Modifier.align(Alignment.Center),
                         )
                     }
 
@@ -129,7 +130,7 @@ fun LaunchList(
     isNextPageLoading: Boolean,
     isLastPage: Boolean,
     loadNextPage: () -> Unit,
-    searchQuery: String
+    searchQuery: String,
 ) {
     val listState = rememberLazyListState()
     val dimensions = LocalDimensions.current
@@ -145,7 +146,7 @@ fun LaunchList(
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(dimensions.paddingSmall)
+        verticalArrangement = Arrangement.spacedBy(dimensions.paddingSmall),
     ) {
         itemsIndexed(launches, key = { _, item -> item.id }) { index, launch ->
             LaunchItem(launch)
@@ -159,10 +160,11 @@ fun LaunchList(
         if (isNextPageLoading) {
             item {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(dimensions.paddingMedium),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(dimensions.paddingMedium),
+                    contentAlignment = Alignment.Center,
                 ) {
                     CircularProgressIndicator(modifier = Modifier.size(dimensions.circularProgressIndicatorSize))
                 }
@@ -176,7 +178,7 @@ fun LaunchList(
                     modifier = Modifier.fillMaxWidth().padding(16.dp),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.outline
+                    color = MaterialTheme.colorScheme.outline,
                 )
             }
         }
@@ -184,15 +186,19 @@ fun LaunchList(
 }
 
 @Composable
-fun ErrorState(message: String, onRetry: () -> Unit, modifier: Modifier = Modifier) {
+fun ErrorState(
+    message: String,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier = modifier.padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = stringResource(Res.string.main_screen_error_text, message),
             color = MaterialTheme.colorScheme.error,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
         Button(onClick = onRetry, modifier = Modifier.padding(top = 8.dp)) {
             Text(stringResource(Res.string.main_screen_button_retry_text))
@@ -204,18 +210,18 @@ fun ErrorState(message: String, onRetry: () -> Unit, modifier: Modifier = Modifi
 fun EmptyState(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
             imageResource(Res.drawable.nothingFound),
             contentDescription = stringResource(Res.string.nothing_found_content_description),
-            modifier = Modifier.size(150.dp)
+            modifier = Modifier.size(150.dp),
         )
         Text(
             text = stringResource(Res.string.nothing_found_text),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
     }
 }
@@ -229,6 +235,6 @@ fun PreviewMainScreen() {
         onProfileClick = {},
         onRefresh = {},
         onLoadNextPage = {},
-        onRetry = {}
+        onRetry = {},
     )
 }

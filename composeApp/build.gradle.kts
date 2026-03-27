@@ -19,7 +19,7 @@ kotlin {
 
     listOf(
         iosArm64(),
-        iosSimulatorArm64()
+        iosSimulatorArm64(),
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
@@ -32,6 +32,7 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.android)
+            implementation(libs.koin.android)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -57,7 +58,6 @@ kotlin {
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
             implementation(libs.koin.core)
-            implementation(libs.koin.android)
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.compose)
             implementation(libs.insert.koin.koin.compose.viewmodel)
@@ -69,9 +69,12 @@ kotlin {
                 implementation(libs.ktor.client.darwin)
             }
         }
-
-        iosArm64Main.get().dependsOn(iosMain)
-        iosSimulatorArm64Main.get().dependsOn(iosMain)
+        val iosArm64Main by getting {
+            dependsOn(iosMain)
+        }
+        val iosSimulatorArm64Main by getting {
+            dependsOn(iosMain)
+        }
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -82,6 +85,8 @@ kotlin {
 room {
     schemaDirectory("$projectDir/schemas")
 }
+
+apply("$rootDir/ktlint.gradle")
 
 android {
     namespace = "com.manualcheg.ktscourse"
@@ -112,5 +117,9 @@ android {
 
 dependencies {
     debugImplementation(libs.compose.uiTooling)
-    add("ksp", libs.androidx.room.compiler)
+
+    // Используем таргет-зависимые конфигурации для KSP, чтобы убрать warning о deprecation
+    add("kspAndroid", libs.androidx.room.compiler)
+    add("kspIosArm64", libs.androidx.room.compiler)
+    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
 }

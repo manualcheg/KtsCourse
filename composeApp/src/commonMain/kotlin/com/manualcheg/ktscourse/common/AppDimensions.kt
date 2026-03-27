@@ -35,8 +35,7 @@ data class AppDimensions(
     val onboardingSmallSpacerHeight: Dp = 8.dp,
     val onboardingLetterSpacing: TextUnit = 1.sp,
     val onboardingTextPadding: Dp = 10.dp,
-
-    //Colors
+    // Colors
     val upcomingColor: Long = 0xFF2196F3,
     val successColor: Long = 0xFF4CAF50,
 )

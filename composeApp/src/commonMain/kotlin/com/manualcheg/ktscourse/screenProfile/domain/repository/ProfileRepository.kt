@@ -5,5 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface ProfileRepository {
     fun getData(): Flow<UserData>
+
     suspend fun logout()
 }

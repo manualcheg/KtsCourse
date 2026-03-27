@@ -30,37 +30,46 @@ fun AppNavHost() {
 
     NavHost(
         navController = navController,
-        startDestination = startScreen
+        startDestination = startScreen,
     )
     {
         composable<Screen.Onboard> {
-            Onboarding({
-                navController.navigate(Screen.Login) {
-                    popUpTo(Screen.Onboard)
-                }
-            })
+            Onboarding(
+                {
+                    navController.navigate(Screen.Login) {
+                        popUpTo(Screen.Onboard)
+                    }
+                },
+            )
         }
         composable<Screen.Login> {
-            LoginScreen({
-                navController.navigate(Screen.Main) {
-                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                }
-            })
+            LoginScreen(
+                {
+                    navController.navigate(Screen.Main) {
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                    }
+                },
+            )
         }
         composable<Screen.Main> {
-            MainScreen(onProfileClick = {
-                navController.navigate(Screen.Profile)
-            })
+            MainScreen(
+                onProfileClick = {
+                    navController.navigate(Screen.Profile)
+                },
+            )
         }
 
         composable<Screen.Profile> {
-            ProfileScreen({
-                navController.navigate(Screen.Login) {
-                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                }
-            }, {
-                navController.navigateUp()
-            })
+            ProfileScreen(
+                {
+                    navController.navigate(Screen.Login) {
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                    }
+                },
+                {
+                    navController.navigateUp()
+                },
+            )
         }
     }
 }

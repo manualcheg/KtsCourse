@@ -11,8 +11,9 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-val mainModule = module {
-    viewModelOf(::ViewModelMainScreen)
-    factoryOf(::GetLaunchesUseCaseImpl) bind GetLaunchesUseCase::class
-    singleOf(::LaunchRepositoryImpl) bind LaunchRepository::class
-}
+val mainModule =
+    module {
+        viewModelOf(::ViewModelMainScreen)
+        factoryOf(::GetLaunchesUseCaseImpl) bind GetLaunchesUseCase::class
+        singleOf(::LaunchRepositoryImpl) bind LaunchRepository::class
+    }
