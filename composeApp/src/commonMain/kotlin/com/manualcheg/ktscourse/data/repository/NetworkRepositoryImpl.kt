@@ -6,6 +6,7 @@ import com.manualcheg.ktscourse.data.models.SpaceXQueryDto
 import com.manualcheg.ktscourse.data.models.SpaceXQueryInnerDto
 import com.manualcheg.ktscourse.data.models.SpaceXResponseDto
 import com.manualcheg.ktscourse.data.models.SpaceXTextSearchDto
+import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -15,6 +16,8 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import ktscourse.composeapp.generated.resources.Res
+import ktscourse.composeapp.generated.resources.network_error
 
 class NetworkRepositoryImpl : NetworkRepository {
     private val httpClient = HttpClient {
@@ -50,6 +53,7 @@ class NetworkRepositoryImpl : NetworkRepository {
 
             Result.success(response)
         } catch (e: Exception) {
+            Napier.e("No response from api.spacexdata.com", e)
             Result.failure(e)
         }
     }

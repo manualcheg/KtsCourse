@@ -4,6 +4,7 @@ import com.manualcheg.ktscourse.data.repository.DatabaseRepository
 import com.manualcheg.ktscourse.data.repository.NetworkRepository
 import com.manualcheg.ktscourse.screenMain.domain.model.Launch
 import com.manualcheg.ktscourse.screenMain.domain.repository.LaunchRepository
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
@@ -37,6 +38,7 @@ class LaunchRepositoryImpl(
 
                 Result.success(response.hasNextPage)
             } else {
+                Napier.e("Error fetching launches",result.exceptionOrNull() ?: Exception("Unknown error"))
                 Result.failure(result.exceptionOrNull() ?: Exception("Unknown error"))
             }
         }

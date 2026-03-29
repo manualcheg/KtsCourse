@@ -2,6 +2,7 @@ package com.manualcheg.ktscourse.screenMain.domain.useCase
 
 import com.manualcheg.ktscourse.screenMain.domain.model.LaunchesPageResult
 import com.manualcheg.ktscourse.screenMain.domain.repository.LaunchRepository
+import io.github.aakira.napier.Napier
 
 class GetLaunchesUseCaseImpl(private val launchRepository: LaunchRepository) : GetLaunchesUseCase {
     companion object {
@@ -25,6 +26,7 @@ class GetLaunchesUseCaseImpl(private val launchRepository: LaunchRepository) : G
             }
             Result.success(LaunchesPageResult(pagedData, isLastPage))
         } catch (e: Exception) {
+            Napier.e("GetLaunchesUseCaseImpl error",e)
             Result.failure(e)
         }
     }

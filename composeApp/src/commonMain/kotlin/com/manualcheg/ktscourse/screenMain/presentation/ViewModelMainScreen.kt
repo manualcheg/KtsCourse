@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.manualcheg.ktscourse.screenMain.domain.model.LaunchesPageResult
 import com.manualcheg.ktscourse.screenMain.domain.useCase.GetLaunchesUseCase
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -51,6 +52,8 @@ class ViewModelMainScreen(
         val pageToLoad = if (isFirstPage) 1 else currentPage + 1
 
         updateLoadingStatus(isFirstPage, isRefresh)
+//
+//        triggerTestError(true)
 
         loadingJob?.cancel()
         loadingJob =
@@ -82,6 +85,11 @@ class ViewModelMainScreen(
     }
 
     private fun handleFailure(error: Throwable) {
+        Napier.e(
+            message = "Failed to load launches",
+            throwable = error,
+            tag = "ViewModelMainScreen",
+        )
         _uiState.update {
             it.copy(
                 error = error.message ?: "Unknown error",

@@ -12,6 +12,7 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+        maven { setUrl("https://artifactory-external.vkpartner.ru/artifactory/maven/") }
     }
 }
 
@@ -25,6 +26,7 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
+        maven { setUrl("https://artifactory-external.vkpartner.ru/artifactory/maven/") }
     }
 }
 
