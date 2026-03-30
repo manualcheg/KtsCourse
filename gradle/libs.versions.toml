@@ -31,6 +31,7 @@ room = "2.7.0-alpha11"
 sqlite = "2.5.0-alpha11"
 ksp = "2.1.0-1.0.29"
 koin-bom = "4.1.1"
+tracerVersion = "1.1.7"
 
 [libraries]
 androidx-datastore-core = { module = "androidx.datastore:datastore-core", version.ref = "datastorePreferencesCore" }
@@ -81,6 +82,13 @@ koin-compose = { module = "io.insert-koin:koin-compose" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel" }
 koin-ktor = { module = "io.insert-koin:koin-ktor" }
 koin-test = { module = "io.insert-koin:koin-test" }
+tracer-profiler-systrace = { module = "ru.ok.tracer:tracer-profiler-systrace" }
+tracer-profiler-sampling = { module = "ru.ok.tracer:tracer-profiler-sampling" }
+tracer-disk-usage = { module = "ru.ok.tracer:tracer-disk-usage" }
+tracer-heap-dumps = { module = "ru.ok.tracer:tracer-heap-dumps" }
+tracer-crash-report-native = { module = "ru.ok.tracer:tracer-crash-report-native" }
+tracer-crash-report = { module = "ru.ok.tracer:tracer-crash-report" }
+tracer-platform = { module = "ru.ok.tracer:tracer-platform", version.ref = "tracerVersion"}
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -93,3 +101,5 @@ androidMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library",
 #Room
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 androidx-room = { id = "androidx.room", version.ref = "room" }
+#Apptracer
+tracer = { id ="ru.ok.tracer", version.ref = "tracerVersion"}

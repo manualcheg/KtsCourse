@@ -53,7 +53,7 @@ class ViewModelMainScreen(
 
         updateLoadingStatus(isFirstPage, isRefresh)
 //
-//        triggerTestError(true)
+//        triggerTestError(false)
 
         loadingJob?.cancel()
         loadingJob =

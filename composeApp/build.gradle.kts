@@ -1,4 +1,3 @@
-import org.gradle.kotlin.dsl.invoke
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -9,7 +8,7 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.androidx.room)
-    id("ru.ok.tracer").version("1.1.7")
+    alias(libs.plugins.tracer)
 }
 
 kotlin {
@@ -35,23 +34,14 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.android)
             implementation(libs.koin.android)
-            implementation(project.dependencies.platform("ru.ok.tracer:tracer-platform:1.1.7"))
+            implementation(project.dependencies.platform(libs.tracer.platform))
 
-            // Плагины независимы друг от друга. Можно подключать только те,
-            // которые необходимы в данный момент.
-
-            // Сбор и анализ крешей и ANR
-            implementation("ru.ok.tracer:tracer-crash-report")
-            // Сбор и анализ нативных крешей
-            implementation("ru.ok.tracer:tracer-crash-report-native")
-            // Сбор и анализ хипдапмов при OOM
-            implementation("ru.ok.tracer:tracer-heap-dumps")
-            // Анализ потребления дискового места на устройстве
-            implementation("ru.ok.tracer:tracer-disk-usage")
-            // Семплирующий профайлер
-            implementation("ru.ok.tracer:tracer-profiler-sampling")
-            // Систрейс
-            implementation("ru.ok.tracer:tracer-profiler-systrace")
+            implementation(libs.tracer.crash.report)
+            implementation(libs.tracer.crash.report.native)
+            implementation(libs.tracer.heap.dumps)
+            implementation(libs.tracer.disk.usage)
+            implementation(libs.tracer.profiler.sampling)
+            implementation(libs.tracer.profiler.systrace)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -124,7 +114,15 @@ android {
         }
     }
     buildTypes {
-        getByName("release") {
+        release {
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+        }
+        debug {
+            applicationIdSuffix = ".debug"
             isMinifyEnabled = false
         }
     }
@@ -145,24 +143,12 @@ dependencies {
 
 tracer {
     create("defaultConfig") {
-        // См. в разделе _«Настройки»_
         pluginToken = "rsurXfuFU2p8xslo8c8nM9Q5wRKzkazmWxxk3r6EkNL"
         appToken = "huahvSoIj4AIKwAhNVe8KIiP437CrhXPnCLC7vI55061"
 
-        // Ваши параметры конфигурации (подробее см. выше)
-        // Например:
         uploadMapping = true
 //        uploadNativeSymbols = true
         uploadRetryCount = 2
         additionalLibrariesPath = projectDir.toString() + "/aVeryNonstandardLibsDirectory"
-    }
-
-    // Также можно задавать конфигурацию для каждого flavor, buildType, buildVariant.
-    // Конфигурации наследуют defaultConfig.
-    create("debug") {
-        // Параметры...
-    }
-    create("demoDebug") {
-        // Параметры...
     }
 }
