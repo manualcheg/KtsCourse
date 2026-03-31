@@ -6,8 +6,10 @@ import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.manualcheg.ktscourse.common.navigation.Screen
 import com.manualcheg.ktscourse.common.repository.UserPreferencesRepository
+import com.manualcheg.ktscourse.screenLaunchDetails.presentation.LaunchDetailsScreen
 import com.manualcheg.ktscourse.screenLogin.presentation.LoginScreen
 import com.manualcheg.ktscourse.screenMain.presentation.MainScreen
 import com.manualcheg.ktscourse.screenOnboarding.presentation.Onboarding
@@ -56,6 +58,9 @@ fun AppNavHost() {
                 onProfileClick = {
                     navController.navigate(Screen.Profile)
                 },
+                openLaunchDetails = { id ->
+                    navController.navigate(Screen.LaunchDetails(id))
+                },
             )
         }
 
@@ -69,6 +74,15 @@ fun AppNavHost() {
                 {
                     navController.navigateUp()
                 },
+            )
+        }
+
+        composable<Screen.LaunchDetails> { backstackEntry ->
+            val launchDetails: Screen.LaunchDetails = backstackEntry.toRoute()
+            LaunchDetailsScreen(
+                onBackClick = { navController.navigateUp() },
+                launchId = launchDetails.id,
+                onRocketClick = { navController.navigateUp() },
             )
         }
     }

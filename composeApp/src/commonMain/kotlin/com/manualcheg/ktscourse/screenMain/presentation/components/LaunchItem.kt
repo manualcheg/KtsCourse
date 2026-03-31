@@ -1,6 +1,7 @@
 package com.manualcheg.ktscourse.screenMain.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,9 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
+import com.manualcheg.ktscourse.common.LaunchStatus
 import com.manualcheg.ktscourse.common.LocalDimensions
 import com.manualcheg.ktscourse.screenMain.domain.model.Launch
-import com.manualcheg.ktscourse.screenMain.domain.model.LaunchStatus
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.main_screen_launch_status_failed_text
 import ktscourse.composeapp.generated.resources.main_screen_launch_status_success_text
@@ -46,11 +47,12 @@ fun PreviewLaunchItem() {
             "https://images2.imgbox.com/85/43/6VSgldkO_o.png",
             LaunchStatus.SUCCESS,
         ),
+        { println("") },
     )
 }
 
 @Composable
-fun LaunchItem(launch: Launch) {
+fun LaunchItem(launch: Launch, onItemClick: () -> Unit) {
     val dimensions = LocalDimensions.current
     val statusColor = when (launch.status) {
         LaunchStatus.SUCCESS -> Color(dimensions.successColor)
@@ -74,7 +76,8 @@ fun LaunchItem(launch: Launch) {
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = dimensions.paddingLarge),
+            .padding(horizontal = dimensions.paddingLarge)
+            .clickable { onItemClick.invoke() },
     ) {
         Row(
             modifier = Modifier

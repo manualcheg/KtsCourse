@@ -1,7 +1,7 @@
 package com.manualcheg.ktscourse.data.database
 
 import androidx.room.TypeConverter
-import com.manualcheg.ktscourse.screenMain.domain.model.LaunchStatus
+import com.manualcheg.ktscourse.common.LaunchStatus
 
 class DBTypeConverters {
     @TypeConverter

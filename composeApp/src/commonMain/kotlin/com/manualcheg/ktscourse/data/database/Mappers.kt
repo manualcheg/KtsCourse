@@ -12,14 +12,3 @@ fun LaunchEntity.toDomain() =
         imageUrl = imageUrl,
         status = status,
     )
-
-fun Launch.toEntity() =
-    LaunchEntity(
-        id = id,
-        name = name,
-        flightNumber = flightNumber,
-        launchDate = launchDate,
-        details = details,
-        imageUrl = imageUrl,
-        status = status,
-    )

@@ -1,9 +1,7 @@
 package com.manualcheg.ktscourse.screenMain.presentation
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,7 +9,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -32,23 +29,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.manualcheg.ktscourse.common.LocalDimensions
+import com.manualcheg.ktscourse.common.components.EmptyState
+import com.manualcheg.ktscourse.common.components.ErrorState
 import com.manualcheg.ktscourse.screenMain.domain.model.Launch
 import com.manualcheg.ktscourse.screenMain.presentation.components.LaunchItem
 import com.manualcheg.ktscourse.screenMain.presentation.components.MainTopAppBar
-import ktscourse.composeapp.generated.resources.Res
-import ktscourse.composeapp.generated.resources.main_screen_button_retry_text
-import ktscourse.composeapp.generated.resources.main_screen_error_text
-import ktscourse.composeapp.generated.resources.nothingFound
-import ktscourse.composeapp.generated.resources.nothing_found_content_description
-import ktscourse.composeapp.generated.resources.nothing_found_text
-import org.jetbrains.compose.resources.imageResource
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     onProfileClick: () -> Unit = {},
+    openLaunchDetails: (String) -> Unit, // Изменено на (String) -> Unit
     viewModel: ViewModelMainScreen = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -60,6 +52,7 @@ fun MainScreen(
         onRefresh = viewModel::updateData,
         onLoadNextPage = viewModel::loadNextPage,
         onRetry = viewModel::updateData,
+        openLaunchDetails = openLaunchDetails,
     )
 }
 
@@ -72,6 +65,7 @@ fun MainContent(
     onRefresh: () -> Unit,
     onLoadNextPage: () -> Unit,
     onRetry: () -> Unit,
+    openLaunchDetails: (String) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -100,6 +94,7 @@ fun MainContent(
                             isLastPage = uiState.isLastPage,
                             loadNextPage = onLoadNextPage,
                             searchQuery = uiState.searchQuery,
+                            openLaunchDetails = openLaunchDetails,
                         )
                     }
 
@@ -131,6 +126,7 @@ fun LaunchList(
     isLastPage: Boolean,
     loadNextPage: () -> Unit,
     searchQuery: String,
+    openLaunchDetails: (String) -> Unit,
 ) {
     val listState = rememberLazyListState()
     val dimensions = LocalDimensions.current
@@ -149,7 +145,7 @@ fun LaunchList(
         verticalArrangement = Arrangement.spacedBy(dimensions.paddingSmall),
     ) {
         itemsIndexed(launches, key = { _, item -> item.id }) { index, launch ->
-            LaunchItem(launch)
+            LaunchItem(launch, { openLaunchDetails(launch.id) })
             if (index >= launches.size - 2 && !isLastPage && !isNextPageLoading) {
                 LaunchedEffect(launches.size) {
                     loadNextPage()
@@ -185,47 +181,6 @@ fun LaunchList(
     }
 }
 
-@Composable
-fun ErrorState(
-    message: String,
-    onRetry: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier.padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            text = stringResource(Res.string.main_screen_error_text, message),
-            color = MaterialTheme.colorScheme.error,
-            textAlign = TextAlign.Center,
-        )
-        Button(onClick = onRetry, modifier = Modifier.padding(top = 8.dp)) {
-            Text(stringResource(Res.string.main_screen_button_retry_text))
-        }
-    }
-}
-
-@Composable
-fun EmptyState(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier.padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Image(
-            imageResource(Res.drawable.nothingFound),
-            contentDescription = stringResource(Res.string.nothing_found_content_description),
-            modifier = Modifier.size(150.dp),
-        )
-        Text(
-            text = stringResource(Res.string.nothing_found_text),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-        )
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun PreviewMainScreen() {
@@ -236,5 +191,6 @@ fun PreviewMainScreen() {
         onRefresh = {},
         onLoadNextPage = {},
         onRetry = {},
+        openLaunchDetails = { _ -> },
     )
 }

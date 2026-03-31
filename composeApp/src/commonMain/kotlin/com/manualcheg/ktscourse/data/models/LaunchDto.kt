@@ -12,7 +12,6 @@ data class LaunchDto(
     @SerialName("date_unix") val dateUnix: Int?,
     @SerialName("date_utc") val dateUtc: String?,
     @SerialName("details") val details: String? = null,
-//    @SerialName("failures") val failures: List<Any>,
     @SerialName("failures") val failures: List<Failure>? = null,
     @SerialName("fairings") val fairings: Fairings? = null,
     @SerialName("flight_number") val flightNumber: Int,
@@ -21,11 +20,11 @@ data class LaunchDto(
     @SerialName("links") val links: Links?,
     @SerialName("name") val name: String? = "",
     @SerialName("net") val net: Boolean?,
-    @SerialName("payloads") val payloads: List<String>,
+    @SerialName("payloads") val payloads: List<String?>,
     @SerialName("rocket") val rocket: String?,
-//    @SerialName("ships") val ships: List<Any>,
-//    @SerialName("static_fire_date_unix") val staticFireDateUnix: Any,
-//    @SerialName("static_fire_date_utc") val staticFireDateUtc: Any,
+    @SerialName("ships") val ships: List<String?>,
+    @SerialName("static_fire_date_unix") val staticFireDateUnix: Int?,
+    @SerialName("static_fire_date_utc") val staticFireDateUtc: String?,
     @SerialName("success") val success: Boolean?,
     @SerialName("tbd") val tbd: Boolean?,
     @SerialName("upcoming") val upcoming: Boolean?,
@@ -38,9 +37,9 @@ data class LaunchDto(
         @SerialName("flight") val flight: Int?,
         @SerialName("gridfins") val gridfins: Boolean?,
         @SerialName("landing_attempt") val landingAttempt: Boolean?,
-//        @SerialName("landing_success") val landingSuccess: Any,
-//        @SerialName("landing_type") val landingType: Any,
-//        @SerialName("landpad") val landpad: Any,
+        @SerialName("landing_success") val landingSuccess: Boolean?,
+        @SerialName("landing_type") val landingType: String?,
+        @SerialName("landpad") val landpad: String?,
         @SerialName("legs") val legs: Boolean?,
         @SerialName("reused") val reused: Boolean?
     )
@@ -57,26 +56,26 @@ data class LaunchDto(
         @SerialName("recovered") val recovered: Boolean?,
         @SerialName("recovery_attempt") val recoveryAttempt: Boolean?,
         @SerialName("reused") val reused: Boolean?,
-//        @SerialName("ships") val ships: List<Any>
+        @SerialName("ships") val ships: List<String?>
     )
 
     @Serializable
     data class Links(
         @SerialName("article") val article: String?,
-//        @SerialName("flickr") val flickr: Flickr,
+        @SerialName("flickr") val flickr: Flickr?,
         @SerialName("patch") val patch: Patch?,
-//        @SerialName("presskit") val presskit: Any,
-//        @SerialName("reddit") val reddit: Reddit,
+        @SerialName("presskit") val presskit: String?,
+        @SerialName("reddit") val reddit: Reddit?,
         @SerialName("webcast") val webcast: String?,
         @SerialName("wikipedia") val wikipedia: String?,
         @SerialName("youtube_id") val youtubeId: String?
     ) {
 
-        /*@Serializable
+        @Serializable
         data class Flickr(
-            @SerialName("original") val original: List<Any>,
-            @SerialName("small") val small: List<Any>
-        )*/
+            @SerialName("original") val original: List<String>,
+            @SerialName("small") val small: List<String>
+        )
 
         @Serializable
         data class Patch(
@@ -84,12 +83,12 @@ data class LaunchDto(
             @SerialName("small") val small: String?
         )
 
-        /*@Serializable
+        @Serializable
         data class Reddit(
-            @SerialName("campaign") val campaign: Any,
-            @SerialName("launch") val launch: Any,
-            @SerialName("media") val media: Any,
-            @SerialName("recovery") val recovery: Any
-        )*/
+            @SerialName("campaign") val campaign: String?,
+            @SerialName("launch") val launch: String?,
+            @SerialName("media") val media: String?,
+            @SerialName("recovery") val recovery: String?
+        )
     }
 }

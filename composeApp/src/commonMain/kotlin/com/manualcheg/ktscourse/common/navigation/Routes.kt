@@ -15,4 +15,7 @@ sealed class Screen {
 
     @Serializable
     object Profile : Screen()
+
+    @Serializable
+    data class LaunchDetails(val id: String): Screen()
 }

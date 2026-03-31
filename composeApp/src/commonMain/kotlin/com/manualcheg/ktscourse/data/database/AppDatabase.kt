@@ -8,11 +8,12 @@ import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
 
-@Database(entities = [LaunchEntity::class], version = 1)
+@Database(entities = [LaunchEntity::class, FavoriteLaunchEntity::class], version = 3)
 @TypeConverters(Converters::class)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun launchDao(): LaunchDao
+    abstract fun favoriteDao(): FavoriteDao
 }
 
 @Suppress("KotlinNoActualForExpect")

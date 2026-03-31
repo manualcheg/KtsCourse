@@ -1,5 +1,7 @@
 package com.manualcheg.ktscourse.screenMain.domain.model
 
+import com.manualcheg.ktscourse.common.LaunchStatus
+
 data class Launch(
     val id: String,
     val name: String,

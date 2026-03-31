@@ -6,8 +6,6 @@ import com.manualcheg.ktscourse.data.database.getAppDatabase
 import com.manualcheg.ktscourse.data.database.getDatabaseBuilder
 import com.manualcheg.ktscourse.data.repository.DatabaseRepository
 import com.manualcheg.ktscourse.data.repository.DatabaseRepositoryImpl
-import com.manualcheg.ktscourse.data.repository.NetworkRepository
-import com.manualcheg.ktscourse.data.repository.NetworkRepositoryImpl
 import com.manualcheg.ktscourse.data.repository.UserPreferencesRepositoryImpl
 import org.koin.dsl.module
 
@@ -17,9 +15,6 @@ val commonModule =
         single { getAppDatabase(getDatabaseBuilder()) }
         single { get<AppDatabase>().launchDao() }
         single<DatabaseRepository> { DatabaseRepositoryImpl(get()) }
-
-        // Network
-        single<NetworkRepository> { NetworkRepositoryImpl() }
 
         // DataStore & Preferences
         single<UserPreferencesRepository> { UserPreferencesRepositoryImpl(get()) }

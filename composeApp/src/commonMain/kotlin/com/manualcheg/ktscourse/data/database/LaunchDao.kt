@@ -28,7 +28,7 @@ interface LaunchDao {
     suspend fun getLaunchById(id: String): LaunchEntity?
 
     @Transaction
-    suspend fun fetchAndSaveLaunchesTransaction(launches: List<LaunchEntity>){
+    suspend fun fetchAndSaveLaunchesTransaction(launches: List<LaunchEntity>) {
         deleteAllLaunches()
         insertLaunches(launches)
     }
