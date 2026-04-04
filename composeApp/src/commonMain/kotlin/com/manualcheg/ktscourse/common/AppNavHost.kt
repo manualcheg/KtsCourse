@@ -3,6 +3,7 @@ package com.manualcheg.ktscourse.common
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -21,6 +22,7 @@ fun AppNavHost() {
     val navController = rememberNavController()
     val userPreferencesRepository: UserPreferencesRepository = koinInject()
     val userData by userPreferencesRepository.userData.collectAsState(initial = null)
+    val uriHandler = LocalUriHandler.current
 
     val user = userData ?: return
 
@@ -83,6 +85,10 @@ fun AppNavHost() {
                 onBackClick = { navController.navigateUp() },
                 launchId = launchDetails.id,
                 onRocketClick = { navController.navigateUp() },
+                openYoutube = { id ->
+                    val url = "https://youtu.be/$id"
+                    uriHandler.openUri(url)
+                },
             )
         }
     }

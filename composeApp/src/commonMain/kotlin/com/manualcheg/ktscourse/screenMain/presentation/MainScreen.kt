@@ -11,7 +11,10 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -33,14 +36,16 @@ import com.manualcheg.ktscourse.common.components.EmptyState
 import com.manualcheg.ktscourse.common.components.ErrorState
 import com.manualcheg.ktscourse.screenMain.domain.model.Launch
 import com.manualcheg.ktscourse.screenMain.presentation.components.LaunchItem
+import com.manualcheg.ktscourse.screenMain.presentation.components.MainTab
 import com.manualcheg.ktscourse.screenMain.presentation.components.MainTopAppBar
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     onProfileClick: () -> Unit = {},
-    openLaunchDetails: (String) -> Unit, // Изменено на (String) -> Unit
+    openLaunchDetails: (String) -> Unit,
     viewModel: ViewModelMainScreen = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -53,6 +58,7 @@ fun MainScreen(
         onLoadNextPage = viewModel::loadNextPage,
         onRetry = viewModel::updateData,
         openLaunchDetails = openLaunchDetails,
+        changeTab = viewModel::changeTab,
     )
 }
 
@@ -66,6 +72,7 @@ fun MainContent(
     onLoadNextPage: () -> Unit,
     onRetry: () -> Unit,
     openLaunchDetails: (String) -> Unit,
+    changeTab: (tab: MainTab) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -75,6 +82,19 @@ fun MainContent(
                 onProfileClick = onProfileClick,
             )
         },
+        bottomBar = {
+            NavigationBar {
+                MainTab.entries.forEach { tab ->
+                    val title = stringResource(tab.titleRes)
+                    NavigationBarItem(
+                        selected = uiState.selectedTab == tab,
+                        onClick = { changeTab(tab) },
+                        label = { Text(title) },
+                        icon = { Icon(tab.icon, contentDescription = title) },
+                    )
+                }
+            }
+        },
     ) { innerPadding ->
         Surface(
             modifier =
@@ -82,36 +102,50 @@ fun MainContent(
                     .fillMaxSize()
                     .padding(innerPadding),
         ) {
-            PullToRefreshBox(
-                isRefreshing = uiState.isRefreshing,
-                onRefresh = onRefresh,
-            ) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    if (uiState.launches.isNotEmpty()) {
-                        LaunchList(
-                            launches = uiState.launches,
-                            isNextPageLoading = uiState.isNextPageLoading,
-                            isLastPage = uiState.isLastPage,
-                            loadNextPage = onLoadNextPage,
-                            searchQuery = uiState.searchQuery,
-                            openLaunchDetails = openLaunchDetails,
-                        )
-                    }
+            when (uiState.selectedTab) {
+                MainTab.Launches -> PullToRefreshBox(
+                    isRefreshing = uiState.isRefreshing,
+                    onRefresh = onRefresh,
+                ) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        if (uiState.launches.isNotEmpty()) {
+                            LaunchList(
+                                launches = uiState.launches,
+                                isNextPageLoading = uiState.isNextPageLoading,
+                                isLastPage = uiState.isLastPage,
+                                loadNextPage = onLoadNextPage,
+                                searchQuery = uiState.searchQuery,
+                                openLaunchDetails = openLaunchDetails,
+                            )
+                        }
 
-                    if (uiState.showLoading) {
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                    }
+                        if (uiState.showLoading) {
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                        }
 
-                    if (uiState.showErrorState) {
-                        ErrorState(
-                            message = uiState.error!!,
-                            onRetry = onRetry,
-                            modifier = Modifier.align(Alignment.Center),
-                        )
-                    }
+                        if (uiState.showErrorState) {
+                            ErrorState(
+                                message = uiState.error!!,
+                                onRetry = onRetry,
+                                modifier = Modifier.align(Alignment.Center),
+                            )
+                        }
 
-                    if (uiState.showEmptyState) {
-                        EmptyState(modifier = Modifier.align(Alignment.Center))
+                        if (uiState.showEmptyState) {
+                            EmptyState(modifier = Modifier.align(Alignment.Center))
+                        }
+                    }
+                }
+
+                MainTab.Rockets -> {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Экран ракет в разработке")
+                    }
+                }
+
+                MainTab.Favorites -> {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Экран избранного в разработке")
                     }
                 }
             }
@@ -192,5 +226,6 @@ fun PreviewMainScreen() {
         onLoadNextPage = {},
         onRetry = {},
         openLaunchDetails = { _ -> },
+        changeTab = {},
     )
 }

@@ -47,6 +47,26 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.manualcheg.ktscourse.common.LaunchStatus
 import com.manualcheg.ktscourse.common.components.ErrorState
+import ktscourse.composeapp.generated.resources.Res
+import ktscourse.composeapp.generated.resources.details_screen_article_text
+import ktscourse.composeapp.generated.resources.details_screen_back_arrow_text
+import ktscourse.composeapp.generated.resources.details_screen_description_text
+import ktscourse.composeapp.generated.resources.details_screen_flight_number_text
+import ktscourse.composeapp.generated.resources.details_screen_launch_date_text
+import ktscourse.composeapp.generated.resources.details_screen_launchpad_text
+import ktscourse.composeapp.generated.resources.details_screen_links_text
+import ktscourse.composeapp.generated.resources.details_screen_patch_content_description
+import ktscourse.composeapp.generated.resources.details_screen_payloads_text
+import ktscourse.composeapp.generated.resources.details_screen_reddit_text
+import ktscourse.composeapp.generated.resources.details_screen_rocket_text
+import ktscourse.composeapp.generated.resources.details_screen_time_local_text
+import ktscourse.composeapp.generated.resources.details_screen_time_utc_text
+import ktscourse.composeapp.generated.resources.details_screen_wiki_text
+import ktscourse.composeapp.generated.resources.details_screen_youtube_text
+import ktscourse.composeapp.generated.resources.main_screen_launch_status_failed_text
+import ktscourse.composeapp.generated.resources.main_screen_launch_status_success_text
+import ktscourse.composeapp.generated.resources.main_screen_launch_status_upcoming_text
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,7 +75,8 @@ fun LaunchDetailsScreen(
     launchId: String,
     viewModel: LaunchDetailsScreenViewModel = koinInject(),
     onBackClick: () -> Unit,
-    onRocketClick: (String) -> Unit
+    onRocketClick: (String) -> Unit,
+    openYoutube: (String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -65,6 +86,7 @@ fun LaunchDetailsScreen(
         viewModel = viewModel,
         uiState = uiState,
         onRocketClick = onRocketClick,
+        openYoutube = openYoutube,
     )
 
     LaunchedEffect(launchId) {
@@ -79,12 +101,18 @@ fun LaunchDetailsContent(
     onBackClick: () -> Unit,
     viewModel: LaunchDetailsScreenViewModel,
     uiState: DetailsUiState,
-    onRocketClick: (String) -> Unit
+    onRocketClick: (String) -> Unit,
+    openYoutube: (String) -> Unit,
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Details", fontWeight = FontWeight.Bold) },
+                title = {
+                    Text(
+                        stringResource(Res.string.details_screen_back_arrow_text),
+                        fontWeight = FontWeight.Bold,
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -129,10 +157,9 @@ fun LaunchDetailsContent(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 item {
-                    // Mission Patch
                     AsyncImage(
                         model = launch.patchUrl,
-                        contentDescription = "Mission Patch",
+                        contentDescription = stringResource(Res.string.details_screen_patch_content_description),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(250.dp)
@@ -142,7 +169,6 @@ fun LaunchDetailsContent(
                 }
 
                 item {
-                    // Title and Status
                     Column {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -158,7 +184,7 @@ fun LaunchDetailsContent(
                             StatusBadge(launch.status)
                         }
                         Text(
-                            text = "Flight #${launch.flightNumber}",
+                            text = stringResource(Res.string.details_screen_flight_number_text, launch.flightNumber),
                             style = MaterialTheme.typography.titleMedium,
                             color = Color.Gray,
                         )
@@ -166,15 +192,14 @@ fun LaunchDetailsContent(
                 }
 
                 item {
-                    // Dates
-                    InfoCard(title = "Launch Date") {
+                    InfoCard(title = stringResource(Res.string.details_screen_launch_date_text)) {
                         Column {
                             Text(
-                                "UTC: ${launch.dateUtc}",
+                                stringResource(Res.string.details_screen_time_utc_text, launch.dateUtc),
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                             Text(
-                                "Local: ${launch.dateLocal}",
+                                stringResource(Res.string.details_screen_time_local_text, launch.dateLocal),
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                         }
@@ -183,17 +208,16 @@ fun LaunchDetailsContent(
 
                 if (!launch.details.isNullOrBlank()) {
                     item {
-                        InfoCard(title = "Description") {
+                        InfoCard(title = stringResource(Res.string.details_screen_description_text) ) {
                             Text(launch.details, style = MaterialTheme.typography.bodyMedium)
                         }
                     }
                 }
 
                 item {
-                    // Rocket & Launchpad
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         InfoCard(
-                            title = "Rocket",
+                            title = stringResource(Res.string.details_screen_rocket_text),
                             modifier = Modifier.weight(1f)
                                 .clickable { onRocketClick(launch.rocketId) },
                         ) {
@@ -203,7 +227,7 @@ fun LaunchDetailsContent(
                                 color = MaterialTheme.colorScheme.primary,
                             )
                         }
-                        InfoCard(title = "Launchpad", modifier = Modifier.weight(1f)) {
+                        InfoCard(title = stringResource(Res.string.details_screen_launchpad_text), modifier = Modifier.weight(1f)) {
                             Text(launch.launchpadName)
                         }
                     }
@@ -212,7 +236,7 @@ fun LaunchDetailsContent(
                 launch.payloads.let {
                     if (it.isNotEmpty()) {
                         item {
-                            InfoCard(title = "Payloads") {
+                            InfoCard(title = stringResource(Res.string.details_screen_payloads_text)) {
                                 Text(launch.payloads.joinToString(", "))
                             }
                         }
@@ -221,7 +245,7 @@ fun LaunchDetailsContent(
 
                 item {
                     Text(
-                        "Links",
+                        stringResource(Res.string.details_screen_links_text),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                     )
@@ -230,20 +254,20 @@ fun LaunchDetailsContent(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        LinkButton("Wiki", launch.wikipediaUrl, Modifier.weight(1f))
-                        LinkButton("Reddit", launch.redditUrl, Modifier.weight(1f))
-                        LinkButton("Article", launch.articleUrl, Modifier.weight(1f))
+                        LinkButton(stringResource(Res.string.details_screen_wiki_text), launch.wikipediaUrl, Modifier.weight(1f))
+                        LinkButton(stringResource(Res.string.details_screen_reddit_text), launch.redditUrl, Modifier.weight(1f))
+                        LinkButton(stringResource(Res.string.details_screen_article_text), launch.articleUrl, Modifier.weight(1f))
                     }
                 }
 
                 item {
                     Button(
-                        onClick = { /* TODO  Open YouTube */ },
+                        onClick = { openYoutube.invoke(uiState.launch.youtubeUrl ?: "") },
                         enabled = launch.youtubeUrl != null,
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF0000)),
                     ) {
-                        Text("Watch on YouTube", color = Color.White)
+                        Text(stringResource(Res.string.details_screen_youtube_text), color = Color.White)
                     }
                     Spacer(Modifier.height(24.dp))
                 }
@@ -282,9 +306,9 @@ fun InfoCard(
 @Composable
 fun StatusBadge(status: LaunchStatus) {
     val (text, color) = when (status) {
-        LaunchStatus.SUCCESS -> "Success" to Color(0xFF4CAF50)
-        LaunchStatus.FAILURE -> "Failed" to Color(0xFFF44336)
-        LaunchStatus.UPCOMING -> "Upcoming" to Color(0xFF2196F3)
+        LaunchStatus.SUCCESS -> stringResource(Res.string.main_screen_launch_status_success_text) to Color(0xFF4CAF50)
+        LaunchStatus.FAILURE -> stringResource(Res.string.main_screen_launch_status_failed_text) to Color(0xFFF44336)
+        LaunchStatus.UPCOMING -> stringResource(Res.string.main_screen_launch_status_upcoming_text) to Color(0xFF2196F3)
     }
     Surface(
         color = color.copy(alpha = 0.1f),

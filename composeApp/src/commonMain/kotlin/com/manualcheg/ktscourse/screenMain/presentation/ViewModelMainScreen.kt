@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.manualcheg.ktscourse.screenMain.domain.model.LaunchesPageResult
 import com.manualcheg.ktscourse.screenMain.domain.useCase.GetLaunchesUseCase
+import com.manualcheg.ktscourse.screenMain.presentation.components.MainTab
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -127,5 +128,9 @@ class ViewModelMainScreen(
         loadingJob?.cancel()
         currentPage = 1
         _uiState.update { it.copy(launches = emptyList(), isLastPage = false, error = null) }
+    }
+
+    fun changeTab(tab: MainTab) {
+        _uiState.update { it.copy(selectedTab = tab) }
     }
 }

@@ -35,5 +35,23 @@
     <string name="profile_screen_username_text">Name: %1$s</string>
     <string name="profile_screen_button_logout_text">Logout</string>
     <string name="onboarding_skip_text">Skip</string>
+    <string name="main_tab_launches">Launches</string>
+    <string name="main_tab_rockets">Rockets</string>
+    <string name="main_tab_favorites">Favorites</string>
+    <string name="details_screen_back_arrow_text">back</string>
+    <string name="details_screen_launch_date_text">Launch date</string>
+    <string name="details_screen_flight_number_text">Flight #%1$s</string>"
+    <string name="details_screen_description_text">Description</string>
+    <string name="details_screen_rocket_text">Rocket</string>
+    <string name="details_screen_launchpad_text">Launchpad</string>
+    <string name="details_screen_payloads_text">Payloads</string>
+    <string name="details_screen_links_text">Links</string>
+    <string name="details_screen_youtube_text">Watch on Youtube</string>
+    <string name="details_screen_article_text">Article</string>
+    <string name="details_screen_reddit_text">Reddit</string>
+    <string name="details_screen_wiki_text">Wiki</string>
+    <string name="details_screen_time_utc_text">UTC: %1$s</string>
+    <string name="details_screen_time_local_text">Local: %1$s</string>
+    <string name="details_screen_patch_content_description">Mission Patch</string>
 
 </resources>
