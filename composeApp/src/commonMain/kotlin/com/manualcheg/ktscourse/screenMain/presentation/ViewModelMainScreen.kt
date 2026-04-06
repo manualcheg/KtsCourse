@@ -80,6 +80,7 @@ class ViewModelMainScreen(
                 isRefreshing = false,
                 isLastPage = result.isLastPage,
                 error = null,
+                isFromCache = result.isFromCache,
             )
         }
         currentPage = pageLoaded

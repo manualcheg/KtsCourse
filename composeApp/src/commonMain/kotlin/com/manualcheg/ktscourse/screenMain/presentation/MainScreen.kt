@@ -2,6 +2,7 @@ package com.manualcheg.ktscourse.screenMain.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -96,45 +97,60 @@ fun MainContent(
             }
         },
     ) { innerPadding ->
-        Surface(
+        Column(
             modifier =
                 Modifier
                     .fillMaxSize()
                     .padding(innerPadding),
         ) {
+            if (uiState.isFromCache) {
+                Surface(
+                    color = MaterialTheme.colorScheme.tertiary,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(
+                        text = "Показаны офлайн-данные",
+                        modifier = Modifier.padding(8.dp),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onTertiary,
+                    )
+                }
+            }
+
             when (uiState.selectedTab) {
                 MainTab.Launches -> PullToRefreshBox(
                     isRefreshing = uiState.isRefreshing,
                     onRefresh = onRefresh,
                 ) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        if (uiState.launches.isNotEmpty()) {
-                            LaunchList(
-                                launches = uiState.launches,
-                                isNextPageLoading = uiState.isNextPageLoading,
-                                isLastPage = uiState.isLastPage,
-                                loadNextPage = onLoadNextPage,
-                                searchQuery = uiState.searchQuery,
-                                openLaunchDetails = openLaunchDetails,
-                            )
-                        }
+                        Box(modifier =  Modifier.fillMaxSize()) {
+                            if (uiState.launches.isNotEmpty()) {
+                                LaunchList(
+                                    launches = uiState.launches,
+                                    isNextPageLoading = uiState.isNextPageLoading,
+                                    isLastPage = uiState.isLastPage,
+                                    loadNextPage = onLoadNextPage,
+                                    searchQuery = uiState.searchQuery,
+                                    openLaunchDetails = openLaunchDetails,
+                                )
+                            }
 
-                        if (uiState.showLoading) {
-                            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                        }
+                            if (uiState.showLoading) {
+                                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                            }
 
-                        if (uiState.showErrorState) {
-                            ErrorState(
-                                message = uiState.error!!,
-                                onRetry = onRetry,
-                                modifier = Modifier.align(Alignment.Center),
-                            )
-                        }
+                            if (uiState.showErrorState) {
+                                ErrorState(
+                                    message = uiState.error!!,
+                                    onRetry = onRetry,
+                                    modifier = Modifier.align(Alignment.Center),
+                                )
+                            }
 
-                        if (uiState.showEmptyState) {
-                            EmptyState(modifier = Modifier.align(Alignment.Center))
+                            if (uiState.showEmptyState) {
+                                EmptyState(modifier = Modifier.align(Alignment.Center))
+                            }
                         }
-                    }
                 }
 
                 MainTab.Rockets -> {

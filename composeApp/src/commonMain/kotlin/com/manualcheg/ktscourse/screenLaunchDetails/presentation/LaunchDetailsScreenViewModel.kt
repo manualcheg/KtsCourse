@@ -2,6 +2,7 @@ package com.manualcheg.ktscourse.screenLaunchDetails.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.manualcheg.ktscourse.screenLaunchDetails.data.ShareServiceProvider
 import com.manualcheg.ktscourse.screenLaunchDetails.domain.useCase.GetLaunchDetailsUseCase
 import com.manualcheg.ktscourse.screenLaunchDetails.domain.useCase.ToggleFavoriteUseCase
 import io.github.aakira.napier.Napier
@@ -14,6 +15,7 @@ import kotlinx.coroutines.launch
 class LaunchDetailsScreenViewModel(
     private val getLaunchDetailsUseCase: GetLaunchDetailsUseCase,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
+    private val shareServiceProvider: ShareServiceProvider,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DetailsUiState())
     val uiState: StateFlow<DetailsUiState> = _uiState.asStateFlow()
@@ -42,6 +44,21 @@ class LaunchDetailsScreenViewModel(
                 .onFailure { error ->
                     Napier.e("Failed to toggle favorite for launch id: ${currentLaunch.id}", error)
                 }
+        }
+    }
+
+    fun shareLaunch() {
+        val launch = _uiState.value.launch
+        val shareText = """
+            🚀 Mission: ${launch.name}
+            📅 Date: ${launch.dateLocal}
+            📊 Status: ${launch.status}
+            🔗 More info: ${launch.articleUrl}
+        """.trimIndent()
+        try {
+            shareServiceProvider.getShareService().share(shareText)
+        } catch (e: Exception) {
+            Napier.e("Failed to share launch details", e)
         }
     }
 }

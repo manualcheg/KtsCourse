@@ -1,5 +1,6 @@
 package com.manualcheg.ktscourse.common.di.modules
 
+import com.manualcheg.ktscourse.screenLaunchDetails.data.ShareServiceProvider
 import com.manualcheg.ktscourse.screenLaunchDetails.domain.useCase.GetLaunchDetailsUseCase
 import com.manualcheg.ktscourse.screenLaunchDetails.domain.useCase.GetLaunchDetailsUseCaseImpl
 import com.manualcheg.ktscourse.screenLaunchDetails.domain.useCase.ToggleFavoriteUseCase
@@ -15,4 +16,5 @@ val launchDetailsModule =
         viewModelOf(::LaunchDetailsScreenViewModel)
         factoryOf(::GetLaunchDetailsUseCaseImpl) bind GetLaunchDetailsUseCase::class
         factoryOf(::ToggleFavoriteUseCaseImpl) bind ToggleFavoriteUseCase::class
+        single { ShareServiceProvider() }
     }

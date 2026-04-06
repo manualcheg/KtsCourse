@@ -18,7 +18,7 @@ import io.ktor.http.contentType
 
 class NetworkRepositoryImpl(private val httpClient: HttpClient) : NetworkRepository {
 
-    override suspend fun getAllLaunches(
+    override suspend fun getLaunches(
         query: String,
         page: Int
     ): Result<SpaceXResponseDto<LaunchDto>> {

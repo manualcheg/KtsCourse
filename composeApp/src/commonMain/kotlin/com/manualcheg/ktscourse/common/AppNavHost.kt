@@ -85,8 +85,9 @@ fun AppNavHost() {
                 onBackClick = { navController.navigateUp() },
                 launchId = launchDetails.id,
                 onRocketClick = { navController.navigateUp() },
-                openYoutube = { id ->
-                    val url = "https://youtu.be/$id"
+                openLink = { url ->
+                    val url = if (url.startsWith("https") || url.startsWith("http"))
+                        url else "https://$url"
                     uriHandler.openUri(url)
                 },
             )

@@ -27,7 +27,7 @@ class LaunchRepositoryImpl(
 
     override suspend fun fetchAndSaveLaunches(query: String, page: Int): Result<Boolean> =
         withContext(Dispatchers.IO) {
-            val result = networkRepository.getAllLaunches(query, page)
+            val result = networkRepository.getLaunches(query, page)
             if (result.isSuccess) {
                 val response = result.getOrThrow()
                 val entities = response.docs.map { it.toEntity() }

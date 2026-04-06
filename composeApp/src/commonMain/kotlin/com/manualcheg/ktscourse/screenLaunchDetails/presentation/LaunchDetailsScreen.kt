@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.manualcheg.ktscourse.common.LaunchStatus
 import com.manualcheg.ktscourse.common.components.ErrorState
+import com.manualcheg.ktscourse.screenLaunchDetails.data.ShareServiceProvider
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.details_screen_article_text
 import ktscourse.composeapp.generated.resources.details_screen_back_arrow_text
@@ -76,7 +77,7 @@ fun LaunchDetailsScreen(
     viewModel: LaunchDetailsScreenViewModel = koinInject(),
     onBackClick: () -> Unit,
     onRocketClick: (String) -> Unit,
-    openYoutube: (String) -> Unit,
+    openLink: (String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -86,7 +87,7 @@ fun LaunchDetailsScreen(
         viewModel = viewModel,
         uiState = uiState,
         onRocketClick = onRocketClick,
-        openYoutube = openYoutube,
+        openLink = openLink,
     )
 
     LaunchedEffect(launchId) {
@@ -102,7 +103,7 @@ fun LaunchDetailsContent(
     viewModel: LaunchDetailsScreenViewModel,
     uiState: DetailsUiState,
     onRocketClick: (String) -> Unit,
-    openYoutube: (String) -> Unit,
+    openLink: (String) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -128,8 +129,14 @@ fun LaunchDetailsContent(
                             )
                         }
 
-                        IconButton(onClick = { /* TODO share */ }) {
-                            Icon(Icons.Default.Share, contentDescription = "Share")
+                        IconButton(
+                            onClick = { viewModel.shareLaunch() },
+                            enabled = !uiState.isLoading,
+                        ) {
+                            Icon(
+                                Icons.Default.Share,
+                                contentDescription = "Share",
+                            )
                         }
                     }
                 },
@@ -184,7 +191,10 @@ fun LaunchDetailsContent(
                             StatusBadge(launch.status)
                         }
                         Text(
-                            text = stringResource(Res.string.details_screen_flight_number_text, launch.flightNumber),
+                            text = stringResource(
+                                Res.string.details_screen_flight_number_text,
+                                launch.flightNumber,
+                            ),
                             style = MaterialTheme.typography.titleMedium,
                             color = Color.Gray,
                         )
@@ -195,11 +205,17 @@ fun LaunchDetailsContent(
                     InfoCard(title = stringResource(Res.string.details_screen_launch_date_text)) {
                         Column {
                             Text(
-                                stringResource(Res.string.details_screen_time_utc_text, launch.dateUtc),
+                                stringResource(
+                                    Res.string.details_screen_time_utc_text,
+                                    launch.dateUtc,
+                                ),
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                             Text(
-                                stringResource(Res.string.details_screen_time_local_text, launch.dateLocal),
+                                stringResource(
+                                    Res.string.details_screen_time_local_text,
+                                    launch.dateLocal,
+                                ),
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                         }
@@ -208,7 +224,7 @@ fun LaunchDetailsContent(
 
                 if (!launch.details.isNullOrBlank()) {
                     item {
-                        InfoCard(title = stringResource(Res.string.details_screen_description_text) ) {
+                        InfoCard(title = stringResource(Res.string.details_screen_description_text)) {
                             Text(launch.details, style = MaterialTheme.typography.bodyMedium)
                         }
                     }
@@ -227,7 +243,10 @@ fun LaunchDetailsContent(
                                 color = MaterialTheme.colorScheme.primary,
                             )
                         }
-                        InfoCard(title = stringResource(Res.string.details_screen_launchpad_text), modifier = Modifier.weight(1f)) {
+                        InfoCard(
+                            title = stringResource(Res.string.details_screen_launchpad_text),
+                            modifier = Modifier.weight(1f),
+                        ) {
                             Text(launch.launchpadName)
                         }
                     }
@@ -254,20 +273,38 @@ fun LaunchDetailsContent(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        LinkButton(stringResource(Res.string.details_screen_wiki_text), launch.wikipediaUrl, Modifier.weight(1f))
-                        LinkButton(stringResource(Res.string.details_screen_reddit_text), launch.redditUrl, Modifier.weight(1f))
-                        LinkButton(stringResource(Res.string.details_screen_article_text), launch.articleUrl, Modifier.weight(1f))
+                        LinkButton(
+                            stringResource(Res.string.details_screen_wiki_text),
+                            launch.wikipediaUrl,
+                            Modifier.weight(1f),
+                            openLink,
+                        )
+                        LinkButton(
+                            stringResource(Res.string.details_screen_reddit_text),
+                            launch.redditUrl,
+                            Modifier.weight(1f),
+                            openLink,
+                        )
+                        LinkButton(
+                            stringResource(Res.string.details_screen_article_text),
+                            launch.articleUrl,
+                            Modifier.weight(1f),
+                            openLink,
+                        )
                     }
                 }
 
                 item {
                     Button(
-                        onClick = { openYoutube.invoke(uiState.launch.youtubeUrl ?: "") },
+                        onClick = { openLink.invoke(uiState.launch.youtubeUrl ?: "") },
                         enabled = launch.youtubeUrl != null,
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF0000)),
                     ) {
-                        Text(stringResource(Res.string.details_screen_youtube_text), color = Color.White)
+                        Text(
+                            stringResource(Res.string.details_screen_youtube_text),
+                            color = Color.White,
+                        )
                     }
                     Spacer(Modifier.height(24.dp))
                 }
@@ -306,9 +343,17 @@ fun InfoCard(
 @Composable
 fun StatusBadge(status: LaunchStatus) {
     val (text, color) = when (status) {
-        LaunchStatus.SUCCESS -> stringResource(Res.string.main_screen_launch_status_success_text) to Color(0xFF4CAF50)
-        LaunchStatus.FAILURE -> stringResource(Res.string.main_screen_launch_status_failed_text) to Color(0xFFF44336)
-        LaunchStatus.UPCOMING -> stringResource(Res.string.main_screen_launch_status_upcoming_text) to Color(0xFF2196F3)
+        LaunchStatus.SUCCESS -> stringResource(Res.string.main_screen_launch_status_success_text) to Color(
+            0xFF4CAF50,
+        )
+
+        LaunchStatus.FAILURE -> stringResource(Res.string.main_screen_launch_status_failed_text) to Color(
+            0xFFF44336,
+        )
+
+        LaunchStatus.UPCOMING -> stringResource(Res.string.main_screen_launch_status_upcoming_text) to Color(
+            0xFF2196F3,
+        )
     }
     Surface(
         color = color.copy(alpha = 0.1f),
@@ -326,9 +371,14 @@ fun StatusBadge(status: LaunchStatus) {
 }
 
 @Composable
-fun LinkButton(label: String, url: String?, modifier: Modifier = Modifier) {
+fun LinkButton(
+    label: String,
+    url: String?,
+    modifier: Modifier = Modifier,
+    openLink: (String) -> Unit
+) {
     OutlinedButton(
-        onClick = { /* TODO Open URL */ },
+        onClick = { openLink.invoke(url ?: "") },
         enabled = url != null,
         modifier = modifier,
         shape = RoundedCornerShape(8.dp),

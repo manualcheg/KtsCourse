@@ -16,6 +16,7 @@ class GetLaunchesUseCaseImpl(private val launchRepository: LaunchRepository) : G
         return try {
             val networkResult = launchRepository.fetchAndSaveLaunches(query, page)
             val pagedData = launchRepository.getPagedLaunchesFromDb(query, page, PAGE_SIZE)
+            val isFromCache = networkResult.isFailure
 
             val isLastPage = if (networkResult.isSuccess) {
                 !networkResult.getOrThrow()
@@ -24,9 +25,15 @@ class GetLaunchesUseCaseImpl(private val launchRepository: LaunchRepository) : G
                     launchRepository.getPagedLaunchesFromDb(query, page + 1, 1).isNotEmpty()
                 pagedData.size < PAGE_SIZE || !hasMoreInDb
             }
-            Result.success(LaunchesPageResult(pagedData, isLastPage))
+            Result.success(
+                LaunchesPageResult(
+                    pagedData,
+                    isLastPage,
+                    isFromCache,
+                ),
+            )
         } catch (e: Exception) {
-            Napier.e("GetLaunchesUseCaseImpl error",e)
+            Napier.e("GetLaunchesUseCaseImpl error", e)
             Result.failure(e)
         }
     }

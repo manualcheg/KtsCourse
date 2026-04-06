@@ -12,6 +12,7 @@ data class MainUiState(
     val searchQuery: String = "",
     val isLastPage: Boolean = false,
     val selectedTab: MainTab = MainTab.Launches,
+    val isFromCache: Boolean = false,
 ) {
     val showLoading = isLoading && launches.isEmpty()
     val showErrorState = error != null && launches.isEmpty()
