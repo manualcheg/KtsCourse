@@ -8,15 +8,12 @@ import kotlinx.coroutines.flow.Flow
 
 class ProfileRepositoryImpl(
     private val userPreferencesRepository: UserPreferencesRepository,
-    private val databaseRepository: DatabaseRepository
-) :
-    ProfileRepository {
-    override fun getData(): Flow<UserData> {
-        return userPreferencesRepository.userData
-    }
+    private val databaseRepository: DatabaseRepository,
+) : ProfileRepository {
+    override fun getData(): Flow<UserData> = userPreferencesRepository.userData
 
     override suspend fun logout() {
         userPreferencesRepository.clearUserData()
-        databaseRepository.deleteAllLaunches()
+        databaseRepository.clearAllTables()
     }
 }

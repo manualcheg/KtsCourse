@@ -81,7 +81,7 @@ fun LoginScreen(
                     if (uiState.error) {
                         Text(
                             text = stringResource(Res.string.login_screen_wrong_username_text),
-                            color = MaterialTheme.colorScheme.error
+                            color = MaterialTheme.colorScheme.error,
                         )
                     }
                 },
@@ -105,7 +105,7 @@ fun LoginScreen(
                     if (uiState.error) {
                         Text(
                             text = stringResource(Res.string.login_screen_wrong_password_text),
-                            color = MaterialTheme.colorScheme.error
+                            color = MaterialTheme.colorScheme.error,
                         )
                     }
                 },
@@ -116,7 +116,7 @@ fun LoginScreen(
             Button(
                 onClick = { viewModel.checkCredentials() },
                 modifier = Modifier.padding(horizontal = dimensions.paddingStandard),
-                enabled = uiState.isLoginButtonActive
+                enabled = uiState.isLoginButtonActive,
             ) {
                 Text(stringResource(Res.string.login_screen_button_login_text))
             }

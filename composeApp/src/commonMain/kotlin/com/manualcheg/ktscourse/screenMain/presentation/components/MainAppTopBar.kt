@@ -24,69 +24,78 @@ import ktscourse.composeapp.generated.resources.ic_search_24dp
 import ktscourse.composeapp.generated.resources.main_screen_docked_search_bar_placeholder
 import ktscourse.composeapp.generated.resources.main_screen_icon_clear_field_content_description
 import ktscourse.composeapp.generated.resources.main_screen_icon_search_content_description
+import ktscourse.composeapp.generated.resources.main_screen_profile_icon_content_description
+import ktscourse.composeapp.generated.resources.main_tab_favorites
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainTopAppBar(
-    searchQuery: String, 
+    searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
-    onProfileClick: () -> Unit
+    onProfileClick: () -> Unit,
+    showSearch: Boolean = true
 ) {
     val focusManager = LocalFocusManager.current
     val dimensions = LocalDimensions.current
 
     TopAppBar(
         title = {
-            DockedSearchBar(
-                inputField = {
-                    SearchBarDefaults.InputField(
-                        query = searchQuery,
-                        onQueryChange = { onSearchQueryChange(it) },
-                        onSearch = { focusManager.clearFocus() },
-                        expanded = false,
-                        onExpandedChange = { },
-                        modifier = Modifier.fillMaxWidth().wrapContentHeight()
-                            .padding(end = dimensions.paddingMedium),
-                        placeholder = { Text(stringResource(Res.string.main_screen_docked_search_bar_placeholder)) },
-                        leadingIcon = {
-                            Icon(
-                                painterResource(Res.drawable.ic_search_24dp),
-                                contentDescription = stringResource(Res.string.main_screen_icon_search_content_description),
-                                modifier = Modifier.size(dimensions.iconSize)
-                            )
-                        },
-                        trailingIcon = {
-                            if (searchQuery.isNotEmpty()) {
-                                IconButton(onClick = {
-                                    onSearchQueryChange("")
-                                }) {
-                                    Icon(
-                                        painterResource(Res.drawable.ic_close_24dp),
-                                        contentDescription = stringResource(Res.string.main_screen_icon_clear_field_content_description),
-                                        modifier = Modifier.size(dimensions.iconSize)
-                                    )
+            if (showSearch) {
+                DockedSearchBar(
+                    inputField = {
+                        SearchBarDefaults.InputField(
+                            query = searchQuery,
+                            onQueryChange = { onSearchQueryChange(it) },
+                            onSearch = { focusManager.clearFocus() },
+                            expanded = false,
+                            onExpandedChange = { },
+                            modifier = Modifier.fillMaxWidth().wrapContentHeight()
+                                .padding(end = dimensions.paddingMedium),
+                            placeholder = { Text(stringResource(Res.string.main_screen_docked_search_bar_placeholder)) },
+                            leadingIcon = {
+                                Icon(
+                                    painterResource(Res.drawable.ic_search_24dp),
+                                    contentDescription = stringResource(Res.string.main_screen_icon_search_content_description),
+                                    modifier = Modifier.size(dimensions.iconSize),
+                                )
+                            },
+                            trailingIcon = {
+                                if (searchQuery.isNotEmpty()) {
+                                    IconButton(
+                                        onClick = {
+                                            onSearchQueryChange("")
+                                        },
+                                    ) {
+                                        Icon(
+                                            painterResource(Res.drawable.ic_close_24dp),
+                                            contentDescription = stringResource(Res.string.main_screen_icon_clear_field_content_description),
+                                            modifier = Modifier.size(dimensions.iconSize),
+                                        )
+                                    }
                                 }
-                            }
-                        },
-                    )
-                },
-                expanded = false,
-                onExpandedChange = { },
-                modifier = Modifier.fillMaxWidth().padding(end = dimensions.paddingMedium),
-                content = { },
-            )
+                            },
+                        )
+                    },
+                    expanded = false,
+                    onExpandedChange = { },
+                    modifier = Modifier.fillMaxWidth().padding(end = dimensions.paddingMedium),
+                    content = { },
+                )
+            } else {
+                Text(stringResource(Res.string.main_tab_favorites))
+            }
         },
         actions = {
             IconButton(onClick = onProfileClick) {
                 Icon(
                     imageVector = Icons.Default.AccountCircle,
-                    contentDescription = "Profile",
-                    modifier = Modifier.size(dimensions.iconSize)
+                    contentDescription = stringResource(Res.string.main_screen_profile_icon_content_description),
+                    modifier = Modifier.size(dimensions.iconSize),
                 )
             }
-        }
+        },
     )
 }
 

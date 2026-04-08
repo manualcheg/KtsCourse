@@ -33,6 +33,7 @@ import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.profile_screen_back_arrow_text
 import ktscourse.composeapp.generated.resources.profile_screen_button_logout_text
 import ktscourse.composeapp.generated.resources.profile_screen_icon_content_descript
+import ktscourse.composeapp.generated.resources.profile_screen_profile_text
 import ktscourse.composeapp.generated.resources.profile_screen_username_text
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -42,7 +43,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ProfileScreen(
     moveToLoginScreen: () -> Unit,
     onNavigateUp: () -> Unit,
-    viewModel: ViewModelProfileScreen = koinViewModel()
+    viewModel: ViewModelProfileScreen = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val dimensions = LocalDimensions.current
@@ -63,19 +64,20 @@ fun ProfileScreen(
                     IconButton(onClick = onNavigateUp) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(Res.string.profile_screen_back_arrow_text)
+                            contentDescription = stringResource(Res.string.profile_screen_back_arrow_text),
                         )
                     }
-                }
+                },
             )
-        }
+        },
     ) { innerPadding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Icon(
                 imageVector = Icons.Default.AccountCircle,
@@ -85,18 +87,19 @@ fun ProfileScreen(
             )
             Spacer(modifier = Modifier.height(dimensions.paddingLarge))
             Text(
-                "Profile",
+                stringResource(Res.string.profile_screen_profile_text),
                 modifier = Modifier.padding(bottom = dimensions.paddingMedium),
-                style = MaterialTheme.typography.headlineMedium
+                style = MaterialTheme.typography.headlineMedium,
             )
             Text(stringResource(Res.string.profile_screen_username_text, uiState.username))
             Spacer(modifier = Modifier.weight(1f))
             Button(
                 onClick = { viewModel.logout() },
                 modifier = Modifier.fillMaxWidth().padding(horizontal = dimensions.paddingMedium),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error
-                )
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                    ),
             ) {
                 Text(stringResource(Res.string.profile_screen_button_logout_text))
             }
@@ -109,6 +112,6 @@ fun ProfileScreen(
 fun PreviewProfileScreen() {
     ProfileScreen(
         moveToLoginScreen = {},
-        onNavigateUp = {}
+        onNavigateUp = {},
     )
 }

@@ -1,6 +1,7 @@
 package com.manualcheg.ktscourse.screenMain.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,9 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
-import com.manualcheg.ktscourse.screenMain.domain.model.Launch
-import com.manualcheg.ktscourse.screenMain.domain.model.LaunchStatus
+import com.manualcheg.ktscourse.common.LaunchStatus
 import com.manualcheg.ktscourse.common.LocalDimensions
+import com.manualcheg.ktscourse.screenMain.domain.model.Launch
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.main_screen_launch_status_failed_text
 import ktscourse.composeapp.generated.resources.main_screen_launch_status_success_text
@@ -44,13 +45,14 @@ fun PreviewLaunchItem() {
             "15.02.2012",
             "kdfjbfjk kjbjkb hbhh jbjdfns,k 345 cbklkd fgf kjned!!!",
             "https://images2.imgbox.com/85/43/6VSgldkO_o.png",
-            LaunchStatus.SUCCESS
-        )
+            LaunchStatus.SUCCESS,
+        ),
+        { println("") },
     )
 }
 
 @Composable
-fun LaunchItem(launch: Launch) {
+fun LaunchItem(launch: Launch, onItemClick: () -> Unit) {
     val dimensions = LocalDimensions.current
     val statusColor = when (launch.status) {
         LaunchStatus.SUCCESS -> Color(dimensions.successColor)
@@ -70,17 +72,18 @@ fun LaunchItem(launch: Launch) {
             containerColor = MaterialTheme.colorScheme.outline,
             contentColor = MaterialTheme.colorScheme.onSurface,
             disabledContainerColor = MaterialTheme.colorScheme.tertiary,
-            disabledContentColor = MaterialTheme.colorScheme.onTertiary
+            disabledContentColor = MaterialTheme.colorScheme.onTertiary,
         ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = dimensions.paddingLarge)
+            .clickable { onItemClick.invoke() },
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(dimensions.paddingLarge),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             if (launch.imageUrl != "") {
                 AsyncImage(
@@ -89,7 +92,7 @@ fun LaunchItem(launch: Launch) {
                     placeholder = painterResource(Res.drawable.rocket_launch_128),
                     error = painterResource(Res.drawable.rocket_launch_128),
                     modifier = Modifier
-                        .size(dimensions.imageSize)
+                        .size(dimensions.imageSize),
                 )
             }
 
@@ -98,13 +101,13 @@ fun LaunchItem(launch: Launch) {
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
             ) {
                 Text(
                     text = launch.name,
                     modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
                 )
 
                 Spacer(modifier = Modifier.height(dimensions.spacerHeight))
@@ -113,7 +116,7 @@ fun LaunchItem(launch: Launch) {
                     text = launch.flightNumber.toString(),
                     modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colorScheme.onPrimary,
-                    style = MaterialTheme.typography.titleSmall
+                    style = MaterialTheme.typography.titleSmall,
                 )
 
                 if (launch.details.isNotEmpty()) {
@@ -123,7 +126,7 @@ fun LaunchItem(launch: Launch) {
                         modifier = Modifier.fillMaxWidth(),
                         color = MaterialTheme.colorScheme.onBackground,
                         style = MaterialTheme.typography.bodySmall,
-                        maxLines = 2
+                        maxLines = 2,
                     )
                 }
 
@@ -133,7 +136,7 @@ fun LaunchItem(launch: Launch) {
                     text = launch.launchDate,
                     modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colorScheme.onPrimary,
-                    style = MaterialTheme.typography.titleSmall
+                    style = MaterialTheme.typography.titleSmall,
                 )
 
                 Spacer(modifier = Modifier.height(dimensions.spacerHeight))
@@ -142,9 +145,9 @@ fun LaunchItem(launch: Launch) {
                     Box(
                         modifier = Modifier
                             .size(
-                                dimensions.successIndicatorSize
+                                dimensions.successIndicatorSize,
                             ).background(statusColor, shape = CircleShape)
-                            .align(Alignment.CenterVertically)
+                            .align(Alignment.CenterVertically),
                     )
 
                     Spacer(modifier = Modifier.width(dimensions.paddingSmall))

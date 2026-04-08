@@ -15,15 +15,16 @@ import kotlinx.coroutines.launch
 
 sealed class OnboardingEvent {
     data object NextPage : OnboardingEvent()
+
     data object MoveToLogin : OnboardingEvent()
+
     data object BackPage : OnboardingEvent()
 }
 
 class ViewModelOnboardingScreen(
     private val firstStartUseCase: FirstStartUseCase,
-    getOnboardingItemsUseCase: GetOnboardingItemsUseCase
-) :
-    ViewModel() {
+    getOnboardingItemsUseCase: GetOnboardingItemsUseCase,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(OnboardingUiState())
     val uiState: StateFlow<OnboardingUiState> = _uiState.asStateFlow()
 
@@ -58,8 +59,7 @@ class ViewModelOnboardingScreen(
 
     fun onBackClick() {
         val state = _uiState.value
-        if (state.canGoBack)
-            sendEvent(OnboardingEvent.BackPage)
+        if (state.canGoBack) sendEvent(OnboardingEvent.BackPage)
     }
 
     private fun sendEvent(event: OnboardingEvent) {

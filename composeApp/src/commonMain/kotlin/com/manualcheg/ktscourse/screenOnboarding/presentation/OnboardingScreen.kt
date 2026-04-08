@@ -63,7 +63,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun Onboarding(
     moveToLoginScreen: () -> Unit,
-    viewModel: ViewModelOnboardingScreen = koinViewModel()
+    viewModel: ViewModelOnboardingScreen = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
     OnboardingContent(
@@ -73,7 +73,7 @@ fun Onboarding(
         onNextClick = viewModel::onNextClick,
         onBackClick = viewModel::onBackClick,
         onSkipClick = viewModel::onSkipClick,
-        moveToLoginScreen = moveToLoginScreen
+        moveToLoginScreen = moveToLoginScreen,
     )
 }
 
@@ -85,7 +85,7 @@ fun OnboardingContent(
     onNextClick: () -> Unit,
     onBackClick: () -> Unit,
     onSkipClick: () -> Unit,
-    moveToLoginScreen: () -> Unit
+    moveToLoginScreen: () -> Unit,
 ) {
     val pageState = rememberPagerState(pageCount = { uiState.items.size })
     val dimensions = LocalDimensions.current
@@ -109,14 +109,15 @@ fun OnboardingContent(
             TopSection(
                 onBackClick = { onBackClick() },
                 onSkipClick = { onSkipClick() },
-                showBackButton = uiState.canGoBack
+                showBackButton = uiState.canGoBack,
             )
 
             HorizontalPager(
                 state = pageState,
-                modifier = Modifier
-                    .fillMaxHeight(dimensions.onboardingPagerMaxHeight)
-                    .fillMaxWidth()
+                modifier =
+                    Modifier
+                        .fillMaxHeight(dimensions.onboardingPagerMaxHeight)
+                        .fillMaxWidth(),
             ) { page -> OnboardingItem(item = uiState.items[page]) }
 
             BottomSection(
@@ -133,18 +134,19 @@ fun OnboardingContent(
 fun TopSection(
     onBackClick: () -> Unit,
     onSkipClick: () -> Unit,
-    showBackButton: Boolean
+    showBackButton: Boolean,
 ) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(LocalDimensions.current.paddingLarge)
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(LocalDimensions.current.paddingLarge),
     ) {
         if (showBackButton) {
             IconButton(onClick = onBackClick, modifier = Modifier.align(Alignment.CenterStart)) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowLeft,
-                    contentDescription = null
+                    contentDescription = null,
                 )
             }
         }
@@ -152,11 +154,11 @@ fun TopSection(
         TextButton(
             onClick = onSkipClick,
             modifier = Modifier.align(Alignment.CenterEnd),
-            contentPadding = PaddingValues(LocalDimensions.current.zeroPadding)
+            contentPadding = PaddingValues(LocalDimensions.current.zeroPadding),
         ) {
             Text(
                 text = stringResource(Res.string.onboarding_skip_text),
-                color = MaterialTheme.colorScheme.primary/*MaterialTheme.colorScheme.onBackground*/
+                color = MaterialTheme.colorScheme.primary, // MaterialTheme.colorScheme.onBackground
             )
         }
     }
@@ -167,41 +169,47 @@ fun BottomSection(
     size: Int,
     index: Int,
     onButtonClick: () -> Unit = {},
-    isLastPage: Boolean
+    isLastPage: Boolean,
 ) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(LocalDimensions.current.paddingLarge)
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(LocalDimensions.current.paddingLarge),
     ) {
         Indicators(size, index)
 
         FloatingActionButton(
             onClick = onButtonClick,
             containerColor = MaterialTheme.colorScheme.primary,
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .clip(RoundedCornerShape(LocalDimensions.current.roundCornerSize))
+            modifier =
+                Modifier
+                    .align(Alignment.CenterEnd)
+                    .clip(RoundedCornerShape(LocalDimensions.current.roundCornerSize)),
         ) {
             Icon(
-                imageVector = if (isLastPage) {
-                    Icons.Default.Done
-                } else {
-                    Icons.AutoMirrored.Outlined.KeyboardArrowRight
-                },
+                imageVector =
+                    if (isLastPage) {
+                        Icons.Default.Done
+                    } else {
+                        Icons.AutoMirrored.Outlined.KeyboardArrowRight
+                    },
                 tint = MaterialTheme.colorScheme.onPrimary,
-                contentDescription = stringResource(Res.string.onboard_screen_button_next_text)
+                contentDescription = stringResource(Res.string.onboard_screen_button_next_text),
             )
         }
     }
 }
 
 @Composable
-fun BoxScope.Indicators(size: Int, index: Int) {
+fun BoxScope.Indicators(
+    size: Int,
+    index: Int,
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(LocalDimensions.current.boxScopeArrangementSize),
-        modifier = Modifier.align(Alignment.CenterStart)
+        modifier = Modifier.align(Alignment.CenterStart),
     ) {
         repeat(size) {
             Indicator(isSelected = it == index)
@@ -212,19 +220,21 @@ fun BoxScope.Indicators(size: Int, index: Int) {
 @Composable
 fun Indicator(isSelected: Boolean) {
     val dimensions = LocalDimensions.current
-    val width = animateDpAsState(
-        targetValue = if (isSelected) dimensions.targetSelectedSize else dimensions.targetSize,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
-    )
+    val width =
+        animateDpAsState(
+            targetValue = if (isSelected) dimensions.targetSelectedSize else dimensions.targetSize,
+            animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        )
 
     Box(
-        modifier = Modifier
-            .height(dimensions.boxIndicatorSize)
-            .width(width.value)
-            .clip(CircleShape)
-            .background(
-                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
-            )
+        modifier =
+            Modifier
+                .height(dimensions.boxIndicatorSize)
+                .width(width.value)
+                .clip(CircleShape)
+                .background(
+                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
+                ),
     )
 }
 
@@ -234,15 +244,17 @@ fun OnboardingItem(item: OnboardingItem) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) {
         Image(
             painter = painterResource(item.image),
             contentDescription = null,
             contentScale = ContentScale.Fit,
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground),
-            modifier = Modifier.size(dimensions.onboardingImageSize)
-                .padding(horizontal = dimensions.onboardingImageHorizontalPadding)
+            modifier =
+                Modifier
+                    .size(dimensions.onboardingImageSize)
+                    .padding(horizontal = dimensions.onboardingImageHorizontalPadding),
         )
 
         Spacer(modifier = Modifier.height(dimensions.onboardingBigSpacerHeight))
@@ -273,20 +285,23 @@ fun OnboardingItem(item: OnboardingItem) {
 @Composable
 fun PreviewScreen() {
     OnboardingContent(
-        uiState = OnboardingUiState(
-            items = listOf(
-                OnboardingItem(
-                    Res.drawable.ic_stat_black,
-                    Res.string.onboarding_skip_text,
-                    Res.string.onboarding_stat_desc
-                )
-            ), 0
-        ),
+        uiState =
+            OnboardingUiState(
+                items =
+                    listOf(
+                        OnboardingItem(
+                            Res.drawable.ic_stat_black,
+                            Res.string.onboarding_skip_text,
+                            Res.string.onboarding_stat_desc,
+                        ),
+                    ),
+                0,
+            ),
         onPageChanged = {},
         events = MutableSharedFlow<OnboardingEvent>().asSharedFlow(),
         onNextClick = {},
         onBackClick = {},
         onSkipClick = {},
-        moveToLoginScreen = {}
+        moveToLoginScreen = {},
     )
 }

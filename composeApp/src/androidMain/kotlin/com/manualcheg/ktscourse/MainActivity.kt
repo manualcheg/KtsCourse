@@ -11,13 +11,12 @@ import com.manualcheg.ktscourse.common.App
 import com.manualcheg.ktscourse.presentation.theme.AppThemeMaterial
 
 class MainActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         setContent {
-            AppThemeMaterial() {
+            AppThemeMaterial {
                 App()
             }
         }
@@ -25,15 +24,14 @@ class MainActivity : ComponentActivity() {
 }
 
 @Preview(name = "Light Mode")
-
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES,
     showBackground = true,
-    name = "Dark Mode"
+    name = "Dark Mode",
 )
 @Composable
 fun AppAndroidPreview() {
-    AppThemeMaterial() {
+    AppThemeMaterial {
         App()
     }
 }

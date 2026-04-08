@@ -1,12 +1,18 @@
 package com.manualcheg.ktscourse.data.database
 
 import androidx.room.TypeConverter
-import com.manualcheg.ktscourse.screenMain.domain.model.LaunchStatus
+import kotlinx.serialization.json.Json
 
 class Converters {
-    @TypeConverter
-    fun fromStatus(status: LaunchStatus): String = status.name
+    private val json = Json { ignoreUnknownKeys = true }
 
     @TypeConverter
-    fun toStatus(value: String): LaunchStatus = LaunchStatus.valueOf(value)
+    fun fromStringList(value: String?): List<String?>? {
+        return value?.let { json.decodeFromString(it) }
+    }
+
+    @TypeConverter
+    fun toStringList(list: List<String?>?): String? {
+        return list?.let { json.encodeToString(it) }
+    }
 }

@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.androidx.room)
+    alias(libs.plugins.tracer)
 }
 
 kotlin {
@@ -19,7 +20,7 @@ kotlin {
 
     listOf(
         iosArm64(),
-        iosSimulatorArm64()
+        iosSimulatorArm64(),
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
@@ -32,6 +33,15 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.android)
+            implementation(libs.koin.android)
+            implementation(project.dependencies.platform(libs.tracer.platform))
+
+            implementation(libs.tracer.crash.report)
+            implementation(libs.tracer.crash.report.native)
+            implementation(libs.tracer.heap.dumps)
+            implementation(libs.tracer.disk.usage)
+            implementation(libs.tracer.profiler.sampling)
+            implementation(libs.tracer.profiler.systrace)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -57,7 +67,6 @@ kotlin {
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
             implementation(libs.koin.core)
-            implementation(libs.koin.android)
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.compose)
             implementation(libs.insert.koin.koin.compose.viewmodel)
@@ -69,9 +78,12 @@ kotlin {
                 implementation(libs.ktor.client.darwin)
             }
         }
-
-        iosArm64Main.get().dependsOn(iosMain)
-        iosSimulatorArm64Main.get().dependsOn(iosMain)
+        val iosArm64Main by getting {
+            dependsOn(iosMain)
+        }
+        val iosSimulatorArm64Main by getting {
+            dependsOn(iosMain)
+        }
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -82,6 +94,8 @@ kotlin {
 room {
     schemaDirectory("$projectDir/schemas")
 }
+
+apply("$rootDir/ktlint.gradle")
 
 android {
     namespace = "com.manualcheg.ktscourse"
@@ -100,7 +114,15 @@ android {
         }
     }
     buildTypes {
-        getByName("release") {
+        release {
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+        }
+        debug {
+            applicationIdSuffix = ".debug"
             isMinifyEnabled = false
         }
     }
@@ -112,5 +134,21 @@ android {
 
 dependencies {
     debugImplementation(libs.compose.uiTooling)
-    add("ksp", libs.androidx.room.compiler)
+    debugImplementation(libs.leakcanary.android)
+
+    add("kspAndroid", libs.androidx.room.compiler)
+    add("kspIosArm64", libs.androidx.room.compiler)
+    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
+}
+
+tracer {
+    create("defaultConfig") {
+        pluginToken = "rsurXfuFU2p8xslo8c8nM9Q5wRKzkazmWxxk3r6EkNL"
+        appToken = "huahvSoIj4AIKwAhNVe8KIiP437CrhXPnCLC7vI55061"
+
+        uploadMapping = true
+//        uploadNativeSymbols = true
+        uploadRetryCount = 2
+        additionalLibrariesPath = projectDir.toString() + "/aVeryNonstandardLibsDirectory"
+    }
 }

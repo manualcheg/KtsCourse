@@ -24,7 +24,7 @@ class ViewModelLoginUiScreen(private val loginUseCase: LoginUseCase) :
     fun onUsernameChanged(username: String) {
         _uiState.update {
             it.copy(
-                username = username.trim()
+                username = username.trim(),
             )
         }
         makeButtonLoginActive()
@@ -34,7 +34,7 @@ class ViewModelLoginUiScreen(private val loginUseCase: LoginUseCase) :
     fun onPasswordChanged(password: String) {
         _uiState.update {
             it.copy(
-                password = password.trim()
+                password = password.trim(),
             )
         }
         makeButtonLoginActive()
@@ -45,7 +45,7 @@ class ViewModelLoginUiScreen(private val loginUseCase: LoginUseCase) :
         _uiState.update {
             it.copy(
                 isLoginButtonActive = it.username.isNotEmpty() && it.password.isNotEmpty(),
-                error = false
+                error = false,
             )
         }
     }
@@ -67,7 +67,7 @@ class ViewModelLoginUiScreen(private val loginUseCase: LoginUseCase) :
     fun makeTextInputInErrorState() {
         _uiState.update {
             it.copy(
-                error = true
+                error = true,
             )
         }
     }
@@ -75,7 +75,7 @@ class ViewModelLoginUiScreen(private val loginUseCase: LoginUseCase) :
     fun makeTextInputInNormalState() {
         _uiState.update {
             it.copy(
-                error = false
+                error = false,
             )
         }
     }

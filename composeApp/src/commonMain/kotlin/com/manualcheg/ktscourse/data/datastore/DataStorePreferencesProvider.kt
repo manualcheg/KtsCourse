@@ -4,7 +4,3 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 
 expect fun provideDataStore(context: Any? = null): DataStore<Preferences>
-
-/*object DataStorePreferencesProvider {
-    lateinit var datastore: DataStore<Preferences>
-}*/

@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class ViewModelProfileScreen(
     private val logoutUseCase: LogoutUseCase,
-    private val getUserDataUseCase: GetUserDataUseCase
+    private val getUserDataUseCase: GetUserDataUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
@@ -34,7 +34,7 @@ class ViewModelProfileScreen(
     fun updateUsername(username: String) {
         _uiState.update {
             it.copy(
-                username = username
+                username = username,
             )
         }
     }
@@ -42,7 +42,7 @@ class ViewModelProfileScreen(
     fun logout() {
         viewModelScope.launch {
             _events.emit(ProfileUiEvent.Logout)
-            logoutUseCase.execute()
+            logoutUseCase()
         }
     }
 }

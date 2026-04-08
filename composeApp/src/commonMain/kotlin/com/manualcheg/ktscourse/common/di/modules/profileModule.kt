@@ -13,9 +13,10 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-val profileModule = module {
-    viewModelOf(::ViewModelProfileScreen)
-    factoryOf(::LogoutUseCaseImpl) bind LogoutUseCase::class
-    factoryOf(::GetUserDataUseCaseImpl) bind GetUserDataUseCase::class
-    singleOf(::ProfileRepositoryImpl) bind ProfileRepository::class
-}
+val profileModule =
+    module {
+        viewModelOf(::ViewModelProfileScreen)
+        factoryOf(::LogoutUseCaseImpl) bind LogoutUseCase::class
+        factoryOf(::GetUserDataUseCaseImpl) bind GetUserDataUseCase::class
+        singleOf(::ProfileRepositoryImpl) bind ProfileRepository::class
+    }
