@@ -14,6 +14,6 @@ class ProfileRepositoryImpl(
 
     override suspend fun logout() {
         userPreferencesRepository.clearUserData()
-        databaseRepository.deleteAllLaunches()
+        databaseRepository.clearAllTables()
     }
 }

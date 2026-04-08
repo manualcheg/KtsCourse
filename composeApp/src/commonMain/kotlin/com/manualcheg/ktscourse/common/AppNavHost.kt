@@ -15,6 +15,7 @@ import com.manualcheg.ktscourse.screenLogin.presentation.LoginScreen
 import com.manualcheg.ktscourse.screenMain.presentation.MainScreen
 import com.manualcheg.ktscourse.screenOnboarding.presentation.Onboarding
 import com.manualcheg.ktscourse.screenProfile.presentation.ProfileScreen
+import com.manualcheg.ktscourse.screenRocketDetails.presentation.RocketDetailsScreen
 import org.koin.compose.koinInject
 
 @Composable
@@ -63,6 +64,9 @@ fun AppNavHost() {
                 openLaunchDetails = { id ->
                     navController.navigate(Screen.LaunchDetails(id))
                 },
+                openRocketDetails = { id ->
+                    navController.navigate(Screen.RocketDetails(id))
+                },
             )
         }
 
@@ -84,11 +88,20 @@ fun AppNavHost() {
             LaunchDetailsScreen(
                 onBackClick = { navController.navigateUp() },
                 launchId = launchDetails.id,
-                onRocketClick = { navController.navigateUp() },
+                onRocketClick = { navController.navigate(Screen.RocketDetails(it)) },
                 openLink = { url ->
-                    val url = if (url.startsWith("https") || url.startsWith("http"))
-                        url else "https://$url"
-                    uriHandler.openUri(url)
+                    uriHandler.openSafeUri(url)
+                },
+            )
+        }
+
+        composable<Screen.RocketDetails> {
+            val rocketDetails: Screen.RocketDetails = it.toRoute()
+            RocketDetailsScreen(
+                onBackClick = { navController.navigateUp() },
+                rocketId = rocketDetails.id,
+                onLinkClick = { url ->
+                    uriHandler.openSafeUri(url)
                 },
             )
         }

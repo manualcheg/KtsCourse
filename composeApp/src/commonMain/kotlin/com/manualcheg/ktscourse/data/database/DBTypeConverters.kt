@@ -5,8 +5,8 @@ import com.manualcheg.ktscourse.common.LaunchStatus
 
 class DBTypeConverters {
     @TypeConverter
-    fun fromLaunchStatus(status: LaunchStatus): String = status.name
+    fun fromLaunchStatus(status: LaunchStatus?): String? = status?.name
 
     @TypeConverter
-    fun toLaunchStatus(status: String): LaunchStatus = LaunchStatus.valueOf(status)
+    fun toLaunchStatus(status: String?): LaunchStatus? = status?.let { LaunchStatus.valueOf(it) }
 }

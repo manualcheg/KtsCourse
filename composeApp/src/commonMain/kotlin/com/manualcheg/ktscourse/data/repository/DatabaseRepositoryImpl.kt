@@ -1,19 +1,24 @@
 package com.manualcheg.ktscourse.data.repository
 
-import com.manualcheg.ktscourse.common.LaunchStatus
 import com.manualcheg.ktscourse.data.database.AppDatabase
-import com.manualcheg.ktscourse.data.database.FavoriteDao
-import com.manualcheg.ktscourse.data.database.FavoriteLaunchEntity
-import com.manualcheg.ktscourse.data.database.LaunchDao
-import com.manualcheg.ktscourse.data.database.LaunchEntity
-import com.manualcheg.ktscourse.data.database.toDomain
-import com.manualcheg.ktscourse.screenLaunchDetails.domain.model.LaunchDetails
+import com.manualcheg.ktscourse.data.database.dao.FavoriteDao
+import com.manualcheg.ktscourse.data.database.entity.FavoriteLaunchEntity
+import com.manualcheg.ktscourse.data.database.entity.FavoriteRocketEntity
+import com.manualcheg.ktscourse.data.database.dao.LaunchDao
+import com.manualcheg.ktscourse.data.database.entity.LaunchEntity
+import com.manualcheg.ktscourse.data.database.dao.RocketDao
+import com.manualcheg.ktscourse.data.database.entity.RocketEntity
+import com.manualcheg.ktscourse.data.mappers.toDomain
 import com.manualcheg.ktscourse.screenMain.domain.model.Launch
+import com.manualcheg.ktscourse.screenRockets.domain.model.Rocket
 import io.github.aakira.napier.Napier
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class DatabaseRepositoryImpl(database: AppDatabase) : DatabaseRepository {
     private val launchDao: LaunchDao = database.launchDao()
     private val favoriteDao: FavoriteDao = database.favoriteDao()
+    private val rocketDao: RocketDao = database.rocketDao()
 
     override suspend fun getPagedLaunchesFromDb(
         query: String,
@@ -58,6 +63,48 @@ class DatabaseRepositoryImpl(database: AppDatabase) : DatabaseRepository {
         }
     }
 
+    override suspend fun getPagedRocketsFromDb(query: String, page: Int, limit: Int): List<Rocket> {
+        return try {
+            val offset = (page - 1) * limit
+            val entities = if (query.isBlank()) {
+                rocketDao.getRocketsPaged(limit, offset)
+            } else {
+                rocketDao.searchRocketsPaged(query, limit, offset)
+            }
+            entities.map { entity ->
+                val isFavorite = favoriteDao.isFavorite(entity.id)
+                entity.toDomain().copy(isFavorite = isFavorite)
+            }
+        } catch (e: Exception) {
+            Napier.e("Failed to get paged rockets from DB", e)
+            emptyList()
+        }
+    }
+
+    override suspend fun fetchAndSaveRocketsTransaction(entities: List<RocketEntity>) {
+        try {
+            rocketDao.fetchAndSaveRocketsTransaction(entities)
+        } catch (e: Exception) {
+            Napier.e("Failed to execute fetchAndSaveRocketsTransaction", e)
+        }
+    }
+
+    override suspend fun insertRockets(entities: List<RocketEntity>) {
+        try {
+            rocketDao.insertRockets(entities)
+        } catch (e: Exception) {
+            Napier.e("Failed to insert rockets into DB", e)
+        }
+    }
+
+    override suspend fun deleteAllRockets() {
+        try {
+            rocketDao.deleteAllRockets()
+        } catch (e: Exception) {
+            Napier.e("Failed to delete all rockets from DB", e)
+        }
+    }
+
     override suspend fun toggleFavorite(launch: FavoriteLaunchEntity): Boolean {
         return try {
             val isCurrentlyFavorite = favoriteDao.isFavorite(launch.launchId)
@@ -69,6 +116,21 @@ class DatabaseRepositoryImpl(database: AppDatabase) : DatabaseRepository {
             !isCurrentlyFavorite
         } catch (e: Exception) {
             Napier.e("Failed to toggle favorite for launchId: ${launch.launchId}", e)
+            false
+        }
+    }
+
+    override suspend fun toggleFavorite(rocket: FavoriteRocketEntity): Boolean {
+        return try {
+            val isCurrentlyFavorite = favoriteDao.isRocketFavorite(rocket.id)
+            if (isCurrentlyFavorite) {
+                favoriteDao.deleteFavoriteRocket(rocket.id)
+            } else {
+                favoriteDao.insertFavoriteRocket(rocket)
+            }
+            !isCurrentlyFavorite
+        } catch (e: Exception) {
+            Napier.e("Failed to toggle favorite for rocketId: ${rocket.id}", e)
             false
         }
     }
@@ -90,26 +152,22 @@ class DatabaseRepositoryImpl(database: AppDatabase) : DatabaseRepository {
             null
         }
     }
-}
 
-fun LaunchDetails.toFavoriteEntity(): FavoriteLaunchEntity {
-    return FavoriteLaunchEntity(
-        launchId = id,
-        name = name,
-        dateUtc = dateUtc,
-        dateLocal = dateLocal,
-        flightNumber = flightNumber,
-        patchUrl = patchUrl,
-        status = LaunchStatus.valueOf(status.name),
-        details = details,
-        rocketName = rocketName,
-        rocketId = rocketId,
-        launchpadName = launchpadName,
-        payloads = payloads,
-        articleUrl = articleUrl,
-        wikipediaUrl = wikipediaUrl,
-        youtubeUrl = youtubeUrl,
-        redditUrl = redditUrl,
-        isFavorite = true,
-    )
+    override fun getAllFavoriteLaunches(): Flow<List<Launch>> {
+        return favoriteDao.getAllFavorites().map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
+
+    override fun getAllFavoriteRockets(): Flow<List<Rocket>> {
+        return favoriteDao.getAllFavoriteRockets().map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
+
+    override suspend fun clearAllTables() {
+        launchDao.deleteAllLaunches()
+        rocketDao.deleteAllRockets()
+        favoriteDao.deleteAllFavorites()
+    }
 }

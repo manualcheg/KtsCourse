@@ -14,6 +14,8 @@ val commonModule =
         // Database
         single { getAppDatabase(getDatabaseBuilder()) }
         single { get<AppDatabase>().launchDao() }
+        single { get<AppDatabase>().rocketDao() }
+        single { get<AppDatabase>().favoriteDao() }
         single<DatabaseRepository> { DatabaseRepositoryImpl(get()) }
 
         // DataStore & Preferences

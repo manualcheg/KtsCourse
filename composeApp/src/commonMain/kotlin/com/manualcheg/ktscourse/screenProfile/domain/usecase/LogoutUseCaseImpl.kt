@@ -5,7 +5,7 @@ import com.manualcheg.ktscourse.screenProfile.domain.repository.ProfileRepositor
 class LogoutUseCaseImpl(
     private val profileRepository: ProfileRepository,
 ) : LogoutUseCase {
-    override suspend fun execute() {
+    override suspend operator fun invoke() {
         profileRepository.logout()
     }
 }

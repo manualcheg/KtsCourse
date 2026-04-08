@@ -1,10 +1,10 @@
 package com.manualcheg.ktscourse.screenMain.data
 
-import com.manualcheg.ktscourse.common.LaunchStatus
-import com.manualcheg.ktscourse.data.models.LaunchDetailsDto
+import com.manualcheg.ktscourse.data.mappers.toDomain
+import com.manualcheg.ktscourse.data.mappers.toDomainDetails
+import com.manualcheg.ktscourse.data.mappers.toFavoriteEntity
 import com.manualcheg.ktscourse.data.repository.DatabaseRepository
-import com.manualcheg.ktscourse.data.repository.NetworkRepository
-import com.manualcheg.ktscourse.data.repository.toFavoriteEntity
+import com.manualcheg.ktscourse.data.repository.LaunchNetworkRepository
 import com.manualcheg.ktscourse.screenLaunchDetails.domain.model.LaunchDetails
 import com.manualcheg.ktscourse.screenMain.domain.model.Launch
 import com.manualcheg.ktscourse.screenMain.domain.repository.LaunchRepository
@@ -14,7 +14,7 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 
 class LaunchRepositoryImpl(
-    private val networkRepository: NetworkRepository,
+    private val networkRepository: LaunchNetworkRepository,
     private val databaseRepository: DatabaseRepository
 ) : LaunchRepository {
     override suspend fun getPagedLaunchesFromDb(
@@ -40,7 +40,8 @@ class LaunchRepositoryImpl(
 
                 Result.success(response.hasNextPage)
             } else {
-                val exception = result.exceptionOrNull() ?: Exception("Unknown error fetching launches")
+                val exception =
+                    result.exceptionOrNull() ?: Exception("Unknown error fetching launches")
                 Napier.e("Error in fetchAndSaveLaunches", exception)
                 Result.failure(exception)
             }
@@ -48,15 +49,22 @@ class LaunchRepositoryImpl(
 
     override suspend fun getLaunchById(id: String): Result<LaunchDetails> =
         withContext(Dispatchers.IO) {
+
+            val favorite = databaseRepository.getFavoriteLaunch(id)
+            if (favorite != null) {
+                return@withContext Result.success(favorite.toDomainDetails())
+            }
+
             val networkResult = networkRepository.getLaunch(id)
             if (networkResult.isSuccess) {
                 val dto = networkResult.getOrThrow()
-                val isFavorite = databaseRepository.isFavorite(id)
-                Result.success(dto.toDomain(isFavorite))
+                Result.success(dto.toDomain(isFavorite = false))
             } else {
-                val exception = networkResult.exceptionOrNull() ?: Exception("Unknown error fetching launch by id: $id")
-                Napier.e("Error in getLaunchById for id: $id", exception)
-                Result.failure(exception)
+                Napier.e(
+                    "Error in getLaunchById",
+                    networkResult.exceptionOrNull() ?: Exception("Launch not found"),
+                )
+                Result.failure(networkResult.exceptionOrNull() ?: Exception("Launch not found"))
             }
         }
 
@@ -70,30 +78,4 @@ class LaunchRepositoryImpl(
                 Result.failure(e)
             }
         }
-
-    private fun LaunchDetailsDto.toDomain(isFavorite: Boolean): LaunchDetails {
-        return LaunchDetails(
-            id = id,
-            name = name ?: "",
-            dateUtc = dateUtc ?: "",
-            dateLocal = dateLocal ?: "",
-            flightNumber = flightNumber ?: 0,
-            patchUrl = links?.patch?.large,
-            status = when {
-                upcoming == true -> LaunchStatus.UPCOMING
-                success == true -> LaunchStatus.SUCCESS
-                else -> LaunchStatus.FAILURE
-            },
-            details = details,
-            rocketName = "Rocket $rocket",
-            rocketId = rocket ?: "",
-            launchpadName = "Launchpad $launchpad",
-            payloads = payloads?.filterNotNull() ?: emptyList(),
-            articleUrl = links?.article,
-            wikipediaUrl = links?.wikipedia,
-            youtubeUrl = links?.webcast,
-            redditUrl = links?.reddit?.launch,
-            isFavorite = isFavorite,
-        )
-    }
 }

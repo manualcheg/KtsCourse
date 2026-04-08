@@ -2,9 +2,11 @@ package com.manualcheg.ktscourse.screenMain.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.manualcheg.ktscourse.screenMain.domain.model.LaunchesPageResult
+import com.manualcheg.ktscourse.screenFavorites.domain.repository.FavoritesRepository
 import com.manualcheg.ktscourse.screenMain.domain.useCase.GetLaunchesUseCase
 import com.manualcheg.ktscourse.screenMain.presentation.components.MainTab
+import com.manualcheg.ktscourse.screenRockets.domain.usecase.GetRocketsUseCase
+import com.manualcheg.ktscourse.screenRockets.presentation.RocketListUiState
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -22,6 +24,8 @@ import kotlinx.coroutines.launch
 
 class ViewModelMainScreen(
     private val getLaunchesUseCase: GetLaunchesUseCase,
+    private val getRocketsUseCase: GetRocketsUseCase,
+    private val favoritesRepository: FavoritesRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MainUiState())
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
@@ -49,46 +53,90 @@ class ViewModelMainScreen(
         val state = _uiState.value
         if (!isRefresh && (state.isLastPage || state.isNextPageLoading || state.isLoading || state.isRefreshing)) return
 
-        val isFirstPage = isRefresh || state.launches.isEmpty()
+        val itemsEmpty = when (state.selectedTab) {
+            MainTab.Launches -> state.launches.isEmpty()
+            MainTab.Rockets -> state.rocketsUiState.items.isEmpty()
+            MainTab.Favorites -> true
+        }
+        val isFirstPage = isRefresh || itemsEmpty
         val pageToLoad = if (isFirstPage) 1 else currentPage + 1
 
         updateLoadingStatus(isFirstPage, isRefresh)
-//
-//        triggerTestError(false)
 
         loadingJob?.cancel()
-        loadingJob =
-            viewModelScope.launch {
-                getLaunchesUseCase
-                    .execute(state.searchQuery, pageToLoad)
-                    .onSuccess { result ->
-                        handleSuccess(result, isFirstPage, pageToLoad)
-                    }.onFailure { handleFailure(it) }
+        loadingJob = viewModelScope.launch {
+            when (state.selectedTab) {
+                MainTab.Launches -> {
+                    getLaunchesUseCase.execute(state.searchQuery, pageToLoad)
+                        .onSuccess { result ->
+                            _uiState.update {
+                                it.copy(
+                                    launches = if (isFirstPage) result.launches else it.launches + result.launches,
+                                    isLaunchesFromCache = result.isFromCache,
+                                    isLastPage = result.isLastPage,
+                                    isLoading = false,
+                                    isNextPageLoading = false,
+                                    isRefreshing = false,
+                                    error = null,
+                                )
+                            }
+                            currentPage = pageToLoad
+                        }
+                        .onFailure { handleFailure(it) }
+                }
+
+                MainTab.Rockets -> {
+                    getRocketsUseCase.execute(state.searchQuery, pageToLoad)
+                        .onSuccess { result ->
+                            _uiState.update {
+                                it.copy(
+                                    rocketsUiState = it.rocketsUiState.copy(
+                                        items = if (isFirstPage) result.rockets else it.rocketsUiState.items + result.rockets,
+                                        isFromCache = result.isFromCache,
+                                        isLastPage = !result.hasNextPage,
+                                        isNextPageLoading = false,
+                                    ),
+                                    isLoading = false,
+                                    isRefreshing = false,
+                                    error = null,
+                                )
+                            }
+                            currentPage = pageToLoad
+                        }
+                        .onFailure { handleFailure(it) }
+                }
+
+                MainTab.Favorites -> {}
             }
+        }
     }
 
-    private fun handleSuccess(
-        result: LaunchesPageResult,
-        isFirstPage: Boolean,
-        pageLoaded: Int,
-    ) {
+    private fun handleSuccess(pageLoaded: Int) {
         _uiState.update { state ->
             state.copy(
-                launches = if (isFirstPage) result.launches else state.launches + result.launches,
                 isLoading = false,
                 isNextPageLoading = false,
                 isRefreshing = false,
-                isLastPage = result.isLastPage,
                 error = null,
-                isFromCache = result.isFromCache,
             )
         }
         currentPage = pageLoaded
     }
 
     private fun handleFailure(error: Throwable) {
+        if (error is kotlinx.coroutines.CancellationException) {
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    isNextPageLoading = false,
+                    isRefreshing = false,
+                )
+            }
+            return
+        }
+
         Napier.e(
-            message = "Failed to load launches",
+            message = "Failed to load data",
             throwable = error,
             tag = "ViewModelMainScreen",
         )
@@ -98,6 +146,11 @@ class ViewModelMainScreen(
                 isLoading = false,
                 isNextPageLoading = false,
                 isRefreshing = false,
+                isLaunchesFromCache = it.launches.isNotEmpty(),
+                rocketsUiState = it.rocketsUiState.copy(
+                    isFromCache = it.rocketsUiState.items.isNotEmpty(),
+                    isNextPageLoading = false,
+                ),
             )
         }
     }
@@ -108,9 +161,21 @@ class ViewModelMainScreen(
     ) {
         _uiState.update {
             when {
-                isRefresh -> it.copy(isRefreshing = true, error = null)
+                isRefresh -> it.copy(
+                    isRefreshing = true,
+                    error = null,
+                    isLaunchesFromCache = false,
+                    rocketsUiState = it.rocketsUiState.copy(isFromCache = false),
+                )
+
                 isFirstPage -> it.copy(isLoading = true, error = null)
-                else -> it.copy(isNextPageLoading = true, error = null)
+                else -> it.copy(
+                    isNextPageLoading = if (it.selectedTab == MainTab.Launches) true else it.isNextPageLoading,
+                    rocketsUiState = it.rocketsUiState.copy(
+                        isNextPageLoading = if (it.selectedTab == MainTab.Rockets) true else it.rocketsUiState.isNextPageLoading,
+                    ),
+                    error = null,
+                )
             }
         }
     }
@@ -128,10 +193,48 @@ class ViewModelMainScreen(
     private fun resetPagination() {
         loadingJob?.cancel()
         currentPage = 1
-        _uiState.update { it.copy(launches = emptyList(), isLastPage = false, error = null) }
+        _uiState.update {
+            it.copy(
+                launches = emptyList(),
+                rocketsUiState = RocketListUiState(),
+                isLastPage = false,
+                isLoading = false,
+                isNextPageLoading = false,
+                isRefreshing = false,
+                error = null,
+            )
+        }
     }
 
     fun changeTab(tab: MainTab) {
         _uiState.update { it.copy(selectedTab = tab) }
+        if (tab == MainTab.Favorites) {
+            loadFavorites()
+        } else {
+            resetPagination()
+            loadNextPage()
+        }
+    }
+
+    fun changeFavoriteType(type: FavoriteType) {
+        _uiState.update { it.copy(selectedFavoriteType = type) }
+        loadFavorites()
+    }
+
+    private var favoritesJob: Job? = null
+
+    private fun loadFavorites() {
+        favoritesJob?.cancel()
+        favoritesJob = viewModelScope.launch {
+            favoritesRepository.getAllFavoritesLaunches()
+                .onEach { launches ->
+                    _uiState.update { it.copy(favoriteLaunches = launches) }
+                }.launchIn(this)
+
+            favoritesRepository.getAllFavoritesRockets()
+                .onEach { rockets ->
+                    _uiState.update { it.copy(favoriteRockets = rockets) }
+                }.launchIn(this)
+        }
     }
 }

@@ -33,6 +33,7 @@ import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.profile_screen_back_arrow_text
 import ktscourse.composeapp.generated.resources.profile_screen_button_logout_text
 import ktscourse.composeapp.generated.resources.profile_screen_icon_content_descript
+import ktscourse.composeapp.generated.resources.profile_screen_profile_text
 import ktscourse.composeapp.generated.resources.profile_screen_username_text
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -86,7 +87,7 @@ fun ProfileScreen(
             )
             Spacer(modifier = Modifier.height(dimensions.paddingLarge))
             Text(
-                "Profile",
+                stringResource(Res.string.profile_screen_profile_text),
                 modifier = Modifier.padding(bottom = dimensions.paddingMedium),
                 style = MaterialTheme.typography.headlineMedium,
             )

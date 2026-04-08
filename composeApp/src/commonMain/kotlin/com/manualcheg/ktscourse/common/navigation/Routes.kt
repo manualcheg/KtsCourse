@@ -18,4 +18,7 @@ sealed class Screen {
 
     @Serializable
     data class LaunchDetails(val id: String): Screen()
+
+    @Serializable
+    data class RocketDetails(val id: String): Screen()
 }

@@ -34,13 +34,16 @@
     <string name="profile_screen_icon_content_descript">Profile icon</string>
     <string name="profile_screen_username_text">Name: %1$s</string>
     <string name="profile_screen_button_logout_text">Logout</string>
+    <string name="profile_screen_profile_text">Profile</string>
     <string name="onboarding_skip_text">Skip</string>
     <string name="main_tab_launches">Launches</string>
     <string name="main_tab_rockets">Rockets</string>
     <string name="main_tab_favorites">Favorites</string>
+    <string name="favorites_tab_launches">Launches</string>
+    <string name="favorites_tab_rockets">Rockets</string>
     <string name="details_screen_back_arrow_text">back</string>
     <string name="details_screen_launch_date_text">Launch date</string>
-    <string name="details_screen_flight_number_text">Flight #%1$s</string>"
+    <string name="details_screen_flight_number_text">Flight #%1$s</string>
     <string name="details_screen_description_text">Description</string>
     <string name="details_screen_rocket_text">Rocket</string>
     <string name="details_screen_launchpad_text">Launchpad</string>
@@ -53,5 +56,36 @@
     <string name="details_screen_time_utc_text">UTC: %1$s</string>
     <string name="details_screen_time_local_text">Local: %1$s</string>
     <string name="details_screen_patch_content_description">Mission Patch</string>
-
+    <string name="details_screen_back_button_content_description">Back</string>
+    <string name="details_screen_favorite_button_content_description">Favorite</string>
+    <string name="details_screen_share_button_content_description">Share</string>
+    <string name="details_screen_rocket_image_content_description">Rocket Image</string>
+    <string name="details_screen_unknown_company">Unknown Company</string>
+    <string name="details_screen_general_info_title">General Information</string>
+    <string name="details_screen_country_label">Country</string>
+    <string name="details_screen_first_flight_label">First Flight</string>
+    <string name="details_screen_cost_per_launch_label">Cost per launch</string>
+    <string name="details_screen_success_rate_label">Success Rate</string>
+    <string name="details_screen_no_description">No description available</string>
+    <string name="details_screen_specifications_title">Specifications</string>
+    <string name="details_screen_height_label">Height</string>
+    <string name="details_screen_diameter_label">Diameter</string>
+    <string name="details_screen_mass_label">Mass</string>
+    <string name="details_screen_stages_label">Stages</string>
+    <string name="details_screen_boosters_label">Boosters</string>
+    <string name="details_screen_payload_capacity_title">Payload Capacity</string>
+    <string name="details_screen_active_badge">Active</string>
+    <string name="details_screen_inactive_badge">Inactive</string>
+    <string name="rocket_share_text_template">🚀 Rocket: %1$s\n📊 Is active: %2$s\n📏 Size: height = %3$sm, diameter = %4$sm\n⚖️ Weight: %5$skg\n🔗 More info: %6$s</string>
+    <string name="favorites_empty_launches">Favorite launches list is empty. \nAdd a launch to favorites.</string>
+    <string name="favorites_empty_rockets">Favorite rockets list is empty. \nAdd a rocket to favorites.</string>
+    <string name="rockets_list_all_loaded">All rockets loaded</string>
+    <string name="launches_list_all_loaded">All launches loaded</string>
+    <string name="main_screen_profile_icon_content_description">Profile</string>
+    <string name="rocket_item_active">Active</string>
+    <string name="rocket_item_inactive">Inactive</string>
+    <string name="rocket_item_cost_template">Cost: $%1$s</string>
+    <string name="rocket_item_no_description">No description</string>
+    <string name="rocket_item_height_template">Height: %1$s m</string>
+    <string name="rocket_item_diameter_template">Diameter: %1$s m</string>
 </resources>

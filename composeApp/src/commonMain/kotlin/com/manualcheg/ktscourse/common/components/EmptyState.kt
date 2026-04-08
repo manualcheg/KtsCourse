@@ -19,7 +19,10 @@ import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun EmptyState(modifier: Modifier = Modifier) {
+fun EmptyState(
+    modifier: Modifier = Modifier,
+    text: String = stringResource(Res.string.nothing_found_text)
+) {
     Column(
         modifier = modifier.padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -30,7 +33,7 @@ fun EmptyState(modifier: Modifier = Modifier) {
             modifier = Modifier.size(150.dp),
         )
         Text(
-            text = stringResource(Res.string.nothing_found_text),
+            text = text,
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,

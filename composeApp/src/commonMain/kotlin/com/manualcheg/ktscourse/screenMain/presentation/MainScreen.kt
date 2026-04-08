@@ -1,44 +1,37 @@
 package com.manualcheg.ktscourse.screenMain.presentation
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.manualcheg.ktscourse.common.LocalDimensions
 import com.manualcheg.ktscourse.common.components.EmptyState
-import com.manualcheg.ktscourse.common.components.ErrorState
-import com.manualcheg.ktscourse.screenMain.domain.model.Launch
-import com.manualcheg.ktscourse.screenMain.presentation.components.LaunchItem
+import com.manualcheg.ktscourse.common.components.OfflineBadge
+import com.manualcheg.ktscourse.screenMain.presentation.components.LaunchList
 import com.manualcheg.ktscourse.screenMain.presentation.components.MainTab
 import com.manualcheg.ktscourse.screenMain.presentation.components.MainTopAppBar
+import com.manualcheg.ktscourse.screenMain.presentation.components.PagedListContainer
+import com.manualcheg.ktscourse.screenRockets.presentation.RocketListUiState
+import com.manualcheg.ktscourse.screenRockets.presentation.components.RocketList
+import ktscourse.composeapp.generated.resources.Res
+import ktscourse.composeapp.generated.resources.favorites_empty_launches
+import ktscourse.composeapp.generated.resources.favorites_empty_rockets
+import ktscourse.composeapp.generated.resources.favorites_tab_launches
+import ktscourse.composeapp.generated.resources.favorites_tab_rockets
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -47,6 +40,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun MainScreen(
     onProfileClick: () -> Unit = {},
     openLaunchDetails: (String) -> Unit,
+    openRocketDetails: (String) -> Unit,
     viewModel: ViewModelMainScreen = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -60,6 +54,8 @@ fun MainScreen(
         onRetry = viewModel::updateData,
         openLaunchDetails = openLaunchDetails,
         changeTab = viewModel::changeTab,
+        changeFavoriteType = viewModel::changeFavoriteType,
+        openRocketDetails = openRocketDetails,
     )
 }
 
@@ -74,6 +70,8 @@ fun MainContent(
     onRetry: () -> Unit,
     openLaunchDetails: (String) -> Unit,
     changeTab: (tab: MainTab) -> Unit,
+    changeFavoriteType: (FavoriteType) -> Unit,
+    openRocketDetails: (id: String) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -81,6 +79,7 @@ fun MainContent(
                 searchQuery = uiState.searchQuery,
                 onSearchQueryChange = onSearchQueryChange,
                 onProfileClick = onProfileClick,
+                showSearch = uiState.selectedTab != MainTab.Favorites,
             )
         },
         bottomBar = {
@@ -103,129 +102,113 @@ fun MainContent(
                     .fillMaxSize()
                     .padding(innerPadding),
         ) {
-            if (uiState.isFromCache) {
-                Surface(
-                    color = MaterialTheme.colorScheme.tertiary,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(
-                        text = "Показаны офлайн-данные",
-                        modifier = Modifier.padding(8.dp),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onTertiary,
-                    )
-                }
-            }
-
             when (uiState.selectedTab) {
-                MainTab.Launches -> PullToRefreshBox(
-                    isRefreshing = uiState.isRefreshing,
-                    onRefresh = onRefresh,
-                ) {
-                        Box(modifier =  Modifier.fillMaxSize()) {
-                            if (uiState.launches.isNotEmpty()) {
-                                LaunchList(
-                                    launches = uiState.launches,
-                                    isNextPageLoading = uiState.isNextPageLoading,
-                                    isLastPage = uiState.isLastPage,
-                                    loadNextPage = onLoadNextPage,
-                                    searchQuery = uiState.searchQuery,
-                                    openLaunchDetails = openLaunchDetails,
-                                )
-                            }
-
-                            if (uiState.showLoading) {
-                                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                            }
-
-                            if (uiState.showErrorState) {
-                                ErrorState(
-                                    message = uiState.error!!,
-                                    onRetry = onRetry,
-                                    modifier = Modifier.align(Alignment.Center),
-                                )
-                            }
-
-                            if (uiState.showEmptyState) {
-                                EmptyState(modifier = Modifier.align(Alignment.Center))
-                            }
-                        }
+                MainTab.Launches -> {
+                    if (uiState.isLaunchesFromCache && !uiState.isLoading && uiState.error == null) {
+                        OfflineBadge()
+                    }
+                    PagedListContainer(
+                        isRefreshing = uiState.isRefreshing,
+                        onRefresh = onRefresh,
+                        showLoading = uiState.showLoading,
+                        showErrorState = uiState.showErrorState,
+                        showEmptyState = uiState.showEmptyState,
+                        error = uiState.error,
+                        onRetry = onRetry,
+                    ) {
+                        LaunchList(
+                            launches = uiState.launches,
+                            isNextPageLoading = uiState.isNextPageLoading,
+                            isLastPage = uiState.isLastPage,
+                            loadNextPage = onLoadNextPage,
+                            searchQuery = uiState.searchQuery,
+                            openLaunchDetails = openLaunchDetails,
+                        )
+                    }
                 }
 
                 MainTab.Rockets -> {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Экран ракет в разработке")
+                    if (uiState.isRocketsFromCache && !uiState.isLoading && uiState.error == null) {
+                        OfflineBadge()
+                    }
+                    PagedListContainer(
+                        isRefreshing = uiState.isRefreshing,
+                        onRefresh = onRefresh,
+                        showLoading = uiState.showLoading,
+                        showErrorState = uiState.showErrorState,
+                        showEmptyState = uiState.showEmptyState,
+                        error = uiState.error,
+                        onRetry = onRetry,
+                    ) {
+                        RocketList(
+                            uiState = uiState.rocketsUiState.copy(searchQuery = uiState.searchQuery),
+                            loadNextPage = onLoadNextPage,
+                            openRocketDetails = openRocketDetails,
+                        )
                     }
                 }
 
                 MainTab.Favorites -> {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Экран избранного в разработке")
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        SingleChoiceSegmentedButtonRow(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                        ) {
+                            FavoriteType.entries.forEachIndexed { index, type ->
+                                val label = when (type) {
+                                    FavoriteType.Launches -> stringResource(Res.string.favorites_tab_launches)
+                                    FavoriteType.Rockets -> stringResource(Res.string.favorites_tab_rockets)
+                                }
+                                SegmentedButton(
+                                    selected = uiState.selectedFavoriteType == type,
+                                    onClick = { changeFavoriteType(type) },
+                                    shape = SegmentedButtonDefaults.itemShape(
+                                        index = index,
+                                        count = FavoriteType.entries.size,
+                                    ),
+                                ) {
+                                    Text(label)
+                                }
+                            }
+                        }
+
+                        if (uiState.selectedFavoriteType == FavoriteType.Launches) {
+                            if (uiState.favoriteLaunches.isEmpty()) {
+                                EmptyState(
+                                    modifier = Modifier.fillMaxSize(),
+                                    text = stringResource(Res.string.favorites_empty_launches),
+                                )
+                            } else {
+                                LaunchList(
+                                    launches = uiState.favoriteLaunches,
+                                    isNextPageLoading = false,
+                                    isLastPage = true,
+                                    loadNextPage = {},
+                                    searchQuery = "",
+                                    openLaunchDetails = openLaunchDetails,
+                                )
+                            }
+                        } else {
+                            if (uiState.favoriteRockets.isEmpty()) {
+                                EmptyState(
+                                    modifier = Modifier.fillMaxSize(),
+                                    text = stringResource(Res.string.favorites_empty_rockets),
+                                )
+                            } else {
+                                RocketList(
+                                    uiState = RocketListUiState(
+                                        items = uiState.favoriteRockets,
+                                        isLastPage = true,
+                                        searchQuery = "",
+                                    ),
+                                    loadNextPage = {},
+                                    openRocketDetails = openRocketDetails,
+                                )
+                            }
+                        }
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-fun LaunchList(
-    launches: List<Launch>,
-    isNextPageLoading: Boolean,
-    isLastPage: Boolean,
-    loadNextPage: () -> Unit,
-    searchQuery: String,
-    openLaunchDetails: (String) -> Unit,
-) {
-    val listState = rememberLazyListState()
-    val dimensions = LocalDimensions.current
-    var lastQuery by remember { mutableStateOf("") }
-
-    LaunchedEffect(searchQuery) {
-        if (searchQuery != lastQuery && lastQuery.isNotEmpty()) {
-            listState.animateScrollToItem(0)
-        }
-        lastQuery = searchQuery
-    }
-
-    LazyColumn(
-        state = listState,
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(dimensions.paddingSmall),
-    ) {
-        itemsIndexed(launches, key = { _, item -> item.id }) { index, launch ->
-            LaunchItem(launch, { openLaunchDetails(launch.id) })
-            if (index >= launches.size - 2 && !isLastPage && !isNextPageLoading) {
-                LaunchedEffect(launches.size) {
-                    loadNextPage()
-                }
-            }
-        }
-
-        if (isNextPageLoading) {
-            item {
-                Box(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(dimensions.paddingMedium),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    CircularProgressIndicator(modifier = Modifier.size(dimensions.circularProgressIndicatorSize))
-                }
-            }
-        }
-
-        if (isLastPage && launches.isNotEmpty()) {
-            item {
-                Text(
-                    text = "All launches loaded",
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.outline,
-                )
             }
         }
     }
@@ -243,5 +226,7 @@ fun PreviewMainScreen() {
         onRetry = {},
         openLaunchDetails = { _ -> },
         changeTab = {},
+        changeFavoriteType = {},
+        openRocketDetails = { },
     )
 }

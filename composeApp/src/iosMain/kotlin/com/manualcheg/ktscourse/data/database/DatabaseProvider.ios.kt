@@ -9,5 +9,5 @@ actual fun getDatabaseBuilder(): RoomDatabase.Builder<AppDatabase> {
     return Room.databaseBuilder<AppDatabase>(
         name = dbFilePath,
         factory = { AppDatabase::class.instantiateImpl() },
-    )
+    ).setDriver(androidx.sqlite.driver.bundled.BundledSQLiteDriver())
 }

@@ -1,7 +1,7 @@
 package com.manualcheg.ktscourse.screenMain.data
 
 import com.manualcheg.ktscourse.common.LaunchStatus
-import com.manualcheg.ktscourse.data.database.LaunchEntity
+import com.manualcheg.ktscourse.data.database.entity.LaunchEntity
 import com.manualcheg.ktscourse.data.models.LaunchDto
 import com.manualcheg.ktscourse.screenMain.domain.model.Launch
 

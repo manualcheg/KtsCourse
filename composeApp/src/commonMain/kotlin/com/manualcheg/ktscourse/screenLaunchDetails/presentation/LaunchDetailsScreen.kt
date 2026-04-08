@@ -47,7 +47,6 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.manualcheg.ktscourse.common.LaunchStatus
 import com.manualcheg.ktscourse.common.components.ErrorState
-import com.manualcheg.ktscourse.screenLaunchDetails.data.ShareServiceProvider
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.details_screen_article_text
 import ktscourse.composeapp.generated.resources.details_screen_back_arrow_text
@@ -101,7 +100,7 @@ fun LaunchDetailsContent(
     launchId: String,
     onBackClick: () -> Unit,
     viewModel: LaunchDetailsScreenViewModel,
-    uiState: DetailsUiState,
+    uiState: LaunchDetailsUiState,
     onRocketClick: (String) -> Unit,
     openLink: (String) -> Unit,
 ) {
@@ -120,7 +119,7 @@ fun LaunchDetailsContent(
                     }
                 },
                 actions = {
-                    if (!uiState.isLoading && uiState.error == null) {
+                    if (!uiState.isLoading && uiState.error == null && uiState.launch != null) {
                         IconButton(onClick = { viewModel.toggleFavorite() }) {
                             Icon(
                                 if (uiState.launch.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
@@ -156,157 +155,159 @@ fun LaunchDetailsContent(
             }
         } else {
             val launch = uiState.launch
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                item {
-                    AsyncImage(
-                        model = launch.patchUrl,
-                        contentDescription = stringResource(Res.string.details_screen_patch_content_description),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(250.dp)
-                            .clip(RoundedCornerShape(16.dp)),
-                        contentScale = ContentScale.Fit,
-                    )
-                }
-
-                item {
-                    Column {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Text(
-                                text = launch.name,
-                                style = MaterialTheme.typography.headlineMedium,
-                                fontWeight = FontWeight.ExtraBold,
-                                modifier = Modifier.weight(1f),
-                            )
-                            StatusBadge(launch.status)
-                        }
-                        Text(
-                            text = stringResource(
-                                Res.string.details_screen_flight_number_text,
-                                launch.flightNumber,
-                            ),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = Color.Gray,
+            if (launch != null) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    item {
+                        AsyncImage(
+                            model = launch.patchUrl,
+                            contentDescription = stringResource(Res.string.details_screen_patch_content_description),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(250.dp)
+                                .clip(RoundedCornerShape(16.dp)),
+                            contentScale = ContentScale.Fit,
                         )
                     }
-                }
 
-                item {
-                    InfoCard(title = stringResource(Res.string.details_screen_launch_date_text)) {
-                        Column {
-                            Text(
-                                stringResource(
-                                    Res.string.details_screen_time_utc_text,
-                                    launch.dateUtc,
-                                ),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                            Text(
-                                stringResource(
-                                    Res.string.details_screen_time_local_text,
-                                    launch.dateLocal,
-                                ),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                        }
-                    }
-                }
-
-                if (!launch.details.isNullOrBlank()) {
                     item {
-                        InfoCard(title = stringResource(Res.string.details_screen_description_text)) {
-                            Text(launch.details, style = MaterialTheme.typography.bodyMedium)
-                        }
-                    }
-                }
-
-                item {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        InfoCard(
-                            title = stringResource(Res.string.details_screen_rocket_text),
-                            modifier = Modifier.weight(1f)
-                                .clickable { onRocketClick(launch.rocketId) },
-                        ) {
+                        Column {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                Text(
+                                    text = launch.name,
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    modifier = Modifier.weight(1f),
+                                )
+                                StatusBadge(launch.status)
+                            }
                             Text(
-                                launch.rocketName,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary,
+                                text = stringResource(
+                                    Res.string.details_screen_flight_number_text,
+                                    launch.flightNumber,
+                                ),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = Color.Gray,
                             )
                         }
-                        InfoCard(
-                            title = stringResource(Res.string.details_screen_launchpad_text),
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            Text(launch.launchpadName)
-                        }
                     }
-                }
 
-                launch.payloads.let {
-                    if (it.isNotEmpty()) {
-                        item {
-                            InfoCard(title = stringResource(Res.string.details_screen_payloads_text)) {
-                                Text(launch.payloads.joinToString(", "))
+                    item {
+                        InfoCard(title = stringResource(Res.string.details_screen_launch_date_text)) {
+                            Column {
+                                Text(
+                                    stringResource(
+                                        Res.string.details_screen_time_utc_text,
+                                        launch.dateUtc,
+                                    ),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                )
+                                Text(
+                                    stringResource(
+                                        Res.string.details_screen_time_local_text,
+                                        launch.dateLocal,
+                                    ),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                )
                             }
                         }
                     }
-                }
 
-                item {
-                    Text(
-                        stringResource(Res.string.details_screen_links_text),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        LinkButton(
-                            stringResource(Res.string.details_screen_wiki_text),
-                            launch.wikipediaUrl,
-                            Modifier.weight(1f),
-                            openLink,
-                        )
-                        LinkButton(
-                            stringResource(Res.string.details_screen_reddit_text),
-                            launch.redditUrl,
-                            Modifier.weight(1f),
-                            openLink,
-                        )
-                        LinkButton(
-                            stringResource(Res.string.details_screen_article_text),
-                            launch.articleUrl,
-                            Modifier.weight(1f),
-                            openLink,
-                        )
+                    if (!launch.details.isNullOrBlank()) {
+                        item {
+                            InfoCard(title = stringResource(Res.string.details_screen_description_text)) {
+                                Text(launch.details, style = MaterialTheme.typography.bodyMedium)
+                            }
+                        }
                     }
-                }
 
-                item {
-                    Button(
-                        onClick = { openLink.invoke(uiState.launch.youtubeUrl ?: "") },
-                        enabled = launch.youtubeUrl != null,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF0000)),
-                    ) {
+                    item {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            InfoCard(
+                                title = stringResource(Res.string.details_screen_rocket_text),
+                                modifier = Modifier.weight(1f)
+                                    .clickable { onRocketClick(launch.rocketId) },
+                            ) {
+                                Text(
+                                    launch.rocketName,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary,
+                                )
+                            }
+                            InfoCard(
+                                title = stringResource(Res.string.details_screen_launchpad_text),
+                                modifier = Modifier.weight(1f),
+                            ) {
+                                Text(launch.launchpadName)
+                            }
+                        }
+                    }
+
+                    launch.payloads.let {
+                        if (it.isNotEmpty()) {
+                            item {
+                                InfoCard(title = stringResource(Res.string.details_screen_payloads_text)) {
+                                    Text(launch.payloads.joinToString(", "))
+                                }
+                            }
+                        }
+                    }
+
+                    item {
                         Text(
-                            stringResource(Res.string.details_screen_youtube_text),
-                            color = Color.White,
+                            stringResource(Res.string.details_screen_links_text),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
                         )
+                        Spacer(Modifier.height(8.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            LinkButton(
+                                stringResource(Res.string.details_screen_wiki_text),
+                                launch.wikipediaUrl,
+                                Modifier.weight(1f),
+                                openLink,
+                            )
+                            LinkButton(
+                                stringResource(Res.string.details_screen_reddit_text),
+                                launch.redditUrl,
+                                Modifier.weight(1f),
+                                openLink,
+                            )
+                            LinkButton(
+                                stringResource(Res.string.details_screen_article_text),
+                                launch.articleUrl,
+                                Modifier.weight(1f),
+                                openLink,
+                            )
+                        }
                     }
-                    Spacer(Modifier.height(24.dp))
+
+                    item {
+                        Button(
+                            onClick = { openLink.invoke(uiState.launch.youtubeUrl ?: "") },
+                            enabled = launch.youtubeUrl != null,
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF0000)),
+                        ) {
+                            Text(
+                                stringResource(Res.string.details_screen_youtube_text),
+                                color = Color.White,
+                            )
+                        }
+                        Spacer(Modifier.height(24.dp))
+                    }
                 }
             }
         }

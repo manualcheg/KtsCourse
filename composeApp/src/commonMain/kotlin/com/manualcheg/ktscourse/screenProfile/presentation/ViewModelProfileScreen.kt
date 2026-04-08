@@ -42,7 +42,7 @@ class ViewModelProfileScreen(
     fun logout() {
         viewModelScope.launch {
             _events.emit(ProfileUiEvent.Logout)
-            logoutUseCase.execute()
+            logoutUseCase()
         }
     }
 }
