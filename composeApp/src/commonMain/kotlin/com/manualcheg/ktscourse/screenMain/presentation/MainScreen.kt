@@ -14,6 +14,7 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -38,6 +39,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
+    initialRocketId: String? = null,
     onProfileClick: () -> Unit = {},
     openLaunchDetails: (String) -> Unit,
     openRocketDetails: (String) -> Unit,
@@ -45,10 +47,18 @@ fun MainScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    LaunchedEffect(initialRocketId) {
+        if (initialRocketId != null) {
+            viewModel.onRocketFilterChange(initialRocketId)
+            viewModel.changeTab(MainTab.Launches)
+        }
+    }
+
     MainContent(
         uiState = uiState,
         onSearchQueryChange = viewModel::onSearchQueryChange,
-        onProfileClick = onProfileClick,
+        onRocketFilterChange = viewModel::onRocketFilterChange,
+        onSettingsClick = onProfileClick,
         onRefresh = viewModel::updateData,
         onLoadNextPage = viewModel::loadNextPage,
         onRetry = viewModel::updateData,
@@ -64,7 +74,8 @@ fun MainScreen(
 fun MainContent(
     uiState: MainUiState,
     onSearchQueryChange: (String) -> Unit,
-    onProfileClick: () -> Unit,
+    onRocketFilterChange: (String?) -> Unit,
+    onSettingsClick: () -> Unit,
     onRefresh: () -> Unit,
     onLoadNextPage: () -> Unit,
     onRetry: () -> Unit,
@@ -78,7 +89,9 @@ fun MainContent(
             MainTopAppBar(
                 searchQuery = uiState.searchQuery,
                 onSearchQueryChange = onSearchQueryChange,
-                onProfileClick = onProfileClick,
+                rocketFilterId = uiState.rocketFilterId,
+                onRocketFilterChange = onRocketFilterChange,
+                onSettingsClick = onSettingsClick,
                 showSearch = uiState.selectedTab != MainTab.Favorites,
             )
         },
@@ -117,11 +130,8 @@ fun MainContent(
                         onRetry = onRetry,
                     ) {
                         LaunchList(
-                            launches = uiState.launches,
-                            isNextPageLoading = uiState.isNextPageLoading,
-                            isLastPage = uiState.isLastPage,
+                            uiState = uiState.launchesUiState.copy(searchQuery = uiState.searchQuery),
                             loadNextPage = onLoadNextPage,
-                            searchQuery = uiState.searchQuery,
                             openLaunchDetails = openLaunchDetails,
                         )
                     }
@@ -181,11 +191,12 @@ fun MainContent(
                                 )
                             } else {
                                 LaunchList(
-                                    launches = uiState.favoriteLaunches,
-                                    isNextPageLoading = false,
-                                    isLastPage = true,
+                                    uiState = LaunchListUiState(
+                                        items = uiState.favoriteLaunches,
+                                        isLastPage = true,
+                                        searchQuery = "",
+                                    ),
                                     loadNextPage = {},
-                                    searchQuery = "",
                                     openLaunchDetails = openLaunchDetails,
                                 )
                             }
@@ -218,9 +229,10 @@ fun MainContent(
 @Composable
 fun PreviewMainScreen() {
     MainContent(
-        uiState = MainUiState(launches = emptyList(), isLoading = false),
+        uiState = MainUiState(isLoading = false),
         onSearchQueryChange = {},
-        onProfileClick = {},
+        onRocketFilterChange = {},
+        onSettingsClick = {},
         onRefresh = {},
         onLoadNextPage = {},
         onRetry = {},

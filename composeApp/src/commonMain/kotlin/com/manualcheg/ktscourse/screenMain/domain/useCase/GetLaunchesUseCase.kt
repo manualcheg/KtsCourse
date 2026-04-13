@@ -5,6 +5,7 @@ import com.manualcheg.ktscourse.screenMain.domain.model.LaunchesPageResult
 interface GetLaunchesUseCase {
     suspend fun execute(
         query: String,
+        rocketId: String?,
         page: Int
     ): Result<LaunchesPageResult>
 }

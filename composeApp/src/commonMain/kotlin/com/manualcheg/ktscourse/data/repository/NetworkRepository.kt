@@ -1,5 +1,7 @@
 package com.manualcheg.ktscourse.data.repository
 
+import com.manualcheg.ktscourse.data.models.CompanyDto
+import com.manualcheg.ktscourse.data.models.HistoryDto
 import com.manualcheg.ktscourse.data.models.LaunchDetailsDto
 import com.manualcheg.ktscourse.data.models.LaunchDto
 import com.manualcheg.ktscourse.data.models.RocketDto
@@ -19,16 +21,19 @@ import io.ktor.http.contentType
 
 class NetworkRepository(private val httpClient: HttpClient) :
     LaunchNetworkRepository,
-    RocketNetworkRepository {
-
+    RocketNetworkRepository,
+    CompanyNetworkRepository,
+    HistoryNetworkRepository {
     override suspend fun getLaunches(
         query: String,
+        rocketId: String?,
         page: Int
     ): Result<SpaceXResponseDto<LaunchDto>> {
         return try {
             val requestBody = SpaceXQueryDto(
                 query = SpaceXQueryInnerDto(
                     text = if (query.isBlank()) null else SpaceXTextSearchDto(search = query),
+                    rocket = rocketId,
                 ),
                 options = SpaceXOptionsDto(
                     page = page,
@@ -45,6 +50,17 @@ class NetworkRepository(private val httpClient: HttpClient) :
             Result.success(response)
         } catch (e: Exception) {
             Napier.e("No response from api.spacexdata.com/v4/launches/query", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getAllLaunches(): Result<List<LaunchDto>> {
+        return try {
+            val response: List<LaunchDto> =
+                httpClient.get("https://api.spacexdata.com/v4/launches").body()
+            Result.success(response)
+        } catch (e: Exception) {
+            Napier.e("Failed to fetch all launches", e)
             Result.failure(e)
         }
     }
@@ -99,6 +115,30 @@ class NetworkRepository(private val httpClient: HttpClient) :
             Result.success(response)
         } catch (e: Exception) {
             Napier.e("Failed to fetch rocket by ID: $id", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getCompanyInfo(): Result<CompanyDto> {
+        return try {
+            val response: CompanyDto =
+                httpClient.get("https://api.spacexdata.com/v4/company").body()
+            Result.success(response)
+        } catch (e: Exception) {
+            Napier.e("Failed to fetch company info", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getHistoryInfo(): Result<List<HistoryDto>> {
+        return try {
+            val response =
+                httpClient.get("https://api.spacexdata.com/v4/history")
+                    .body<List<HistoryDto>>()
+
+            Result.success(response )
+        } catch (e: Exception) {
+            Napier.e("Failed to fetch history info", e)
             Result.failure(e)
         }
     }

@@ -1,4 +1,4 @@
-package com.manualcheg.ktscourse.common
+package com.manualcheg.ktscourse.common.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -8,14 +8,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.manualcheg.ktscourse.common.navigation.Screen
+import com.manualcheg.ktscourse.common.openSafeUri
 import com.manualcheg.ktscourse.common.repository.UserPreferencesRepository
+import com.manualcheg.ktscourse.screenAbout.presentation.AboutScreen
+import com.manualcheg.ktscourse.screenHistory.presentation.HistoryScreen
 import com.manualcheg.ktscourse.screenLaunchDetails.presentation.LaunchDetailsScreen
 import com.manualcheg.ktscourse.screenLogin.presentation.LoginScreen
 import com.manualcheg.ktscourse.screenMain.presentation.MainScreen
 import com.manualcheg.ktscourse.screenOnboarding.presentation.Onboarding
 import com.manualcheg.ktscourse.screenProfile.presentation.ProfileScreen
 import com.manualcheg.ktscourse.screenRocketDetails.presentation.RocketDetailsScreen
+import com.manualcheg.ktscourse.screenRocketLaunches.presentation.RocketLaunchesScreen
+import com.manualcheg.ktscourse.screenSettings.presentation.SettingsScreen
 import org.koin.compose.koinInject
 
 @Composable
@@ -56,10 +60,11 @@ fun AppNavHost() {
                 },
             )
         }
-        composable<Screen.Main> {
+        composable<Screen.Main> { backStackEntry ->
+//            val mainScreen: Screen.Main = backStackEntry.toRoute()
             MainScreen(
                 onProfileClick = {
-                    navController.navigate(Screen.Profile)
+                    navController.navigate(Screen.Settings)
                 },
                 openLaunchDetails = { id ->
                     navController.navigate(Screen.LaunchDetails(id))
@@ -103,7 +108,40 @@ fun AppNavHost() {
                 onLinkClick = { url ->
                     uriHandler.openSafeUri(url)
                 },
+                onViewLaunchesClick = { rocketId, rocketName ->
+                    navController.navigate(Screen.RocketLaunches(rocketId, rocketName))
+                },
             )
+        }
+
+        composable<Screen.RocketLaunches> {
+            val rocketLaunches: Screen.RocketLaunches = it.toRoute()
+            RocketLaunchesScreen(
+                rocketId = rocketLaunches.rocketId,
+                rocketName = rocketLaunches.rocketName,
+                onBackClick = { navController.navigateUp() },
+                openLaunchDetails = { id ->
+                    navController.navigate(Screen.LaunchDetails(id))
+                },
+            )
+        }
+
+        composable<Screen.Settings> {
+            SettingsScreen(
+                onBackClick = { navController.navigateUp() },
+                onProfileClick = { navController.navigate(Screen.Profile) },
+                onCompanyHistoryClick = { navController.navigate(Screen.History) },
+                onStatisticsClick = { },
+                onAboutSpaceXClick = { navController.navigate(Screen.AboutCompany) },
+            )
+        }
+
+        composable<Screen.AboutCompany> {
+            AboutScreen(onNavigateUp = { navController.navigateUp() })
+        }
+
+        composable<Screen.History> {
+            HistoryScreen(onNavigateUp = { navController.navigateUp() })
         }
     }
 }

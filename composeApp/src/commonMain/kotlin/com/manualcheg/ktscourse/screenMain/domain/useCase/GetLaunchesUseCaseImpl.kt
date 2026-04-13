@@ -12,13 +12,14 @@ class GetLaunchesUseCaseImpl(private val launchRepository: LaunchRepository) : G
 
     override suspend fun execute(
         query: String,
+        rocketId: String?,
         page: Int
     ): Result<LaunchesPageResult> {
         return executePagedRequest(
             page = page,
             pageSize = PAGE_SIZE,
-            fetchFromDb = { p, l -> launchRepository.getPagedLaunchesFromDb(query, p, l) },
-            fetchFromNetwork = { p -> launchRepository.fetchAndSaveLaunches(query, p) },
+            fetchFromDb = { p, l -> launchRepository.getPagedLaunchesFromDb(query, rocketId, p, l) },
+            fetchFromNetwork = { p -> launchRepository.fetchAndSaveLaunches(query, rocketId, p) },
             createResult = { items, hasNext, fromCache ->
                 LaunchesPageResult(
                     launches = items,

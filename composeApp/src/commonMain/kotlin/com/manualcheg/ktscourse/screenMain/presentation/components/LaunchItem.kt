@@ -24,7 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
 import com.manualcheg.ktscourse.common.LaunchStatus
 import com.manualcheg.ktscourse.common.LocalDimensions
-import com.manualcheg.ktscourse.screenMain.domain.model.Launch
+import com.manualcheg.ktscourse.domain.model.Launch
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.main_screen_launch_status_failed_text
 import ktscourse.composeapp.generated.resources.main_screen_launch_status_success_text
@@ -39,13 +39,14 @@ import org.jetbrains.compose.resources.stringResource
 fun PreviewLaunchItem() {
     LaunchItem(
         Launch(
-            "1",
-            "Starship",
-            0,
-            "15.02.2012",
-            "kdfjbfjk kjbjkb hbhh jbjdfns,k 345 cbklkd fgf kjned!!!",
-            "https://images2.imgbox.com/85/43/6VSgldkO_o.png",
-            LaunchStatus.SUCCESS,
+            id = "1",
+            name = "Starship",
+            rocketId = "",
+            launchDate = "15.02.2012",
+            details = "kdfjbfjk kjbjkb hbhh jbjdfns,k 345 cbklkd fgf kjned!!!",
+            imageUrl = "https://images2.imgbox.com/85/43/6VSgldkO_o.png",
+            status = LaunchStatus.SUCCESS,
+            flightNumber = 333,
         ),
         { println("") },
     )

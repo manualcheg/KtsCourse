@@ -1,5 +1,7 @@
 package com.manualcheg.ktscourse.common.di.modules
 
+import com.manualcheg.ktscourse.data.repository.CompanyNetworkRepository
+import com.manualcheg.ktscourse.data.repository.HistoryNetworkRepository
 import com.manualcheg.ktscourse.data.repository.LaunchNetworkRepository
 import com.manualcheg.ktscourse.data.repository.NetworkRepository
 import com.manualcheg.ktscourse.data.repository.RocketNetworkRepository
@@ -18,6 +20,7 @@ val networkModule = module {
                     Json {
                         ignoreUnknownKeys = true
                         coerceInputValues = true
+                        explicitNulls = false
                     },
                 )
             }
@@ -26,5 +29,7 @@ val networkModule = module {
     single { NetworkRepository(get()) }.apply {
         bind<LaunchNetworkRepository>()
         bind<RocketNetworkRepository>()
+        bind<HistoryNetworkRepository>()
+        bind<CompanyNetworkRepository>()
     }
 }

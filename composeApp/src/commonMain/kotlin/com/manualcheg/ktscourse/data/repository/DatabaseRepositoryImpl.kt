@@ -9,7 +9,7 @@ import com.manualcheg.ktscourse.data.database.entity.LaunchEntity
 import com.manualcheg.ktscourse.data.database.dao.RocketDao
 import com.manualcheg.ktscourse.data.database.entity.RocketEntity
 import com.manualcheg.ktscourse.data.mappers.toDomain
-import com.manualcheg.ktscourse.screenMain.domain.model.Launch
+import com.manualcheg.ktscourse.domain.model.Launch
 import com.manualcheg.ktscourse.screenRockets.domain.model.Rocket
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.Flow
@@ -22,15 +22,16 @@ class DatabaseRepositoryImpl(database: AppDatabase) : DatabaseRepository {
 
     override suspend fun getPagedLaunchesFromDb(
         query: String,
+        rocketId: String?,
         page: Int,
         limit: Int
     ): List<Launch> {
         return try {
             val offset = (page - 1) * limit
             val entities = if (query.isBlank()) {
-                launchDao.getLaunchesPaged(limit, offset)
+                launchDao.getLaunchesPaged(limit, offset, rocketId)
             } else {
-                launchDao.searchLaunchesPaged(query, limit, offset)
+                launchDao.searchLaunchesPaged(query, limit, offset, rocketId)
             }
             entities.map { it.toDomain() }
         } catch (e: Exception) {

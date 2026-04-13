@@ -40,7 +40,7 @@ class ViewModelMainScreen(
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun search() {
         _uiState
-            .map { it.searchQuery }
+            .map { it.searchQuery to it.rocketFilterId }
             .distinctUntilChanged()
             .debounce(1000L)
             .onEach {
@@ -54,7 +54,7 @@ class ViewModelMainScreen(
         if (!isRefresh && (state.isLastPage || state.isNextPageLoading || state.isLoading || state.isRefreshing)) return
 
         val itemsEmpty = when (state.selectedTab) {
-            MainTab.Launches -> state.launches.isEmpty()
+            MainTab.Launches -> state.launchesUiState.items.isEmpty()
             MainTab.Rockets -> state.rocketsUiState.items.isEmpty()
             MainTab.Favorites -> true
         }
@@ -67,15 +67,17 @@ class ViewModelMainScreen(
         loadingJob = viewModelScope.launch {
             when (state.selectedTab) {
                 MainTab.Launches -> {
-                    getLaunchesUseCase.execute(state.searchQuery, pageToLoad)
+                    getLaunchesUseCase.execute(state.searchQuery, state.rocketFilterId, pageToLoad)
                         .onSuccess { result ->
                             _uiState.update {
                                 it.copy(
-                                    launches = if (isFirstPage) result.launches else it.launches + result.launches,
-                                    isLaunchesFromCache = result.isFromCache,
-                                    isLastPage = result.isLastPage,
+                                    launchesUiState = it.launchesUiState.copy(
+                                        items = if (isFirstPage) result.launches else it.launchesUiState.items + result.launches,
+                                        isFromCache = result.isFromCache,
+                                        isLastPage = result.isLastPage,
+                                        isNextPageLoading = false,
+                                    ),
                                     isLoading = false,
-                                    isNextPageLoading = false,
                                     isRefreshing = false,
                                     error = null,
                                 )
@@ -105,22 +107,9 @@ class ViewModelMainScreen(
                         }
                         .onFailure { handleFailure(it) }
                 }
-
                 MainTab.Favorites -> {}
             }
         }
-    }
-
-    private fun handleSuccess(pageLoaded: Int) {
-        _uiState.update { state ->
-            state.copy(
-                isLoading = false,
-                isNextPageLoading = false,
-                isRefreshing = false,
-                error = null,
-            )
-        }
-        currentPage = pageLoaded
     }
 
     private fun handleFailure(error: Throwable) {
@@ -128,8 +117,9 @@ class ViewModelMainScreen(
             _uiState.update {
                 it.copy(
                     isLoading = false,
-                    isNextPageLoading = false,
                     isRefreshing = false,
+                    launchesUiState = it.launchesUiState.copy(isNextPageLoading = false),
+                    rocketsUiState = it.rocketsUiState.copy(isNextPageLoading = false),
                 )
             }
             return
@@ -144,9 +134,11 @@ class ViewModelMainScreen(
             it.copy(
                 error = error.message ?: "Unknown error",
                 isLoading = false,
-                isNextPageLoading = false,
                 isRefreshing = false,
-                isLaunchesFromCache = it.launches.isNotEmpty(),
+                launchesUiState = it.launchesUiState.copy(
+                    isFromCache = it.launchesUiState.items.isNotEmpty(),
+                    isNextPageLoading = false,
+                ),
                 rocketsUiState = it.rocketsUiState.copy(
                     isFromCache = it.rocketsUiState.items.isNotEmpty(),
                     isNextPageLoading = false,
@@ -164,13 +156,15 @@ class ViewModelMainScreen(
                 isRefresh -> it.copy(
                     isRefreshing = true,
                     error = null,
-                    isLaunchesFromCache = false,
+                    launchesUiState = it.launchesUiState.copy(isFromCache = false),
                     rocketsUiState = it.rocketsUiState.copy(isFromCache = false),
                 )
 
                 isFirstPage -> it.copy(isLoading = true, error = null)
                 else -> it.copy(
-                    isNextPageLoading = if (it.selectedTab == MainTab.Launches) true else it.isNextPageLoading,
+                    launchesUiState = it.launchesUiState.copy(
+                        isNextPageLoading = if (it.selectedTab == MainTab.Launches) true else it.launchesUiState.isNextPageLoading,
+                    ),
                     rocketsUiState = it.rocketsUiState.copy(
                         isNextPageLoading = if (it.selectedTab == MainTab.Rockets) true else it.rocketsUiState.isNextPageLoading,
                     ),
@@ -186,7 +180,17 @@ class ViewModelMainScreen(
 
     fun onSearchQueryChange(newQuery: String) {
         _uiState.update {
-            it.copy(searchQuery = newQuery)
+            it.copy(
+                searchQuery = newQuery,
+                rocketFilterId = null,
+                launchesUiState = it.launchesUiState.copy(lastQuery = it.searchQuery),
+            )
+        }
+    }
+
+    fun onRocketFilterChange(rocketId: String?) {
+        _uiState.update {
+            it.copy(rocketFilterId = rocketId, searchQuery = "")
         }
     }
 
@@ -195,11 +199,9 @@ class ViewModelMainScreen(
         currentPage = 1
         _uiState.update {
             it.copy(
-                launches = emptyList(),
+                launchesUiState = LaunchListUiState(),
                 rocketsUiState = RocketListUiState(),
-                isLastPage = false,
                 isLoading = false,
-                isNextPageLoading = false,
                 isRefreshing = false,
                 error = null,
             )

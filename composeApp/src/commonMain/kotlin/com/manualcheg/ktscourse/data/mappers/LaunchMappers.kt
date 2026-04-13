@@ -5,8 +5,8 @@ import com.manualcheg.ktscourse.data.database.entity.FavoriteLaunchEntity
 import com.manualcheg.ktscourse.data.database.entity.LaunchEntity
 import com.manualcheg.ktscourse.data.models.LaunchDetailsDto
 import com.manualcheg.ktscourse.data.models.LaunchDto
+import com.manualcheg.ktscourse.domain.model.Launch
 import com.manualcheg.ktscourse.screenLaunchDetails.domain.model.LaunchDetails
-import com.manualcheg.ktscourse.screenMain.domain.model.Launch
 
 fun LaunchDto.toEntity(): LaunchEntity {
     return LaunchEntity(
@@ -21,6 +21,7 @@ fun LaunchDto.toEntity(): LaunchEntity {
             success == true -> LaunchStatus.SUCCESS
             else -> LaunchStatus.FAILURE
         },
+        rocketId = rocket,
     )
 }
 
@@ -28,6 +29,7 @@ fun LaunchEntity.toDomain() =
     Launch(
         id = id,
         name = name,
+        rocketId = rocketId ?: "",
         flightNumber = flightNumber,
         launchDate = launchDate,
         details = details,
@@ -39,6 +41,7 @@ fun FavoriteLaunchEntity.toDomain() =
     Launch(
         id = launchId,
         name = name ?: "",
+        rocketId = rocketId ?: "",
         flightNumber = flightNumber ?: 0,
         launchDate = dateUtc ?: "",
         details = details ?: "",
