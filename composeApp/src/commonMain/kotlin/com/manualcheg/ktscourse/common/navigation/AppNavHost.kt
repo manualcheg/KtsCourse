@@ -20,6 +20,7 @@ import com.manualcheg.ktscourse.screenProfile.presentation.ProfileScreen
 import com.manualcheg.ktscourse.screenRocketDetails.presentation.RocketDetailsScreen
 import com.manualcheg.ktscourse.screenRocketLaunches.presentation.RocketLaunchesScreen
 import com.manualcheg.ktscourse.screenSettings.presentation.SettingsScreen
+import com.manualcheg.ktscourse.screenStatistics.presentation.StatisticsScreen
 import org.koin.compose.koinInject
 
 @Composable
@@ -61,7 +62,6 @@ fun AppNavHost() {
             )
         }
         composable<Screen.Main> { backStackEntry ->
-//            val mainScreen: Screen.Main = backStackEntry.toRoute()
             MainScreen(
                 onProfileClick = {
                     navController.navigate(Screen.Settings)
@@ -131,7 +131,7 @@ fun AppNavHost() {
                 onBackClick = { navController.navigateUp() },
                 onProfileClick = { navController.navigate(Screen.Profile) },
                 onCompanyHistoryClick = { navController.navigate(Screen.History) },
-                onStatisticsClick = { },
+                onStatisticsClick = { navController.navigate(Screen.Statistic) },
                 onAboutSpaceXClick = { navController.navigate(Screen.AboutCompany) },
             )
         }
@@ -142,6 +142,10 @@ fun AppNavHost() {
 
         composable<Screen.History> {
             HistoryScreen(onNavigateUp = { navController.navigateUp() })
+        }
+
+        composable<Screen.Statistic>{
+            StatisticsScreen(onNavigateUp = { navController.navigateUp() })
         }
     }
 }

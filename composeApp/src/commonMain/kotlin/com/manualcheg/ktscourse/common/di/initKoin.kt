@@ -14,6 +14,7 @@ import com.manualcheg.ktscourse.common.di.modules.profileModule
 import com.manualcheg.ktscourse.common.di.modules.rocketDetailsModule
 import com.manualcheg.ktscourse.common.di.modules.rocketLaunchesModule
 import com.manualcheg.ktscourse.common.di.modules.settingsModule
+import com.manualcheg.ktscourse.common.di.modules.statisticsModule
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
 
@@ -35,5 +36,6 @@ fun initKoin(appDeclaration: KoinAppDeclaration = {}) =
             settingsModule,
             aboutModule,
             historyModule,
+            statisticsModule,
         )
     }

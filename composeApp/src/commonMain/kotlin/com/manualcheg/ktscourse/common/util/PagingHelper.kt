@@ -1,7 +1,6 @@
 package com.manualcheg.ktscourse.common.util
 
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.withTimeoutOrNull
 
 suspend fun <T, R> executePagedRequest(
     page: Int,
@@ -16,15 +15,7 @@ suspend fun <T, R> executePagedRequest(
         val cachedData = fetchFromDb(page, pageSize)
 
         // Пытаемся обновить данные из сети
-        val networkResult = if (cachedData.isNotEmpty()) {
-            // Если кэш есть, ждем сеть не более 3 секунд
-            withTimeoutOrNull(3000) {
-                fetchFromNetwork(page)
-            } ?: Result.failure(Exception("Network timeout, using cache"))
-        } else {
-            // Если в БД пусто, ждем сеть сколько потребуется
-            fetchFromNetwork(page)
-        }
+        val networkResult = fetchFromNetwork(page)
 
         //  Получаем итоговые данные (обновленные или из кэша)
         val finalItems = if (networkResult.isSuccess) {
@@ -58,7 +49,7 @@ suspend fun <T, R> executePagedRequest(
         try {
             val cachedData = fetchFromDb(page, pageSize)
             Result.success(createResult(cachedData, false, true))
-        } catch (innerException: Exception) {
+        } catch (_: Exception) {
             Result.failure(e)
         }
     }
