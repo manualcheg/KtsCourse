@@ -47,6 +47,7 @@ fun PreviewLaunchItem() {
             imageUrl = "https://images2.imgbox.com/85/43/6VSgldkO_o.png",
             status = LaunchStatus.SUCCESS,
             flightNumber = 333,
+            launchpad = "dd",
         ),
         { println("") },
     )
@@ -101,24 +102,24 @@ fun LaunchItem(launch: Launch, onItemClick: () -> Unit) {
 
             Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
+                    .weight(1f),
             ) {
-                Text(
-                    text = launch.name,
+                Row(
                     modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.titleMedium,
-                )
-
-                Spacer(modifier = Modifier.height(dimensions.spacerHeight))
-
-                Text(
-                    text = launch.flightNumber.toString(),
-                    modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    style = MaterialTheme.typography.titleSmall,
-                )
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = launch.name,
+                        modifier = Modifier.weight(1f),
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Text(
+                        text = "#${launch.flightNumber}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
 
                 if (launch.details.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(dimensions.spacerHeight))

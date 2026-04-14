@@ -36,11 +36,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.manualcheg.ktscourse.common.components.ErrorState
 import com.manualcheg.ktscourse.screenStatistics.domain.Statistics
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.details_screen_back_button_content_description
 import ktscourse.composeapp.generated.resources.settings_item_statistics
-import ktscourse.composeapp.generated.resources.unknown_error
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -74,10 +74,10 @@ fun StatisticsScreen(
                 }
 
                 uiState.error != null && uiState.statistics == null -> {
-                    Text(
-                        text = uiState.error ?: stringResource(Res.string.unknown_error),
+                    ErrorState(
+                        message = uiState.error!!,
+                        onRetry = { viewModel.retry() },
                         modifier = Modifier.align(Alignment.Center),
-                        color = MaterialTheme.colorScheme.error,
                     )
                 }
 
@@ -131,6 +131,22 @@ fun StatisticsContent(stats: Statistics) {
                     .padding(vertical = 16.dp),
             )
         }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            ),
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                StatisticsRow("Most Used Rocket", stats.mostUsedRocket ?: "Unknown")
+//                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                StatisticsRow("Most Used Launchpad", stats.mostUsedLaunchpad ?: "Unknown")
+            }
+        }
     }
 }
 
@@ -176,7 +192,6 @@ fun LaunchesChart(
             val x = spacing + index * (barWidth + spacing)
             val yBarTop = topPadding + (chartHeight - barHeight)
 
-            // Столбец
             drawRect(
                 color = barColor,
                 topLeft = Offset(x, yBarTop),

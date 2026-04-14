@@ -15,7 +15,7 @@ import com.manualcheg.ktscourse.data.database.entity.FavoriteRocketEntity
 import com.manualcheg.ktscourse.data.database.entity.LaunchEntity
 import com.manualcheg.ktscourse.data.database.entity.RocketEntity
 
-@Database(entities = [LaunchEntity::class, FavoriteLaunchEntity::class, RocketEntity::class, FavoriteRocketEntity::class], version = 7)
+@Database(entities = [LaunchEntity::class, FavoriteLaunchEntity::class, RocketEntity::class, FavoriteRocketEntity::class], version = 8)
 @TypeConverters(Converters::class, DBTypeConverters::class)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {

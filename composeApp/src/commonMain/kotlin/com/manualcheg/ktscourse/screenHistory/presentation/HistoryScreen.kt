@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.manualcheg.ktscourse.common.components.ErrorState
 import com.manualcheg.ktscourse.screenSettings.domain.History
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.details_screen_back_button_content_description
@@ -67,10 +68,10 @@ fun HistoryScreen(
                 }
 
                 uiState.error != null -> {
-                    Text(
-                        text = uiState.error ?: stringResource(Res.string.unknown_error),
+                    ErrorState(
+                        message = uiState.error,
+                        onRetry = { viewModel.loadHistoryInfo() },
                         modifier = Modifier.align(Alignment.Center),
-                        color = MaterialTheme.colorScheme.error,
                     )
                 }
 

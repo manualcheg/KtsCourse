@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.manualcheg.ktscourse.common.LaunchStatus
 import com.manualcheg.ktscourse.common.components.ErrorState
+import com.manualcheg.ktscourse.common.util.NameHelper
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.details_screen_article_text
 import ktscourse.composeapp.generated.resources.details_screen_back_arrow_text
@@ -80,6 +81,7 @@ fun LaunchDetailsScreen(
     onBackClick: () -> Unit,
     onRocketClick: (String) -> Unit,
     openLink: (String) -> Unit,
+    nameHelper: NameHelper,
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -90,6 +92,7 @@ fun LaunchDetailsScreen(
         uiState = uiState,
         onRocketClick = onRocketClick,
         openLink = openLink,
+        nameHelper = nameHelper
     )
 
     LaunchedEffect(launchId) {
@@ -106,6 +109,7 @@ fun LaunchDetailsContent(
     uiState: LaunchDetailsUiState,
     onRocketClick: (String) -> Unit,
     openLink: (String) -> Unit,
+    nameHelper: NameHelper,
 ) {
     Scaffold(
         topBar = {
@@ -244,7 +248,7 @@ fun LaunchDetailsContent(
                                     .clickable { onRocketClick(launch.rocketId) },
                             ) {
                                 Text(
-                                    launch.rocketName,
+                                    nameHelper.getRocketName(launch.rocketName),
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.primary,
                                 )
@@ -253,7 +257,7 @@ fun LaunchDetailsContent(
                                 title = stringResource(Res.string.details_screen_launchpad_text),
                                 modifier = Modifier.weight(1f),
                             ) {
-                                Text(launch.launchpadName)
+                                Text(nameHelper.getLaunchpadName(launch.launchpadName))
                             }
                         }
                     }

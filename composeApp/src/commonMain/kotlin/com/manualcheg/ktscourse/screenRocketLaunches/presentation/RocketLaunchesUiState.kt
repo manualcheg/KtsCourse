@@ -1,12 +1,13 @@
 package com.manualcheg.ktscourse.screenRocketLaunches.presentation
 
 import com.manualcheg.ktscourse.screenMain.presentation.LaunchListUiState
+import org.jetbrains.compose.resources.StringResource
 
 data class RocketLaunchesUiState(
     val launchesUiState: LaunchListUiState = LaunchListUiState(),
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
-    val error: String? = null,
+    val error: StringResource? = null,
 ) {
     private val itemsCount: Int = launchesUiState.items.size
 

@@ -3,6 +3,7 @@ package com.manualcheg.ktscourse.screenAbout.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.manualcheg.ktscourse.data.repository.NetworkRepository
+import com.manualcheg.ktscourse.common.util.toUserFriendlyMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,7 +20,7 @@ class ViewModelAboutScreen(
         loadCompanyInfo()
     }
 
-    private fun loadCompanyInfo() {
+    fun loadCompanyInfo() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             repository.getCompanyInfo()
@@ -27,7 +28,7 @@ class ViewModelAboutScreen(
                     _uiState.update { it.copy(companyInfo = info, isLoading = false) }
                 }
                 .onFailure { error ->
-                    _uiState.update { it.copy(error = error.message, isLoading = false) }
+                    _uiState.update { it.copy(error = error.toUserFriendlyMessage(), isLoading = false) }
                 }
         }
     }

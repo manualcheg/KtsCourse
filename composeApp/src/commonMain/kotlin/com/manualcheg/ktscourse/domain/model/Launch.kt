@@ -10,5 +10,6 @@ data class Launch(
     val launchDate: String,
     val details: String,
     val imageUrl: String,
-    val status: LaunchStatus
+    val status: LaunchStatus,
+    val launchpad: String,
 )

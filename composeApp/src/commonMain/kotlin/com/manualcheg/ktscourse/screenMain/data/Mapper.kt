@@ -20,6 +20,7 @@ fun LaunchDto.toDomain(): Launch =
                 null -> LaunchStatus.UPCOMING
             },
         rocketId = "",
+        launchpad = launchpad ?: "",
     )
 
 fun LaunchDto.toEntity(): LaunchEntity =

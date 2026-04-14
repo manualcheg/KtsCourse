@@ -5,5 +5,7 @@ data class Statistics(
     val successLaunches: Int,
     val failedLaunches: Int,
     val upcomingLaunches: Int,
-    val launchesByYear: Map<Int, Int> = emptyMap()
+    val launchesByYear: Map<Int, Int> = emptyMap(),
+    val mostUsedRocket: String? = null,
+    val mostUsedLaunchpad: String? = null,
 )

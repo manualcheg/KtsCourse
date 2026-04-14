@@ -4,6 +4,7 @@ import com.manualcheg.ktscourse.domain.model.Launch
 import com.manualcheg.ktscourse.screenMain.presentation.components.MainTab
 import com.manualcheg.ktscourse.screenRockets.domain.model.Rocket
 import com.manualcheg.ktscourse.screenRockets.presentation.RocketListUiState
+import org.jetbrains.compose.resources.StringResource
 
 enum class FavoriteType {
     Launches, Rockets
@@ -16,7 +17,7 @@ data class MainUiState(
     val favoriteRockets: List<Rocket> = emptyList(),
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
-    val error: String? = null,
+    val error: StringResource? = null,
     val searchQuery: String = "",
     val rocketFilterId: String? = null,
     val selectedTab: MainTab = MainTab.Launches,

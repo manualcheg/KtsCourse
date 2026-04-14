@@ -18,7 +18,7 @@
     <string name="main_screen_launch_status_failed_text">Провален</string>
     <string name="main_screen_launch_status_upcoming_text">Предстоит</string>
     <string name="main_screen_docked_search_bar_placeholder">Поиск по запускам...</string>
-    <string name="noInternet">нет интернета</string>
+    <string name="noInternet">Нет интернета</string>
     <string name="network_error">Ошибка сети</string>
     <string name="unknown_error">Неизвестная ошибка</string>
     <string name="onboarding_favourites_title">Избранное</string>
@@ -115,9 +115,9 @@
     <string name="about_screen_test_sites">Испытательные площадки</string>
     <string name="about_screen_valuation">Стоимость</string>
     <string name="about_screen_leadership">Руководство</string>
-    <string name="about_screen_ceo">CEO</string>
-    <string name="about_screen_coo">COO</string>
-    <string name="about_screen_cto">CTO</string>
+    <string name="about_screen_ceo">Генеральный директор</string>
+    <string name="about_screen_coo">Исполнительный директор</string>
+    <string name="about_screen_cto">Технический директор</string>
     <string name="about_screen_headquarters">Штаб-квартира</string>
     <string name="about_screen_address">Адрес</string>
     <string name="about_screen_city">Город</string>

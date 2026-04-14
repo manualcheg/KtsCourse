@@ -3,6 +3,7 @@ package com.manualcheg.ktscourse.screenHistory.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.manualcheg.ktscourse.screenHistory.domain.usecase.GetHistoryUseCase
+import com.manualcheg.ktscourse.common.util.toUserFriendlyMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,7 +20,7 @@ class ViewModelHistoryScreen(
         loadHistoryInfo()
     }
 
-    private fun loadHistoryInfo() {
+    fun loadHistoryInfo() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             getHistoryUseCase.execute()
@@ -27,7 +28,7 @@ class ViewModelHistoryScreen(
                     _uiState.update { it.copy(historyInfo = history, isLoading = false) }
                 }
                 .onFailure { error ->
-                    _uiState.update { it.copy(error = error.message, isLoading = false) }
+                    _uiState.update { it.copy(error = error.toUserFriendlyMessage(), isLoading = false) }
                 }
         }
     }

@@ -47,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.manualcheg.ktscourse.common.components.ErrorState
 import com.manualcheg.ktscourse.screenRocketDetails.domain.RocketDetails
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.currency_usd
@@ -96,6 +97,7 @@ fun RocketDetailsScreen(
     }
 
     RocketDetailsContent(
+        rocketId = rocketId,
         viewModel = viewModel,
         onBackClick = onBackClick,
         uiState = uiState,
@@ -107,6 +109,7 @@ fun RocketDetailsScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RocketDetailsContent(
+    rocketId: String,
     viewModel: RocketDetailsViewModel,
     onBackClick: () -> Unit,
     uiState: RocketDetailsUiState,
@@ -165,10 +168,10 @@ fun RocketDetailsContent(
             if (uiState.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             } else if (uiState.error != null) {
-                Text(
-                    text = uiState.error,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.align(Alignment.Center).padding(16.dp),
+                ErrorState(
+                    message = uiState.error,
+                    onRetry = { viewModel.loadRocketDetails(rocketId) },
+                    modifier = Modifier.align(Alignment.Center),
                 )
             } else {
                 uiState.rocketDetails?.let { rocket ->

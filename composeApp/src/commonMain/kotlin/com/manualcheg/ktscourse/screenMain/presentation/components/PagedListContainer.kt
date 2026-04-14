@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.manualcheg.ktscourse.common.components.EmptyState
 import com.manualcheg.ktscourse.common.components.ErrorState
+import org.jetbrains.compose.resources.StringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -19,7 +20,7 @@ fun PagedListContainer(
     showLoading: Boolean,
     showErrorState: Boolean,
     showEmptyState: Boolean,
-    error: String?,
+    error: StringResource?,
     onRetry: () -> Unit,
     content: @Composable () -> Unit
 ) {
@@ -38,7 +39,7 @@ fun PagedListContainer(
 
             if (showErrorState) {
                 ErrorState(
-                    message = error ?: "Unknown error",
+                    message = error,
                     onRetry = onRetry,
                     modifier = Modifier.align(Alignment.Center),
                 )

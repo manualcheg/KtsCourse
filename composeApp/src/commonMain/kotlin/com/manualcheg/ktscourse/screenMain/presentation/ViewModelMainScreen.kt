@@ -2,6 +2,7 @@ package com.manualcheg.ktscourse.screenMain.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.manualcheg.ktscourse.common.util.toUserFriendlyMessage
 import com.manualcheg.ktscourse.screenFavorites.domain.repository.FavoritesRepository
 import com.manualcheg.ktscourse.screenMain.domain.useCase.GetLaunchesUseCase
 import com.manualcheg.ktscourse.screenMain.presentation.components.MainTab
@@ -132,7 +133,7 @@ class ViewModelMainScreen(
         )
         _uiState.update {
             it.copy(
-                error = error.message ?: "Unknown error",
+                error = error.toUserFriendlyMessage(),
                 isLoading = false,
                 isRefreshing = false,
                 launchesUiState = it.launchesUiState.copy(

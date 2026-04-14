@@ -15,4 +15,5 @@ data class LaunchEntity(
     val imageUrl: String,
     val status: LaunchStatus,
     val rocketId: String? = null,
+    val launchpad: String? = null,
 )

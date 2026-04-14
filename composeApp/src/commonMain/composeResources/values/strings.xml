@@ -18,7 +18,7 @@
     <string name="main_screen_launch_status_failed_text">Failed</string>
     <string name="main_screen_launch_status_upcoming_text">Upcoming</string>
     <string name="main_screen_docked_search_bar_placeholder">Search launches...</string>
-    <string name="noInternet">no internet</string>
+    <string name="noInternet">No internet</string>
     <string name="network_error">Network Error</string>
     <string name="unknown_error">Unknown error</string>
     <string name="onboarding_favourites_title">Favourites</string>

@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.manualcheg.ktscourse.common.openSafeUri
 import com.manualcheg.ktscourse.common.repository.UserPreferencesRepository
+import com.manualcheg.ktscourse.common.util.NameHelper
 import com.manualcheg.ktscourse.screenAbout.presentation.AboutScreen
 import com.manualcheg.ktscourse.screenHistory.presentation.HistoryScreen
 import com.manualcheg.ktscourse.screenLaunchDetails.presentation.LaunchDetailsScreen
@@ -61,7 +62,7 @@ fun AppNavHost() {
                 },
             )
         }
-        composable<Screen.Main> { backStackEntry ->
+        composable<Screen.Main> {
             MainScreen(
                 onProfileClick = {
                     navController.navigate(Screen.Settings)
@@ -97,6 +98,7 @@ fun AppNavHost() {
                 openLink = { url ->
                     uriHandler.openSafeUri(url)
                 },
+                nameHelper = koinInject<NameHelper>(),
             )
         }
 
