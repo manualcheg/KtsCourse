@@ -187,7 +187,7 @@ fun MainContent(
                             if (uiState.favoriteLaunches.isEmpty()) {
                                 EmptyState(
                                     modifier = Modifier.fillMaxSize(),
-                                    text = stringResource(Res.string.favorites_empty_launches),
+                                    text = Res.string.favorites_empty_launches,
                                 )
                             } else {
                                 LaunchList(
@@ -204,7 +204,7 @@ fun MainContent(
                             if (uiState.favoriteRockets.isEmpty()) {
                                 EmptyState(
                                     modifier = Modifier.fillMaxSize(),
-                                    text = stringResource(Res.string.favorites_empty_rockets),
+                                    text = Res.string.favorites_empty_rockets,
                                 )
                             } else {
                                 RocketList(

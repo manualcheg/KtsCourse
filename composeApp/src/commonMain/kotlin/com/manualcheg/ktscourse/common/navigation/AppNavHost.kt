@@ -7,6 +7,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.manualcheg.ktscourse.common.openSafeUri
 import com.manualcheg.ktscourse.common.repository.UserPreferencesRepository
@@ -89,7 +90,13 @@ fun AppNavHost() {
             )
         }
 
-        composable<Screen.LaunchDetails> { backstackEntry ->
+        composable<Screen.LaunchDetails>(
+            deepLinks = listOf(
+                navDeepLink<Screen.LaunchDetails>(
+                    basePath = "spacex://launch",
+                ),
+            ),
+        ) { backstackEntry ->
             val launchDetails: Screen.LaunchDetails = backstackEntry.toRoute()
             LaunchDetailsScreen(
                 onBackClick = { navController.navigateUp() },
@@ -102,7 +109,13 @@ fun AppNavHost() {
             )
         }
 
-        composable<Screen.RocketDetails> {
+        composable<Screen.RocketDetails>(
+            deepLinks = listOf(
+                navDeepLink<Screen.RocketDetails>(
+                    basePath = "spacex://rocket",
+                ),
+            ),
+        ) {
             val rocketDetails: Screen.RocketDetails = it.toRoute()
             RocketDetailsScreen(
                 onBackClick = { navController.navigateUp() },
@@ -146,7 +159,7 @@ fun AppNavHost() {
             HistoryScreen(onNavigateUp = { navController.navigateUp() })
         }
 
-        composable<Screen.Statistic>{
+        composable<Screen.Statistic> {
             StatisticsScreen(onNavigateUp = { navController.navigateUp() })
         }
     }

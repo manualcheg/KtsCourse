@@ -47,7 +47,6 @@ import ktscourse.composeapp.generated.resources.about_screen_title
 import ktscourse.composeapp.generated.resources.about_screen_valuation
 import ktscourse.composeapp.generated.resources.about_screen_vehicles
 import ktscourse.composeapp.generated.resources.details_screen_back_button_content_description
-import ktscourse.composeapp.generated.resources.unknown_error
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 

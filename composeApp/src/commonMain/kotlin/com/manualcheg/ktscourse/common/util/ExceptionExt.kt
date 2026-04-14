@@ -7,7 +7,6 @@ import org.jetbrains.compose.resources.StringResource
 import io.ktor.client.network.sockets.ConnectTimeoutException
 import io.ktor.client.network.sockets.SocketTimeoutException
 import io.ktor.client.plugins.HttpRequestTimeoutException
-import io.ktor.utils.io.errors.IOException
 
 fun Throwable.toUserFriendlyMessage(): StringResource {
     return when (this) {

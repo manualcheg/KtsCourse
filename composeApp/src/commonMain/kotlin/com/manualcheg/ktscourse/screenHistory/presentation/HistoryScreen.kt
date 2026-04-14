@@ -29,12 +29,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.manualcheg.ktscourse.common.components.EmptyState
 import com.manualcheg.ktscourse.common.components.ErrorState
 import com.manualcheg.ktscourse.screenSettings.domain.History
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.details_screen_back_button_content_description
 import ktscourse.composeapp.generated.resources.history_screen_title
-import ktscourse.composeapp.generated.resources.unknown_error
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -76,7 +76,12 @@ fun HistoryScreen(
                 }
 
                 uiState.historyInfo != null -> {
-                    HistoryContent(uiState.historyInfo)
+                    val history = uiState.historyInfo!!
+                    if (history.isEmpty()) {
+                        EmptyState(modifier = Modifier.align(Alignment.Center))
+                    } else {
+                        HistoryContent(history)
+                    }
                 }
             }
         }
