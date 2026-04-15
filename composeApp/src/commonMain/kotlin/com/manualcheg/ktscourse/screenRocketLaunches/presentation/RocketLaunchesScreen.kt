@@ -45,6 +45,10 @@ fun RocketLaunchesScreen(
         },
     ) { padding ->
         Column(modifier = Modifier.padding(padding).fillMaxSize()) {
+            if (uiState.isFromCache && !uiState.isLoading && uiState.error == null) {
+                com.manualcheg.ktscourse.common.components.OfflineBadge()
+            }
+
             PagedListContainer(
                 isRefreshing = uiState.isRefreshing,
                 onRefresh = viewModel::refresh,
@@ -56,7 +60,7 @@ fun RocketLaunchesScreen(
             ) {
                 LaunchList(
                     uiState = uiState.launchesUiState,
-                    loadNextPage = viewModel::loadNextPage,
+                    loadNextPage = {},
                     openLaunchDetails = openLaunchDetails,
                 )
             }

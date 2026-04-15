@@ -3,6 +3,7 @@ package com.manualcheg.ktscourse.screenRocketLaunches.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.manualcheg.ktscourse.common.util.toUserFriendlyMessage
+import com.manualcheg.ktscourse.domain.model.LaunchFilterType
 import com.manualcheg.ktscourse.screenRocketLaunches.domain.usecase.GetRocketLaunchesUseCase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,17 +33,16 @@ class RocketLaunchesViewModel(
 
         loadingJob?.cancel()
         loadingJob = viewModelScope.launch {
-            getRocketLaunchesUseCase(rocketId)
-                .onSuccess { launches ->
+            getRocketLaunchesUseCase(rocketId, LaunchFilterType.All)
+                .onSuccess { result ->
                     _uiState.update {
                         it.copy(
                             launchesUiState = it.launchesUiState.copy(
-                                items = launches,
-                                isLastPage = true,
-                                isNextPageLoading = false,
+                                items = result.launches.distinctBy { launch -> launch.id },
                             ),
                             isLoading = false,
                             isRefreshing = false,
+                            isFromCache = result.isFromCache,
                             error = null,
                         )
                     }

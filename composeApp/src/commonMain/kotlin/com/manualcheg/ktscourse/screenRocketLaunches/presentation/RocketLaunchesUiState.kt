@@ -7,6 +7,7 @@ data class RocketLaunchesUiState(
     val launchesUiState: LaunchListUiState = LaunchListUiState(),
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
+    val isFromCache: Boolean = false,
     val error: StringResource? = null,
 ) {
     private val itemsCount: Int = launchesUiState.items.size

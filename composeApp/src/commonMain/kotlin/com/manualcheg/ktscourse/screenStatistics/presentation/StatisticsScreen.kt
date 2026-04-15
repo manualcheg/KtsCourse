@@ -41,6 +41,14 @@ import com.manualcheg.ktscourse.screenStatistics.domain.Statistics
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.details_screen_back_button_content_description
 import ktscourse.composeapp.generated.resources.settings_item_statistics
+import ktscourse.composeapp.generated.resources.statistics_failed_launches
+import ktscourse.composeapp.generated.resources.statistics_launches_by_year
+import ktscourse.composeapp.generated.resources.statistics_most_used_launchpad
+import ktscourse.composeapp.generated.resources.statistics_most_used_rocket
+import ktscourse.composeapp.generated.resources.statistics_success_launches
+import ktscourse.composeapp.generated.resources.statistics_total_launches
+import ktscourse.composeapp.generated.resources.statistics_unknown
+import ktscourse.composeapp.generated.resources.statistics_upcoming_launches
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -108,17 +116,29 @@ fun StatisticsContent(stats: Statistics) {
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                StatisticsRow("Total Launches", stats.totalLaunches.toString())
+                StatisticsRow(
+                    stringResource(Res.string.statistics_total_launches),
+                    stats.totalLaunches.toString(),
+                )
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                StatisticsRow("Success Launches", stats.successLaunches.toString())
-                StatisticsRow("Failed Launches", stats.failedLaunches.toString())
-                StatisticsRow("Upcoming Launches", stats.upcomingLaunches.toString())
+                StatisticsRow(
+                    stringResource(Res.string.statistics_success_launches),
+                    stats.successLaunches.toString(),
+                )
+                StatisticsRow(
+                    stringResource(Res.string.statistics_failed_launches),
+                    stats.failedLaunches.toString(),
+                )
+                StatisticsRow(
+                    stringResource(Res.string.statistics_upcoming_launches),
+                    stats.upcomingLaunches.toString(),
+                )
             }
         }
 
         if (stats.launchesByYear.isNotEmpty()) {
             Text(
-                text = "Launches by Year",
+                text = stringResource(Res.string.statistics_launches_by_year),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(top = 8.dp),
@@ -142,9 +162,14 @@ fun StatisticsContent(stats: Statistics) {
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                StatisticsRow("Most Used Rocket", stats.mostUsedRocket ?: "Unknown")
-//                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                StatisticsRow("Most Used Launchpad", stats.mostUsedLaunchpad ?: "Unknown")
+                StatisticsRow(
+                    stringResource(Res.string.statistics_most_used_rocket),
+                    stats.mostUsedRocket ?: stringResource(Res.string.statistics_unknown),
+                )
+                StatisticsRow(
+                    stringResource(Res.string.statistics_most_used_launchpad),
+                    stats.mostUsedLaunchpad ?: stringResource(Res.string.statistics_unknown),
+                )
             }
         }
     }

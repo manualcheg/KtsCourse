@@ -1,6 +1,7 @@
 package com.manualcheg.ktscourse.screenMain.domain.useCase
 
 import com.manualcheg.ktscourse.common.util.executePagedRequest
+import com.manualcheg.ktscourse.domain.model.LaunchFilterType
 import com.manualcheg.ktscourse.screenMain.domain.model.LaunchesPageResult
 import com.manualcheg.ktscourse.screenMain.domain.repository.LaunchRepository
 import io.github.aakira.napier.Napier
@@ -13,13 +14,29 @@ class GetLaunchesUseCaseImpl(private val launchRepository: LaunchRepository) : G
     override suspend fun execute(
         query: String,
         rocketId: String?,
+        filterType: LaunchFilterType,
         page: Int
     ): Result<LaunchesPageResult> {
         return executePagedRequest(
             page = page,
             pageSize = PAGE_SIZE,
-            fetchFromDb = { p, l -> launchRepository.getPagedLaunchesFromDb(query, rocketId, p, l) },
-            fetchFromNetwork = { p -> launchRepository.fetchAndSaveLaunches(query, rocketId, p) },
+            fetchFromDb = { p, l ->
+                launchRepository.getPagedLaunchesFromDb(
+                    query,
+                    rocketId,
+                    filterType,
+                    p,
+                    l,
+                )
+            },
+            fetchFromNetwork = { p ->
+                launchRepository.fetchAndSaveLaunches(
+                    query,
+                    rocketId,
+                    filterType,
+                    p,
+                )
+            },
             createResult = { items, hasNext, fromCache ->
                 LaunchesPageResult(
                     launches = items,

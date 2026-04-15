@@ -105,7 +105,10 @@
     <string name="settings_section_account">Account</string>
     <string name="settings_item_profile">Profile</string>
     <string name="settings_item_notifications">Notifications</string>
-    <string name="settings_item_dark_theme">Enable Dark theme</string>
+    <string name="settings_item_theme">App Theme</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_theme_system">System Default</string>
     <string name="about_screen_title">About Company</string>
     <string name="about_screen_founder">Founder</string>
     <string name="about_screen_founded">Founded</string>
@@ -122,5 +125,18 @@
     <string name="about_screen_address">Address</string>
     <string name="about_screen_city">City</string>
     <string name="about_screen_state">State</string>
-    <string name="history_screen_title">History</string>"
+    <string name="history_screen_title">History</string>
+    <string name="filter_all">All</string>
+    <string name="filter_past">Past</string>
+    <string name="filter_upcoming">Upcoming</string>
+    <string name="filter_latest">Latest</string>
+    <string name="filter_next">Next</string>
+    <string name="statistics_total_launches">Total Launches</string>
+    <string name="statistics_success_launches">Success Launches</string>
+    <string name="statistics_failed_launches">Failed Launches</string>
+    <string name="statistics_upcoming_launches">Upcoming Launches</string>
+    <string name="statistics_launches_by_year">Launches by Year</string>
+    <string name="statistics_most_used_rocket">Most Used Rocket</string>
+    <string name="statistics_most_used_launchpad">Most Used Launchpad</string>
+    <string name="statistics_unknown">Unknown</string>
 </resources>

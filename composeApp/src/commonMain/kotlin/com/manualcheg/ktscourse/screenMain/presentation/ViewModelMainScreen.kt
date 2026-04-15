@@ -3,11 +3,11 @@ package com.manualcheg.ktscourse.screenMain.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.manualcheg.ktscourse.common.util.toUserFriendlyMessage
+import com.manualcheg.ktscourse.domain.model.LaunchFilterType
 import com.manualcheg.ktscourse.screenFavorites.domain.repository.FavoritesRepository
 import com.manualcheg.ktscourse.screenMain.domain.useCase.GetLaunchesUseCase
 import com.manualcheg.ktscourse.screenMain.presentation.components.MainTab
 import com.manualcheg.ktscourse.screenRockets.domain.usecase.GetRocketsUseCase
-import com.manualcheg.ktscourse.screenRockets.presentation.RocketListUiState
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -41,7 +41,7 @@ class ViewModelMainScreen(
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun search() {
         _uiState
-            .map { it.searchQuery to it.rocketFilterId }
+            .map { Triple(it.searchQuery, it.rocketFilterId, it.selectedFilter) }
             .distinctUntilChanged()
             .debounce(1000L)
             .onEach {
@@ -68,12 +68,21 @@ class ViewModelMainScreen(
         loadingJob = viewModelScope.launch {
             when (state.selectedTab) {
                 MainTab.Launches -> {
-                    getLaunchesUseCase.execute(state.searchQuery, state.rocketFilterId, pageToLoad)
+                    getLaunchesUseCase.execute(
+                        state.searchQuery,
+                        state.rocketFilterId,
+                        state.selectedFilter,
+                        pageToLoad,
+                    )
                         .onSuccess { result ->
                             _uiState.update {
                                 it.copy(
                                     launchesUiState = it.launchesUiState.copy(
-                                        items = if (isFirstPage) result.launches else it.launchesUiState.items + result.launches,
+                                        items = if (isFirstPage) {
+                                            result.launches
+                                        } else {
+                                            (it.launchesUiState.items + result.launches).distinctBy { launch -> launch.id }
+                                        },
                                         isFromCache = result.isFromCache,
                                         isLastPage = result.isLastPage,
                                         isNextPageLoading = false,
@@ -108,6 +117,7 @@ class ViewModelMainScreen(
                         }
                         .onFailure { handleFailure(it) }
                 }
+
                 MainTab.Favorites -> {}
             }
         }
@@ -195,13 +205,27 @@ class ViewModelMainScreen(
         }
     }
 
+    fun onFilterSelected(filterType: LaunchFilterType) {
+        _uiState.update {
+            it.copy(selectedFilter = filterType, searchQuery = "")
+        }
+    }
+
     private fun resetPagination() {
         loadingJob?.cancel()
         currentPage = 1
         _uiState.update {
             it.copy(
-                launchesUiState = LaunchListUiState(),
-                rocketsUiState = RocketListUiState(),
+                launchesUiState = it.launchesUiState.copy(
+                    items = emptyList(),
+                    isLastPage = false,
+                    isNextPageLoading = false,
+                ),
+                rocketsUiState = it.rocketsUiState.copy(
+                    items = emptyList(),
+                    isLastPage = false,
+                    isNextPageLoading = false,
+                ),
                 isLoading = false,
                 isRefreshing = false,
                 error = null,
@@ -210,7 +234,7 @@ class ViewModelMainScreen(
     }
 
     fun changeTab(tab: MainTab) {
-        _uiState.update { it.copy(selectedTab = tab) }
+        _uiState.update { it.copy(selectedTab = tab, searchQuery = "") }
         if (tab == MainTab.Favorites) {
             loadFavorites()
         } else {

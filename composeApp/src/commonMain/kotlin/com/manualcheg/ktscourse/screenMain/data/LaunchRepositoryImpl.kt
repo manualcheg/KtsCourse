@@ -7,6 +7,7 @@ import com.manualcheg.ktscourse.data.mappers.toFavoriteEntity
 import com.manualcheg.ktscourse.data.repository.DatabaseRepository
 import com.manualcheg.ktscourse.data.repository.LaunchNetworkRepository
 import com.manualcheg.ktscourse.domain.model.Launch
+import com.manualcheg.ktscourse.domain.model.LaunchFilterType
 import com.manualcheg.ktscourse.screenLaunchDetails.domain.model.LaunchDetails
 import com.manualcheg.ktscourse.screenMain.domain.repository.LaunchRepository
 import io.github.aakira.napier.Napier
@@ -21,28 +22,26 @@ class LaunchRepositoryImpl(
     override suspend fun getPagedLaunchesFromDb(
         query: String,
         rocketId: String?,
+        filterType: LaunchFilterType,
         page: Int,
         limit: Int
     ): List<Launch> {
-        return databaseRepository.getPagedLaunchesFromDb(query, rocketId, page, limit)
+        return databaseRepository.getPagedLaunchesFromDb(query, rocketId, filterType, page, limit)
     }
 
     override suspend fun fetchAndSaveLaunches(
         query: String,
         rocketId: String?,
+        filterType: LaunchFilterType,
         page: Int
     ): Result<Boolean> =
         withContext(Dispatchers.IO) {
-            val result = networkRepository.getLaunches(query, rocketId, page)
+            val result = networkRepository.getLaunches(query, rocketId, filterType, page)
             if (result.isSuccess) {
                 val response = result.getOrThrow()
                 val entities = response.docs.map { it.toEntity() }
 
-                if (page == 1 && query.isBlank() && rocketId == null) {
-                    databaseRepository.fetchAndSaveLaunchesTransaction(entities)
-                } else {
-                    databaseRepository.insertLaunches(entities)
-                }
+                databaseRepository.insertLaunches(entities)
 
                 Result.success(response.hasNextPage)
             } else {

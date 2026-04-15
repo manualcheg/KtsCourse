@@ -1,20 +1,34 @@
 package com.manualcheg.ktscourse.screenSettings.presentation
 
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import androidx.lifecycle.viewModelScope
+import com.manualcheg.ktscourse.common.repository.UserPreferencesRepository
+import com.manualcheg.ktscourse.domain.model.AppThemeType
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-class SettingsViewModel : ViewModel() {
-    private val _uiState = MutableStateFlow(SettingsUiState())
-    val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
+class SettingsViewModel(
+    private val repository: UserPreferencesRepository
+) : ViewModel() {
 
-    fun toggleNotification(enabled: Boolean) {
-        _uiState.update { it.copy(isNotificationEnabled = enabled) }
-    }
+    val uiState: StateFlow<SettingsUiState> = repository.userData
+        .map { userData ->
+            SettingsUiState(
+                appTheme = userData.appTheme,
+            )
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = SettingsUiState(),
+        )
 
-    fun toggleDarkTheme(enabled: Boolean) {
-        _uiState.update { it.copy(isDarkThemeEnabled = enabled) }
+    fun setTheme(theme: AppThemeType) {
+        viewModelScope.launch {
+            repository.updateAppTheme(theme)
+        }
     }
 }

@@ -1,7 +1,8 @@
 package com.manualcheg.ktscourse.screenRocketLaunches.domain
 
-import com.manualcheg.ktscourse.domain.model.Launch
+import com.manualcheg.ktscourse.domain.model.LaunchFilterType
+import com.manualcheg.ktscourse.screenMain.domain.model.LaunchesPageResult
 
 interface RocketLaunchesRepository {
-    suspend fun getAllLaunches(): Result<List<Launch>>
+    suspend fun getLaunches(filterType: LaunchFilterType): Result<LaunchesPageResult>
 }

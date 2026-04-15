@@ -122,5 +122,18 @@
     <string name="about_screen_address">Адрес</string>
     <string name="about_screen_city">Город</string>
     <string name="about_screen_state">Штат</string>
-    <string name="history_screen_title">История</string>"
+    <string name="history_screen_title">История</string>
+    <string name="filter_all">Все</string>
+    <string name="filter_past">Прошлые</string>
+    <string name="filter_upcoming">Будущие</string>
+    <string name="filter_latest">Последний</string>
+    <string name="filter_next">След.</string>
+    <string name="statistics_total_launches">Всего запусков</string>
+    <string name="statistics_success_launches">Успешных запусков</string>
+    <string name="statistics_failed_launches">Неудачных запусков</string>
+    <string name="statistics_upcoming_launches">Предстоящих запусков</string>
+    <string name="statistics_launches_by_year">Запуски по годам</string>
+    <string name="statistics_most_used_rocket">Популярная ракета</string>
+    <string name="statistics_most_used_launchpad">Популярная площадка</string>
+    <string name="statistics_unknown">Неизвестно</string>
 </resources>

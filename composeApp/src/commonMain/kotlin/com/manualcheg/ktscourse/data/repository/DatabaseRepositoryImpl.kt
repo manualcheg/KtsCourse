@@ -1,15 +1,17 @@
 package com.manualcheg.ktscourse.data.repository
 
+import com.manualcheg.ktscourse.common.LaunchStatus
 import com.manualcheg.ktscourse.data.database.AppDatabase
 import com.manualcheg.ktscourse.data.database.dao.FavoriteDao
+import com.manualcheg.ktscourse.data.database.dao.LaunchDao
+import com.manualcheg.ktscourse.data.database.dao.RocketDao
 import com.manualcheg.ktscourse.data.database.entity.FavoriteLaunchEntity
 import com.manualcheg.ktscourse.data.database.entity.FavoriteRocketEntity
-import com.manualcheg.ktscourse.data.database.dao.LaunchDao
 import com.manualcheg.ktscourse.data.database.entity.LaunchEntity
-import com.manualcheg.ktscourse.data.database.dao.RocketDao
 import com.manualcheg.ktscourse.data.database.entity.RocketEntity
 import com.manualcheg.ktscourse.data.mappers.toDomain
 import com.manualcheg.ktscourse.domain.model.Launch
+import com.manualcheg.ktscourse.domain.model.LaunchFilterType
 import com.manualcheg.ktscourse.screenRockets.domain.model.Rocket
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.Flow
@@ -23,15 +25,45 @@ class DatabaseRepositoryImpl(database: AppDatabase) : DatabaseRepository {
     override suspend fun getPagedLaunchesFromDb(
         query: String,
         rocketId: String?,
+        filterType: LaunchFilterType,
         page: Int,
         limit: Int
     ): List<Launch> {
         return try {
             val offset = (page - 1) * limit
+            val statuses = when (filterType) {
+                LaunchFilterType.Past, LaunchFilterType.Latest -> listOf(
+                    LaunchStatus.SUCCESS,
+                    LaunchStatus.FAILURE,
+                )
+
+                LaunchFilterType.Upcoming, LaunchFilterType.Next -> listOf(LaunchStatus.UPCOMING)
+                else -> null
+            }
+            val isDesc =
+                filterType == LaunchFilterType.Latest || filterType == LaunchFilterType.Past
+            val effectiveLimit =
+                if (filterType == LaunchFilterType.Latest || filterType == LaunchFilterType.Next) 1 else limit
+
             val entities = if (query.isBlank()) {
-                launchDao.getLaunchesPaged(limit, offset, rocketId)
+                launchDao.getLaunchesPaged(
+                    effectiveLimit,
+                    offset,
+                    rocketId,
+                    statuses,
+                    statuses != null,
+                    isDesc,
+                )
             } else {
-                launchDao.searchLaunchesPaged(query, limit, offset, rocketId)
+                launchDao.searchLaunchesPaged(
+                    query,
+                    effectiveLimit,
+                    offset,
+                    rocketId,
+                    statuses,
+                    statuses != null,
+                    isDesc,
+                )
             }
             entities.map { it.toDomain() }
         } catch (e: Exception) {

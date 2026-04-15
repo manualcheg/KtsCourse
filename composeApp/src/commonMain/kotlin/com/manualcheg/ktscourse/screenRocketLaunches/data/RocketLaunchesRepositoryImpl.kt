@@ -4,7 +4,8 @@ import com.manualcheg.ktscourse.data.mappers.toDomain
 import com.manualcheg.ktscourse.data.mappers.toEntity
 import com.manualcheg.ktscourse.data.repository.DatabaseRepository
 import com.manualcheg.ktscourse.data.repository.NetworkRepository
-import com.manualcheg.ktscourse.domain.model.Launch
+import com.manualcheg.ktscourse.domain.model.LaunchFilterType
+import com.manualcheg.ktscourse.screenMain.domain.model.LaunchesPageResult
 import com.manualcheg.ktscourse.screenRocketLaunches.domain.RocketLaunchesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -15,19 +16,44 @@ class RocketLaunchesRepositoryImpl(
     private val databaseRepository: DatabaseRepository
 ) :
     RocketLaunchesRepository {
-    override suspend fun getAllLaunches(): Result<List<Launch>> {
+    override suspend fun getLaunches(filterType: LaunchFilterType): Result<LaunchesPageResult> {
         return withContext(Dispatchers.IO) {
-            val networkResult = networkRepository.getAllLaunches()
+            val networkResult = when (filterType) {
+                LaunchFilterType.All -> networkRepository.getAllLaunches()
+                LaunchFilterType.Past -> networkRepository.getPastLaunches()
+                LaunchFilterType.Upcoming -> networkRepository.getUpcomingLaunches()
+                LaunchFilterType.Latest -> networkRepository.getLatestLaunch().map { listOf(it) }
+                LaunchFilterType.Next -> networkRepository.getNextLaunch().map { listOf(it) }
+            }
             if (networkResult.isSuccess) {
-                val entities = networkResult.getOrThrow().map { it.toEntity() }
+                val docs = networkResult.getOrThrow()
+                val entities = docs.map { it.toEntity() }
 
                 databaseRepository.insertLaunches(entities)
-                Result.success(entities.map { it.toDomain() })
+                Result.success(
+                    LaunchesPageResult(
+                        launches = entities.map { it.toDomain() },
+                        isLastPage = true,
+                        isFromCache = false,
+                    ),
+                )
             } else {
-                // Пытаемся взять всё из БД (без фильтрации здесь)
-                val cached = databaseRepository.getPagedLaunchesFromDb("", null, 1, 1000)
+                // из БД без фильтрации
+                val cached = databaseRepository.getPagedLaunchesFromDb(
+                    query = "",
+                    rocketId = null,
+                    filterType = LaunchFilterType.All,
+                    page = 1,
+                    limit = 1000,
+                )
                 if (cached.isNotEmpty()) {
-                    Result.success(cached)
+                    Result.success(
+                        LaunchesPageResult(
+                            launches = cached,
+                            isLastPage = true,
+                            isFromCache = true,
+                        ),
+                    )
                 } else {
                     Result.failure(networkResult.exceptionOrNull() ?: Exception("Unknown error"))
                 }

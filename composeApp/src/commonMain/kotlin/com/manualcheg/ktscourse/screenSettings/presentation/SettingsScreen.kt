@@ -2,6 +2,7 @@ package com.manualcheg.ktscourse.screenSettings.presentation
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +21,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -32,8 +34,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.manualcheg.ktscourse.domain.model.AppThemeType
 import ktscourse.composeapp.generated.resources.Res
-import ktscourse.composeapp.generated.resources.*
+import ktscourse.composeapp.generated.resources.details_screen_back_button_content_description
+import ktscourse.composeapp.generated.resources.settings_item_about_company
+import ktscourse.composeapp.generated.resources.settings_item_company_history
+import ktscourse.composeapp.generated.resources.settings_item_notifications
+import ktscourse.composeapp.generated.resources.settings_item_profile
+import ktscourse.composeapp.generated.resources.settings_item_statistics
+import ktscourse.composeapp.generated.resources.settings_item_theme
+import ktscourse.composeapp.generated.resources.settings_screen_title
+import ktscourse.composeapp.generated.resources.settings_section_about_spacex
+import ktscourse.composeapp.generated.resources.settings_section_account
+import ktscourse.composeapp.generated.resources.settings_theme_dark
+import ktscourse.composeapp.generated.resources.settings_theme_light
+import ktscourse.composeapp.generated.resources.settings_theme_system
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -114,15 +129,13 @@ fun SettingsScreen(
                     title = stringResource(Res.string.settings_item_notifications),
                     icon = Icons.Default.Notifications,
                     checked = uiState.isNotificationEnabled,
-                    onCheckedChange = { viewModel.toggleNotification(it) },
+                    onCheckedChange = { },
                 )
             }
             item {
-                SettingSwitchItem(
-                    title = stringResource(Res.string.settings_item_dark_theme),
-                    icon = Icons.Default.DarkMode,
-                    checked = uiState.isDarkThemeEnabled,
-                    onCheckedChange = { viewModel.toggleDarkTheme(it) },
+                SettingThemeSelector(
+                    currentTheme = uiState.appTheme,
+                    onThemeChange = { viewModel.setTheme(it) },
                 )
             }
         }
@@ -191,6 +204,76 @@ fun SettingSwitchItem(
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange,
+        )
+    }
+}
+
+@Composable
+fun SettingThemeSelector(
+    currentTheme: AppThemeType,
+    onThemeChange: (AppThemeType) -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Icon(
+                imageVector = Icons.Default.DarkMode,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+            )
+            Text(
+                text = stringResource(Res.string.settings_item_theme),
+                style = MaterialTheme.typography.bodyLarge,
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            ThemeOption(
+                text = stringResource(Res.string.settings_theme_light),
+                selected = currentTheme == AppThemeType.LIGHT,
+                onClick = { onThemeChange(AppThemeType.LIGHT) },
+            )
+            ThemeOption(
+                text = stringResource(Res.string.settings_theme_dark),
+                selected = currentTheme == AppThemeType.DARK,
+                onClick = { onThemeChange(AppThemeType.DARK) },
+            )
+            ThemeOption(
+                text = stringResource(Res.string.settings_theme_system),
+                selected = currentTheme == AppThemeType.SYSTEM,
+                onClick = { onThemeChange(AppThemeType.SYSTEM) },
+            )
+        }
+    }
+}
+
+@Composable
+fun ThemeOption(
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.clickable(onClick = onClick),
+    ) {
+        RadioButton(
+            selected = selected,
+            onClick = onClick,
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
         )
     }
 }

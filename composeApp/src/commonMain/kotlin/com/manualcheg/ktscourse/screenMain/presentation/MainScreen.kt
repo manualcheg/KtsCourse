@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -18,10 +19,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.manualcheg.ktscourse.common.components.EmptyState
 import com.manualcheg.ktscourse.common.components.OfflineBadge
+import com.manualcheg.ktscourse.domain.model.LaunchFilterType
 import com.manualcheg.ktscourse.screenMain.presentation.components.LaunchList
 import com.manualcheg.ktscourse.screenMain.presentation.components.MainTab
 import com.manualcheg.ktscourse.screenMain.presentation.components.MainTopAppBar
@@ -33,6 +37,11 @@ import ktscourse.composeapp.generated.resources.favorites_empty_launches
 import ktscourse.composeapp.generated.resources.favorites_empty_rockets
 import ktscourse.composeapp.generated.resources.favorites_tab_launches
 import ktscourse.composeapp.generated.resources.favorites_tab_rockets
+import ktscourse.composeapp.generated.resources.filter_all
+import ktscourse.composeapp.generated.resources.filter_latest
+import ktscourse.composeapp.generated.resources.filter_next
+import ktscourse.composeapp.generated.resources.filter_past
+import ktscourse.composeapp.generated.resources.filter_upcoming
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -58,6 +67,7 @@ fun MainScreen(
         uiState = uiState,
         onSearchQueryChange = viewModel::onSearchQueryChange,
         onRocketFilterChange = viewModel::onRocketFilterChange,
+        onFilterSelected = viewModel::onFilterSelected,
         onSettingsClick = onProfileClick,
         onRefresh = viewModel::updateData,
         onLoadNextPage = viewModel::loadNextPage,
@@ -75,6 +85,7 @@ fun MainContent(
     uiState: MainUiState,
     onSearchQueryChange: (String) -> Unit,
     onRocketFilterChange: (String?) -> Unit,
+    onFilterSelected: (LaunchFilterType) -> Unit,
     onSettingsClick: () -> Unit,
     onRefresh: () -> Unit,
     onLoadNextPage: () -> Unit,
@@ -120,6 +131,44 @@ fun MainContent(
                     if (uiState.isLaunchesFromCache && !uiState.isLoading && uiState.error == null) {
                         OfflineBadge()
                     }
+
+                    SingleChoiceSegmentedButtonRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                    ) {
+                        LaunchFilterType.entries.forEachIndexed { index, filter ->
+                            val label = when (filter) {
+                                LaunchFilterType.All -> stringResource(Res.string.filter_all)
+                                LaunchFilterType.Past -> stringResource(Res.string.filter_past)
+                                LaunchFilterType.Upcoming -> stringResource(Res.string.filter_upcoming)
+                                LaunchFilterType.Latest -> stringResource(Res.string.filter_latest)
+                                LaunchFilterType.Next -> stringResource(Res.string.filter_next)
+                            }
+                            SegmentedButton(
+                                modifier = Modifier.weight(1f),
+                                shape = SegmentedButtonDefaults.itemShape(
+                                    index = index,
+                                    count = LaunchFilterType.entries.size,
+                                ),
+                                onClick = { onFilterSelected(filter) },
+                                selected = uiState.selectedFilter == filter,
+                                label = {
+                                    Text(
+                                        text = label,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Visible,
+                                        softWrap = false,
+                                        style = MaterialTheme.typography.labelSmall.copy(
+                                            fontSize = 10.sp,
+                                            letterSpacing = 0.sp,
+                                        ),
+                                    )
+                                },
+                            )
+                        }
+                    }
+
                     PagedListContainer(
                         isRefreshing = uiState.isRefreshing,
                         onRefresh = onRefresh,
@@ -240,5 +289,6 @@ fun PreviewMainScreen() {
         changeTab = {},
         changeFavoriteType = {},
         openRocketDetails = { },
+        onFilterSelected = { },
     )
 }
