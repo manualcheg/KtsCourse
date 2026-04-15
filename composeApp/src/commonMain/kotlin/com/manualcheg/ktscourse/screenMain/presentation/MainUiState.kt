@@ -16,7 +16,7 @@ data class MainUiState(
     val rocketsUiState: RocketListUiState = RocketListUiState(),
     val favoriteLaunches: List<Launch> = emptyList(),
     val favoriteRockets: List<Rocket> = emptyList(),
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val isRefreshing: Boolean = false,
     val error: StringResource? = null,
     val searchQuery: String = "",

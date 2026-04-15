@@ -70,12 +70,6 @@ fun LaunchItem(launch: Launch, onItemClick: () -> Unit) {
 
     Card(
         shape = MaterialTheme.shapes.medium,
-        colors = CardColors(
-            containerColor = MaterialTheme.colorScheme.outline,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-            disabledContainerColor = MaterialTheme.colorScheme.tertiary,
-            disabledContentColor = MaterialTheme.colorScheme.onTertiary,
-        ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = dimensions.paddingLarge)
@@ -111,7 +105,7 @@ fun LaunchItem(launch: Launch, onItemClick: () -> Unit) {
                     Text(
                         text = launch.name,
                         modifier = Modifier.weight(1f),
-                        color = MaterialTheme.colorScheme.primary,
+                        color = MaterialTheme.colorScheme.secondary,
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
@@ -137,7 +131,7 @@ fun LaunchItem(launch: Launch, onItemClick: () -> Unit) {
                 Text(
                     text = launch.launchDate,
                     modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.titleSmall,
                 )
 

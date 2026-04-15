@@ -31,11 +31,6 @@ data class OnboardingItem(
                     title = Res.string.onboarding_stat_title,
                     desc = Res.string.onboarding_stat_desc,
                 ),
-                OnboardingItem(
-                    image = Res.drawable.ic_notification,
-                    title = Res.string.onboarding_notification_title,
-                    desc = Res.string.onboarding_notification_desc,
-                ),
             )
     }
 }

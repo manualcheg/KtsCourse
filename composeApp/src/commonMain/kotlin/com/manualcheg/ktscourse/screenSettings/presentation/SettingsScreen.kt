@@ -125,14 +125,6 @@ fun SettingsScreen(
                 )
             }
             item {
-                SettingSwitchItem(
-                    title = stringResource(Res.string.settings_item_notifications),
-                    icon = Icons.Default.Notifications,
-                    checked = uiState.isNotificationEnabled,
-                    onCheckedChange = { },
-                )
-            }
-            item {
                 SettingThemeSelector(
                     currentTheme = uiState.appTheme,
                     onThemeChange = { viewModel.setTheme(it) },
@@ -173,37 +165,6 @@ fun SettingClickableItem(
         Text(
             text = title,
             style = MaterialTheme.typography.bodyLarge,
-        )
-    }
-}
-
-@Composable
-fun SettingSwitchItem(
-    title: String,
-    icon: ImageVector,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(end = 16.dp),
-        )
-        Text(
-            text = title,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f),
-        )
-        Switch(
-            checked = checked,
-            onCheckedChange = onCheckedChange,
         )
     }
 }
