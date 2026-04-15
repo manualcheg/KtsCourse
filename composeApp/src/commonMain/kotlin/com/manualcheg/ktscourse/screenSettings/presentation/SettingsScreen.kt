@@ -14,7 +14,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -23,7 +22,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -39,7 +37,6 @@ import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.details_screen_back_button_content_description
 import ktscourse.composeapp.generated.resources.settings_item_about_company
 import ktscourse.composeapp.generated.resources.settings_item_company_history
-import ktscourse.composeapp.generated.resources.settings_item_notifications
 import ktscourse.composeapp.generated.resources.settings_item_profile
 import ktscourse.composeapp.generated.resources.settings_item_statistics
 import ktscourse.composeapp.generated.resources.settings_item_theme

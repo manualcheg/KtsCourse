@@ -2,12 +2,9 @@ package com.manualcheg.ktscourse.screenOnboarding.domain.model
 
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.ic_favourites_100
-import ktscourse.composeapp.generated.resources.ic_notification
 import ktscourse.composeapp.generated.resources.ic_stat_black
 import ktscourse.composeapp.generated.resources.onboarding_favourites_desc
 import ktscourse.composeapp.generated.resources.onboarding_favourites_title
-import ktscourse.composeapp.generated.resources.onboarding_notification_desc
-import ktscourse.composeapp.generated.resources.onboarding_notification_title
 import ktscourse.composeapp.generated.resources.onboarding_stat_desc
 import ktscourse.composeapp.generated.resources.onboarding_stat_title
 import org.jetbrains.compose.resources.DrawableResource
