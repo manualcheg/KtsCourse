@@ -1,6 +1,6 @@
 package com.manualcheg.ktscourse
 
-import App
+import com.manualcheg.ktscourse.common.App
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
