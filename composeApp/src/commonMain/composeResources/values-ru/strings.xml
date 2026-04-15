@@ -105,7 +105,10 @@
     <string name="settings_item_profile">Профиль</string>
     <string name="profile_screen_title">Профиль</string>
     <string name="settings_item_notifications">Уведомления</string>
-    <string name="settings_item_dark_theme">Темная тема</string>
+    <string name="settings_item_theme">Тема приложения</string>
+    <string name="settings_theme_light">Светлая</string>
+    <string name="settings_theme_dark">Темная</string>
+    <string name="settings_theme_system">Системная</string>
     <string name="about_screen_title">О компании</string>
     <string name="about_screen_founder">Основатель</string>
     <string name="about_screen_founded">Год основания</string>
