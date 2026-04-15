@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,7 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
 import com.manualcheg.ktscourse.common.LaunchStatus
 import com.manualcheg.ktscourse.common.LocalDimensions
-import com.manualcheg.ktscourse.screenMain.domain.model.Launch
+import com.manualcheg.ktscourse.domain.model.Launch
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.main_screen_launch_status_failed_text
 import ktscourse.composeapp.generated.resources.main_screen_launch_status_success_text
@@ -39,13 +38,15 @@ import org.jetbrains.compose.resources.stringResource
 fun PreviewLaunchItem() {
     LaunchItem(
         Launch(
-            "1",
-            "Starship",
-            0,
-            "15.02.2012",
-            "kdfjbfjk kjbjkb hbhh jbjdfns,k 345 cbklkd fgf kjned!!!",
-            "https://images2.imgbox.com/85/43/6VSgldkO_o.png",
-            LaunchStatus.SUCCESS,
+            id = "1",
+            name = "Starship",
+            rocketId = "",
+            launchDate = "15.02.2012",
+            details = "kdfjbfjk kjbjkb hbhh jbjdfns,k 345 cbklkd fgf kjned!!!",
+            imageUrl = "https://images2.imgbox.com/85/43/6VSgldkO_o.png",
+            status = LaunchStatus.SUCCESS,
+            flightNumber = 333,
+            launchpad = "dd",
         ),
         { println("") },
     )
@@ -68,12 +69,6 @@ fun LaunchItem(launch: Launch, onItemClick: () -> Unit) {
 
     Card(
         shape = MaterialTheme.shapes.medium,
-        colors = CardColors(
-            containerColor = MaterialTheme.colorScheme.outline,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-            disabledContainerColor = MaterialTheme.colorScheme.tertiary,
-            disabledContentColor = MaterialTheme.colorScheme.onTertiary,
-        ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = dimensions.paddingLarge)
@@ -100,24 +95,24 @@ fun LaunchItem(launch: Launch, onItemClick: () -> Unit) {
 
             Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
+                    .weight(1f),
             ) {
-                Text(
-                    text = launch.name,
+                Row(
                     modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.titleMedium,
-                )
-
-                Spacer(modifier = Modifier.height(dimensions.spacerHeight))
-
-                Text(
-                    text = launch.flightNumber.toString(),
-                    modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    style = MaterialTheme.typography.titleSmall,
-                )
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = launch.name,
+                        modifier = Modifier.weight(1f),
+                        color = MaterialTheme.colorScheme.secondary,
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Text(
+                        text = "#${launch.flightNumber}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
 
                 if (launch.details.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(dimensions.spacerHeight))
@@ -135,7 +130,7 @@ fun LaunchItem(launch: Launch, onItemClick: () -> Unit) {
                 Text(
                     text = launch.launchDate,
                     modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.titleSmall,
                 )
 

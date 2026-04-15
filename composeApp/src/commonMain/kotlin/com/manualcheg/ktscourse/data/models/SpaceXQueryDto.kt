@@ -11,7 +11,9 @@ data class SpaceXQueryDto(
 
 @Serializable
 data class SpaceXQueryInnerDto(
-    @SerialName("\$text") val text: SpaceXTextSearchDto? = null
+    @SerialName("\$text") val text: SpaceXTextSearchDto? = null,
+    val rocket: String? = null,
+    val upcoming: Boolean? = null
 )
 
 @Serializable

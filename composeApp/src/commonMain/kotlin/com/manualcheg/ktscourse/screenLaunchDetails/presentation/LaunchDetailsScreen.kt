@@ -47,10 +47,13 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.manualcheg.ktscourse.common.LaunchStatus
 import com.manualcheg.ktscourse.common.components.ErrorState
+import com.manualcheg.ktscourse.common.util.NameHelper
 import ktscourse.composeapp.generated.resources.Res
 import ktscourse.composeapp.generated.resources.details_screen_article_text
 import ktscourse.composeapp.generated.resources.details_screen_back_arrow_text
+import ktscourse.composeapp.generated.resources.details_screen_back_button_content_description
 import ktscourse.composeapp.generated.resources.details_screen_description_text
+import ktscourse.composeapp.generated.resources.details_screen_favorite_button_content_description
 import ktscourse.composeapp.generated.resources.details_screen_flight_number_text
 import ktscourse.composeapp.generated.resources.details_screen_launch_date_text
 import ktscourse.composeapp.generated.resources.details_screen_launchpad_text
@@ -59,6 +62,7 @@ import ktscourse.composeapp.generated.resources.details_screen_patch_content_des
 import ktscourse.composeapp.generated.resources.details_screen_payloads_text
 import ktscourse.composeapp.generated.resources.details_screen_reddit_text
 import ktscourse.composeapp.generated.resources.details_screen_rocket_text
+import ktscourse.composeapp.generated.resources.details_screen_share_button_content_description
 import ktscourse.composeapp.generated.resources.details_screen_time_local_text
 import ktscourse.composeapp.generated.resources.details_screen_time_utc_text
 import ktscourse.composeapp.generated.resources.details_screen_wiki_text
@@ -77,6 +81,7 @@ fun LaunchDetailsScreen(
     onBackClick: () -> Unit,
     onRocketClick: (String) -> Unit,
     openLink: (String) -> Unit,
+    nameHelper: NameHelper,
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -87,6 +92,7 @@ fun LaunchDetailsScreen(
         uiState = uiState,
         onRocketClick = onRocketClick,
         openLink = openLink,
+        nameHelper = nameHelper
     )
 
     LaunchedEffect(launchId) {
@@ -103,6 +109,7 @@ fun LaunchDetailsContent(
     uiState: LaunchDetailsUiState,
     onRocketClick: (String) -> Unit,
     openLink: (String) -> Unit,
+    nameHelper: NameHelper,
 ) {
     Scaffold(
         topBar = {
@@ -115,7 +122,10 @@ fun LaunchDetailsContent(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(Res.string.details_screen_back_button_content_description),
+                        )
                     }
                 },
                 actions = {
@@ -123,7 +133,7 @@ fun LaunchDetailsContent(
                         IconButton(onClick = { viewModel.toggleFavorite() }) {
                             Icon(
                                 if (uiState.launch.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                                contentDescription = "Favorite",
+                                contentDescription = stringResource(Res.string.details_screen_favorite_button_content_description),
                                 tint = if (uiState.launch.isFavorite) Color.Red else Color.Gray,
                             )
                         }
@@ -134,7 +144,7 @@ fun LaunchDetailsContent(
                         ) {
                             Icon(
                                 Icons.Default.Share,
-                                contentDescription = "Share",
+                                contentDescription = stringResource(Res.string.details_screen_share_button_content_description),
                             )
                         }
                     }
@@ -238,7 +248,7 @@ fun LaunchDetailsContent(
                                     .clickable { onRocketClick(launch.rocketId) },
                             ) {
                                 Text(
-                                    launch.rocketName,
+                                    nameHelper.getRocketName(launch.rocketName),
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.primary,
                                 )
@@ -247,7 +257,7 @@ fun LaunchDetailsContent(
                                 title = stringResource(Res.string.details_screen_launchpad_text),
                                 modifier = Modifier.weight(1f),
                             ) {
-                                Text(launch.launchpadName)
+                                Text(nameHelper.getLaunchpadName(launch.launchpadName))
                             }
                         }
                     }

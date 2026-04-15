@@ -24,6 +24,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -46,8 +47,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.manualcheg.ktscourse.common.components.ErrorState
 import com.manualcheg.ktscourse.screenRocketDetails.domain.RocketDetails
 import ktscourse.composeapp.generated.resources.Res
+import ktscourse.composeapp.generated.resources.currency_usd
 import ktscourse.composeapp.generated.resources.details_screen_active_badge
 import ktscourse.composeapp.generated.resources.details_screen_back_arrow_text
 import ktscourse.composeapp.generated.resources.details_screen_back_button_content_description
@@ -70,7 +73,12 @@ import ktscourse.composeapp.generated.resources.details_screen_specifications_ti
 import ktscourse.composeapp.generated.resources.details_screen_stages_label
 import ktscourse.composeapp.generated.resources.details_screen_success_rate_label
 import ktscourse.composeapp.generated.resources.details_screen_unknown_company
+import ktscourse.composeapp.generated.resources.details_screen_view_launches_button
 import ktscourse.composeapp.generated.resources.details_screen_wiki_text
+import ktscourse.composeapp.generated.resources.n_a
+import ktscourse.composeapp.generated.resources.unit_kilograms
+import ktscourse.composeapp.generated.resources.unit_meters
+import ktscourse.composeapp.generated.resources.unit_percent
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -79,6 +87,7 @@ fun RocketDetailsScreen(
     rocketId: String,
     onBackClick: () -> Unit,
     onLinkClick: (String) -> Unit,
+    onViewLaunchesClick: (rocketId: String, rocketName: String) -> Unit,
 ) {
     val viewModel: RocketDetailsViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
@@ -88,20 +97,24 @@ fun RocketDetailsScreen(
     }
 
     RocketDetailsContent(
+        rocketId = rocketId,
         viewModel = viewModel,
         onBackClick = onBackClick,
         uiState = uiState,
         onLinkClick = onLinkClick,
+        onViewLaunchesClick = onViewLaunchesClick,
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RocketDetailsContent(
+    rocketId: String,
     viewModel: RocketDetailsViewModel,
     onBackClick: () -> Unit,
     uiState: RocketDetailsUiState,
     onLinkClick: (String) -> Unit,
+    onViewLaunchesClick: (rocketId: String, rocketName: String) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -155,16 +168,17 @@ fun RocketDetailsContent(
             if (uiState.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             } else if (uiState.error != null) {
-                Text(
-                    text = uiState.error,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.align(Alignment.Center).padding(16.dp),
+                ErrorState(
+                    message = uiState.error,
+                    onRetry = { viewModel.loadRocketDetails(rocketId) },
+                    modifier = Modifier.align(Alignment.Center),
                 )
             } else {
                 uiState.rocketDetails?.let { rocket ->
                     RocketDetailsScrollableContent(
                         rocket,
                         onLinkClick = onLinkClick,
+                        onViewLaunchesClick = onViewLaunchesClick,
                     )
                 }
             }
@@ -176,6 +190,7 @@ fun RocketDetailsContent(
 fun RocketDetailsScrollableContent(
     rocket: RocketDetails,
     onLinkClick: (String) -> Unit,
+    onViewLaunchesClick: (rocketId: String, rocketName: String) -> Unit,
 ) {
     val scrollState = rememberScrollState()
 
@@ -237,23 +252,35 @@ fun RocketDetailsScrollableContent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            Button(
+                onClick = { onViewLaunchesClick(rocket.id, rocket.name) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
+            ) {
+                Text(text = stringResource(Res.string.details_screen_view_launches_button))
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             InfoSection(title = stringResource(Res.string.details_screen_general_info_title)) {
                 InfoRow(
                     stringResource(Res.string.details_screen_country_label),
-                    rocket.country ?: "N/A",
+                    rocket.country ?: stringResource(Res.string.n_a),
                 )
                 InfoRow(
                     stringResource(Res.string.details_screen_first_flight_label),
-                    rocket.firstFlight ?: "N/A",
+                    rocket.firstFlight ?: stringResource(Res.string.n_a),
                 )
                 InfoRow(
                     stringResource(Res.string.details_screen_cost_per_launch_label),
-                    rocket.costPerLaunch?.let { "$$it" } ?: "N/A",
+                    rocket.costPerLaunch?.let { stringResource(Res.string.currency_usd, it) } ?: stringResource(Res.string.n_a),
                 )
-                InfoRow(
-                    stringResource(Res.string.details_screen_success_rate_label),
-                    "${rocket.successRatePct}%",
-                )
+                rocket.successRatePct?.let {
+                    InfoRow(
+                        stringResource(Res.string.details_screen_success_rate_label),
+                        stringResource(Res.string.unit_percent, it),
+                    )
+                }
             }
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
@@ -275,15 +302,15 @@ fun RocketDetailsScrollableContent(
             InfoSection(title = stringResource(Res.string.details_screen_specifications_title)) {
                 InfoRow(
                     stringResource(Res.string.details_screen_height_label),
-                    "${rocket.height ?: 0.0} m",
+                    stringResource(Res.string.unit_meters, rocket.height ?: 0.0),
                 )
                 InfoRow(
                     stringResource(Res.string.details_screen_diameter_label),
-                    "${rocket.diameter ?: 0.0} m",
+                    stringResource(Res.string.unit_meters, rocket.diameter ?: 0.0),
                 )
                 InfoRow(
                     stringResource(Res.string.details_screen_mass_label),
-                    "${rocket.mass ?: 0.0} kg",
+                    stringResource(Res.string.unit_kilograms, rocket.mass ?: 0.0),
                 )
                 InfoRow(
                     stringResource(Res.string.details_screen_stages_label),
@@ -303,7 +330,7 @@ fun RocketDetailsScrollableContent(
                     fontWeight = FontWeight.Bold,
                 )
                 rocket.payloadWeights.forEach { (name, kg) ->
-                    InfoRow(name, "$kg kg")
+                    InfoRow(name, stringResource(Res.string.unit_kilograms, kg))
                 }
             }
 

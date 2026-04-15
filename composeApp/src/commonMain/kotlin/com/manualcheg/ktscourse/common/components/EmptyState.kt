@@ -1,6 +1,7 @@
 package com.manualcheg.ktscourse.common.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -17,15 +18,17 @@ import ktscourse.composeapp.generated.resources.nothing_found_content_descriptio
 import ktscourse.composeapp.generated.resources.nothing_found_text
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.StringResource
 
 @Composable
 fun EmptyState(
     modifier: Modifier = Modifier,
-    text: String = stringResource(Res.string.nothing_found_text)
+    text: StringResource = Res.string.nothing_found_text
 ) {
     Column(
         modifier = modifier.padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
     ) {
         Image(
             imageResource(Res.drawable.nothingFound),
@@ -33,7 +36,7 @@ fun EmptyState(
             modifier = Modifier.size(150.dp),
         )
         Text(
-            text = text,
+            text = stringResource(text),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,

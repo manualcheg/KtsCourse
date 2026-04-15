@@ -5,8 +5,26 @@ import com.manualcheg.ktscourse.data.database.entity.FavoriteLaunchEntity
 import com.manualcheg.ktscourse.data.database.entity.LaunchEntity
 import com.manualcheg.ktscourse.data.models.LaunchDetailsDto
 import com.manualcheg.ktscourse.data.models.LaunchDto
+import com.manualcheg.ktscourse.domain.model.Launch
 import com.manualcheg.ktscourse.screenLaunchDetails.domain.model.LaunchDetails
-import com.manualcheg.ktscourse.screenMain.domain.model.Launch
+
+fun LaunchDto.toDomain(): Launch {
+    return Launch(
+        id = id,
+        name = name ?: "",
+        rocketId = rocket ?: "",
+        flightNumber = flightNumber,
+        launchDate = dateUtc ?: "",
+        details = details ?: "",
+        imageUrl = links?.patch?.small ?: "",
+        status = when {
+            upcoming == true -> LaunchStatus.UPCOMING
+            success == true -> LaunchStatus.SUCCESS
+            else -> LaunchStatus.FAILURE
+        },
+        launchpad = launchpad ?: "",
+    )
+}
 
 fun LaunchDto.toEntity(): LaunchEntity {
     return LaunchEntity(
@@ -21,6 +39,8 @@ fun LaunchDto.toEntity(): LaunchEntity {
             success == true -> LaunchStatus.SUCCESS
             else -> LaunchStatus.FAILURE
         },
+        rocketId = rocket,
+        launchpad = launchpad ?: "",
     )
 }
 
@@ -28,22 +48,26 @@ fun LaunchEntity.toDomain() =
     Launch(
         id = id,
         name = name,
+        rocketId = rocketId ?: "",
         flightNumber = flightNumber,
         launchDate = launchDate,
         details = details,
         imageUrl = imageUrl,
         status = status,
+        launchpad = launchpad ?: "",
     )
 
 fun FavoriteLaunchEntity.toDomain() =
     Launch(
         id = launchId,
         name = name ?: "",
+        rocketId = rocketId ?: "",
         flightNumber = flightNumber ?: 0,
         launchDate = dateUtc ?: "",
         details = details ?: "",
         imageUrl = patchUrl ?: "",
         status = status ?: LaunchStatus.FAILURE,
+        launchpad = launchpadName ?: "",
     )
 
 fun FavoriteLaunchEntity.toDomainDetails() =
@@ -81,9 +105,9 @@ fun LaunchDetailsDto.toDomain(isFavorite: Boolean): LaunchDetails {
             else -> LaunchStatus.FAILURE
         },
         details = details,
-        rocketName = "Rocket $rocket",
+        rocketName = rocket,
         rocketId = rocket ?: "",
-        launchpadName = "Launchpad $launchpad",
+        launchpadName = launchpad,
         payloads = payloads?.filterNotNull() ?: emptyList(),
         articleUrl = links?.article,
         wikipediaUrl = links?.wikipedia,

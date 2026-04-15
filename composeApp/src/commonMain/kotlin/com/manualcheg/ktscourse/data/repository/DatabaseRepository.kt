@@ -4,13 +4,20 @@ import com.manualcheg.ktscourse.data.database.entity.FavoriteLaunchEntity
 import com.manualcheg.ktscourse.data.database.entity.FavoriteRocketEntity
 import com.manualcheg.ktscourse.data.database.entity.LaunchEntity
 import com.manualcheg.ktscourse.data.database.entity.RocketEntity
-import com.manualcheg.ktscourse.screenMain.domain.model.Launch
+import com.manualcheg.ktscourse.domain.model.Launch
+import com.manualcheg.ktscourse.domain.model.LaunchFilterType
 import com.manualcheg.ktscourse.screenRockets.domain.model.Rocket
 
 import kotlinx.coroutines.flow.Flow
 
 interface DatabaseRepository {
-    suspend fun getPagedLaunchesFromDb(query: String, page: Int, limit: Int): List<Launch>
+    suspend fun getPagedLaunchesFromDb(
+        query: String,
+        rocketId: String?,
+        filterType: LaunchFilterType,
+        page: Int,
+        limit: Int
+    ): List<Launch>
 
     suspend fun fetchAndSaveLaunchesTransaction(entities: List<LaunchEntity>)
 

@@ -2,11 +2,13 @@ package com.manualcheg.ktscourse.screenMain.data
 
 import com.manualcheg.ktscourse.data.mappers.toDomain
 import com.manualcheg.ktscourse.data.mappers.toDomainDetails
+import com.manualcheg.ktscourse.data.mappers.toEntity
 import com.manualcheg.ktscourse.data.mappers.toFavoriteEntity
 import com.manualcheg.ktscourse.data.repository.DatabaseRepository
 import com.manualcheg.ktscourse.data.repository.LaunchNetworkRepository
+import com.manualcheg.ktscourse.domain.model.Launch
+import com.manualcheg.ktscourse.domain.model.LaunchFilterType
 import com.manualcheg.ktscourse.screenLaunchDetails.domain.model.LaunchDetails
-import com.manualcheg.ktscourse.screenMain.domain.model.Launch
 import com.manualcheg.ktscourse.screenMain.domain.repository.LaunchRepository
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Dispatchers
@@ -19,24 +21,27 @@ class LaunchRepositoryImpl(
 ) : LaunchRepository {
     override suspend fun getPagedLaunchesFromDb(
         query: String,
+        rocketId: String?,
+        filterType: LaunchFilterType,
         page: Int,
         limit: Int
     ): List<Launch> {
-        return databaseRepository.getPagedLaunchesFromDb(query, page, limit)
+        return databaseRepository.getPagedLaunchesFromDb(query, rocketId, filterType, page, limit)
     }
 
-    override suspend fun fetchAndSaveLaunches(query: String, page: Int): Result<Boolean> =
+    override suspend fun fetchAndSaveLaunches(
+        query: String,
+        rocketId: String?,
+        filterType: LaunchFilterType,
+        page: Int
+    ): Result<Boolean> =
         withContext(Dispatchers.IO) {
-            val result = networkRepository.getLaunches(query, page)
+            val result = networkRepository.getLaunches(query, rocketId, filterType, page)
             if (result.isSuccess) {
                 val response = result.getOrThrow()
                 val entities = response.docs.map { it.toEntity() }
 
-                if (page == 1 && query.isBlank()) {
-                    databaseRepository.fetchAndSaveLaunchesTransaction(entities)
-                } else {
-                    databaseRepository.insertLaunches(entities)
-                }
+                databaseRepository.insertLaunches(entities)
 
                 Result.success(response.hasNextPage)
             } else {

@@ -1,26 +1,25 @@
 package com.manualcheg.ktscourse.presentation.theme
 
-import DeepGray
-import DeepSpaceText
-import LunarWhite
-import MarsRed
-import NasaBlue
-import OxygenBlue
-import RocketOrange
-import SpaceBlack
-import SpaceDarkBlue
-import SpaceShipGray
-import StarWhite
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import com.manualcheg.ktscourse.domain.model.AppThemeType
+
+// Цвета переносим из androidMain в commonMain
+val SpaceBlack = Color(0xFF0B0D17)
+val SpaceDarkBlue = Color(0xFF14172B)
+val StarWhite = Color(0xFFFFFFFF)
+val OxygenBlue = Color(0xFF4CB5F5)
+val RocketOrange = Color(0xFFFF5722)
+val DeepGray = Color(0xFF2C2C2C)
+
+val NasaBlue = Color(0xFF0B3D91)
+val MarsRed = Color(0xFFAD4328)
+val LunarWhite = Color(0xFFF4F4F4)
+val DeepSpaceText = Color(0xFF1A1A1A)
+val SpaceShipGray = Color(0xFFD1D1D1)
 
 private val DarkColorScheme = darkColorScheme(
     primary = StarWhite,
@@ -52,24 +51,21 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun AppThemeMaterial(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false,
+fun AppTheme(
+    appTheme: AppThemeType = AppThemeType.SYSTEM,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+    val darkTheme = when (appTheme) {
+        AppThemeType.LIGHT -> false
+        AppThemeType.DARK -> true
+        AppThemeType.SYSTEM -> isSystemInDarkThemeCustom()
     }
+
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = AppTypography,
         content = content,
     )
 }

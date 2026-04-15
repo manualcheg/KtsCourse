@@ -34,6 +34,7 @@ import ktscourse.composeapp.generated.resources.profile_screen_back_arrow_text
 import ktscourse.composeapp.generated.resources.profile_screen_button_logout_text
 import ktscourse.composeapp.generated.resources.profile_screen_icon_content_descript
 import ktscourse.composeapp.generated.resources.profile_screen_profile_text
+import ktscourse.composeapp.generated.resources.profile_screen_title
 import ktscourse.composeapp.generated.resources.profile_screen_username_text
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -59,7 +60,7 @@ fun ProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(Res.string.profile_screen_back_arrow_text)) },
+                title = { Text(stringResource(Res.string.profile_screen_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(
@@ -76,23 +77,27 @@ fun ProfileScreen(
                 Modifier
                     .fillMaxSize()
                     .padding(innerPadding),
-            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Icon(
-                imageVector = Icons.Default.AccountCircle,
-                contentDescription = stringResource(Res.string.profile_screen_icon_content_descript),
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(dimensions.profileScreenIconSize),
-            )
-            Spacer(modifier = Modifier.height(dimensions.paddingLarge))
-            Text(
-                stringResource(Res.string.profile_screen_profile_text),
-                modifier = Modifier.padding(bottom = dimensions.paddingMedium),
-                style = MaterialTheme.typography.headlineMedium,
-            )
-            Text(stringResource(Res.string.profile_screen_username_text, uiState.username))
-            Spacer(modifier = Modifier.weight(1f))
+            Column(
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = stringResource(Res.string.profile_screen_icon_content_descript),
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(dimensions.profileScreenIconSize),
+                    )
+                Spacer(modifier = Modifier.height(dimensions.paddingLarge))
+                Text(
+                    stringResource(Res.string.profile_screen_profile_text),
+                    modifier = Modifier.padding(bottom = dimensions.paddingMedium),
+                    style = MaterialTheme.typography.headlineMedium,
+                )
+                Text(stringResource(Res.string.profile_screen_username_text, uiState.username))
+            }
             Button(
                 onClick = { viewModel.logout() },
                 modifier = Modifier.fillMaxWidth().padding(horizontal = dimensions.paddingMedium),

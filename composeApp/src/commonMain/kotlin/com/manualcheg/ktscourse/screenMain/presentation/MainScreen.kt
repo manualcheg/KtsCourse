@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -14,13 +15,17 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.manualcheg.ktscourse.common.components.EmptyState
 import com.manualcheg.ktscourse.common.components.OfflineBadge
+import com.manualcheg.ktscourse.domain.model.LaunchFilterType
 import com.manualcheg.ktscourse.screenMain.presentation.components.LaunchList
 import com.manualcheg.ktscourse.screenMain.presentation.components.MainTab
 import com.manualcheg.ktscourse.screenMain.presentation.components.MainTopAppBar
@@ -32,12 +37,18 @@ import ktscourse.composeapp.generated.resources.favorites_empty_launches
 import ktscourse.composeapp.generated.resources.favorites_empty_rockets
 import ktscourse.composeapp.generated.resources.favorites_tab_launches
 import ktscourse.composeapp.generated.resources.favorites_tab_rockets
+import ktscourse.composeapp.generated.resources.filter_all
+import ktscourse.composeapp.generated.resources.filter_latest
+import ktscourse.composeapp.generated.resources.filter_next
+import ktscourse.composeapp.generated.resources.filter_past
+import ktscourse.composeapp.generated.resources.filter_upcoming
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
+    initialRocketId: String? = null,
     onProfileClick: () -> Unit = {},
     openLaunchDetails: (String) -> Unit,
     openRocketDetails: (String) -> Unit,
@@ -45,10 +56,19 @@ fun MainScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    LaunchedEffect(initialRocketId) {
+        if (initialRocketId != null) {
+            viewModel.onRocketFilterChange(initialRocketId)
+            viewModel.changeTab(MainTab.Launches)
+        }
+    }
+
     MainContent(
         uiState = uiState,
         onSearchQueryChange = viewModel::onSearchQueryChange,
-        onProfileClick = onProfileClick,
+        onRocketFilterChange = viewModel::onRocketFilterChange,
+        onFilterSelected = viewModel::onFilterSelected,
+        onSettingsClick = onProfileClick,
         onRefresh = viewModel::updateData,
         onLoadNextPage = viewModel::loadNextPage,
         onRetry = viewModel::updateData,
@@ -64,7 +84,9 @@ fun MainScreen(
 fun MainContent(
     uiState: MainUiState,
     onSearchQueryChange: (String) -> Unit,
-    onProfileClick: () -> Unit,
+    onRocketFilterChange: (String?) -> Unit,
+    onFilterSelected: (LaunchFilterType) -> Unit,
+    onSettingsClick: () -> Unit,
     onRefresh: () -> Unit,
     onLoadNextPage: () -> Unit,
     onRetry: () -> Unit,
@@ -78,7 +100,9 @@ fun MainContent(
             MainTopAppBar(
                 searchQuery = uiState.searchQuery,
                 onSearchQueryChange = onSearchQueryChange,
-                onProfileClick = onProfileClick,
+                rocketFilterId = uiState.rocketFilterId,
+                onRocketFilterChange = onRocketFilterChange,
+                onSettingsClick = onSettingsClick,
                 showSearch = uiState.selectedTab != MainTab.Favorites,
             )
         },
@@ -107,6 +131,44 @@ fun MainContent(
                     if (uiState.isLaunchesFromCache && !uiState.isLoading && uiState.error == null) {
                         OfflineBadge()
                     }
+
+                    SingleChoiceSegmentedButtonRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                    ) {
+                        LaunchFilterType.entries.forEachIndexed { index, filter ->
+                            val label = when (filter) {
+                                LaunchFilterType.All -> stringResource(Res.string.filter_all)
+                                LaunchFilterType.Past -> stringResource(Res.string.filter_past)
+                                LaunchFilterType.Upcoming -> stringResource(Res.string.filter_upcoming)
+                                LaunchFilterType.Latest -> stringResource(Res.string.filter_latest)
+                                LaunchFilterType.Next -> stringResource(Res.string.filter_next)
+                            }
+                            SegmentedButton(
+                                modifier = Modifier.weight(1f),
+                                shape = SegmentedButtonDefaults.itemShape(
+                                    index = index,
+                                    count = LaunchFilterType.entries.size,
+                                ),
+                                onClick = { onFilterSelected(filter) },
+                                selected = uiState.selectedFilter == filter,
+                                label = {
+                                    Text(
+                                        text = label,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Visible,
+                                        softWrap = false,
+                                        style = MaterialTheme.typography.labelSmall.copy(
+                                            fontSize = 10.sp,
+                                            letterSpacing = 0.sp,
+                                        ),
+                                    )
+                                },
+                            )
+                        }
+                    }
+
                     PagedListContainer(
                         isRefreshing = uiState.isRefreshing,
                         onRefresh = onRefresh,
@@ -117,11 +179,8 @@ fun MainContent(
                         onRetry = onRetry,
                     ) {
                         LaunchList(
-                            launches = uiState.launches,
-                            isNextPageLoading = uiState.isNextPageLoading,
-                            isLastPage = uiState.isLastPage,
+                            uiState = uiState.launchesUiState.copy(searchQuery = uiState.searchQuery),
                             loadNextPage = onLoadNextPage,
-                            searchQuery = uiState.searchQuery,
                             openLaunchDetails = openLaunchDetails,
                         )
                     }
@@ -177,15 +236,16 @@ fun MainContent(
                             if (uiState.favoriteLaunches.isEmpty()) {
                                 EmptyState(
                                     modifier = Modifier.fillMaxSize(),
-                                    text = stringResource(Res.string.favorites_empty_launches),
+                                    text = Res.string.favorites_empty_launches,
                                 )
                             } else {
                                 LaunchList(
-                                    launches = uiState.favoriteLaunches,
-                                    isNextPageLoading = false,
-                                    isLastPage = true,
+                                    uiState = LaunchListUiState(
+                                        items = uiState.favoriteLaunches,
+                                        isLastPage = true,
+                                        searchQuery = "",
+                                    ),
                                     loadNextPage = {},
-                                    searchQuery = "",
                                     openLaunchDetails = openLaunchDetails,
                                 )
                             }
@@ -193,7 +253,7 @@ fun MainContent(
                             if (uiState.favoriteRockets.isEmpty()) {
                                 EmptyState(
                                     modifier = Modifier.fillMaxSize(),
-                                    text = stringResource(Res.string.favorites_empty_rockets),
+                                    text = Res.string.favorites_empty_rockets,
                                 )
                             } else {
                                 RocketList(
@@ -218,9 +278,10 @@ fun MainContent(
 @Composable
 fun PreviewMainScreen() {
     MainContent(
-        uiState = MainUiState(launches = emptyList(), isLoading = false),
+        uiState = MainUiState(isLoading = false),
         onSearchQueryChange = {},
-        onProfileClick = {},
+        onRocketFilterChange = {},
+        onSettingsClick = {},
         onRefresh = {},
         onLoadNextPage = {},
         onRetry = {},
@@ -228,5 +289,6 @@ fun PreviewMainScreen() {
         changeTab = {},
         changeFavoriteType = {},
         openRocketDetails = { },
+        onFilterSelected = { },
     )
 }

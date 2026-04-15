@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.manualcheg.ktscourse.common.repository.UserPreferencesRepository
+import com.manualcheg.ktscourse.domain.model.AppThemeType
 import com.manualcheg.ktscourse.screenLogin.domain.model.UserData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -16,6 +17,7 @@ class UserPreferencesRepositoryImpl(private val dataStore: DataStore<Preferences
         val EMAIL = stringPreferencesKey("email")
         val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
         val IS_FIRST_START = booleanPreferencesKey("is_first_start")
+        val APP_THEME = stringPreferencesKey("app_theme")
     }
 
     override val userData: Flow<UserData>
@@ -25,6 +27,9 @@ class UserPreferencesRepositoryImpl(private val dataStore: DataStore<Preferences
                 email = prefs[PreferenceKeys.EMAIL] ?: "",
                 isLoggedIn = prefs[PreferenceKeys.IS_LOGGED_IN] ?: false,
                 firstStart = prefs[PreferenceKeys.IS_FIRST_START] ?: true,
+                appTheme = AppThemeType.valueOf(
+                    prefs[PreferenceKeys.APP_THEME] ?: AppThemeType.SYSTEM.name,
+                ),
             )
         }
 
@@ -48,6 +53,14 @@ class UserPreferencesRepositoryImpl(private val dataStore: DataStore<Preferences
         dataStore.updateData { prefs ->
             prefs.toMutablePreferences().apply {
                 this[PreferenceKeys.IS_FIRST_START] = isFirstStart
+            }
+        }
+    }
+
+    override suspend fun updateAppTheme(theme: AppThemeType) {
+        dataStore.updateData { prefs ->
+            prefs.toMutablePreferences().apply {
+                this[PreferenceKeys.APP_THEME] = theme.name
             }
         }
     }

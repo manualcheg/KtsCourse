@@ -14,17 +14,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.manualcheg.ktscourse.common.LocalDimensions
-import com.manualcheg.ktscourse.screenMain.domain.model.Launch
+import com.manualcheg.ktscourse.screenMain.presentation.LaunchListUiState
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import ktscourse.composeapp.generated.resources.Res
@@ -33,25 +29,20 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun LaunchList(
-    launches: List<Launch>,
-    isNextPageLoading: Boolean,
-    isLastPage: Boolean,
+    uiState: LaunchListUiState,
     loadNextPage: () -> Unit,
-    searchQuery: String,
     openLaunchDetails: (String) -> Unit,
 ) {
     val listState = rememberLazyListState()
     val dimensions = LocalDimensions.current
-    var lastQuery by remember { mutableStateOf("") }
 
-    LaunchedEffect(searchQuery) {
-        if (searchQuery != lastQuery && lastQuery.isNotEmpty()) {
+    LaunchedEffect(uiState.searchQuery) {
+        if (uiState.searchQuery != uiState.lastQuery && uiState.lastQuery.isNotEmpty()) {
             listState.animateScrollToItem(0)
         }
-        lastQuery = searchQuery
     }
 
-    LaunchedEffect(listState, isLastPage, isNextPageLoading) {
+    LaunchedEffect(listState, uiState.isLastPage, uiState.isNextPageLoading) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo }
             .filter { visibleItems ->
                 val lastVisibleItemIndex = visibleItems.lastOrNull()?.index ?: 0
@@ -60,7 +51,7 @@ fun LaunchList(
             }
             .distinctUntilChanged()
             .collect {
-                if (!isLastPage && !isNextPageLoading && launches.isNotEmpty()) {
+                if (!uiState.isLastPage && !uiState.isNextPageLoading && uiState.items.isNotEmpty()) {
                     loadNextPage()
                 }
             }
@@ -71,11 +62,11 @@ fun LaunchList(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(dimensions.paddingSmall),
     ) {
-        itemsIndexed(launches, key = { _, item -> item.id }) { _, launch ->
+        itemsIndexed(uiState.items, key = { _, item -> item.id }) { _, launch ->
             LaunchItem(launch, { openLaunchDetails(launch.id) })
         }
 
-        if (isNextPageLoading) {
+        if (uiState.isNextPageLoading) {
             item {
                 Box(
                     modifier =
@@ -89,7 +80,7 @@ fun LaunchList(
             }
         }
 
-        if (isLastPage && launches.isNotEmpty()) {
+        if (uiState.isLastPage && uiState.items.isNotEmpty()) {
             item {
                 Text(
                     text = stringResource(Res.string.launches_list_all_loaded),

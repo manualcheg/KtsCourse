@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.manualcheg.ktscourse.data.shareService.ShareServiceProvider
 import com.manualcheg.ktscourse.screenLaunchDetails.domain.useCase.GetLaunchDetailsUseCase
 import com.manualcheg.ktscourse.screenLaunchDetails.domain.useCase.ToggleFavoriteUseCaseLaunch
+import com.manualcheg.ktscourse.common.util.toUserFriendlyMessage
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,7 +30,7 @@ class LaunchDetailsScreenViewModel(
                 }
                 .onFailure { error ->
                     Napier.e("Failed to load launch details for id: $id", error)
-                    _uiState.update { it.copy(error = error.message, isLoading = false) }
+                    _uiState.update { it.copy(error = error.toUserFriendlyMessage(), isLoading = false) }
                 }
         }
     }

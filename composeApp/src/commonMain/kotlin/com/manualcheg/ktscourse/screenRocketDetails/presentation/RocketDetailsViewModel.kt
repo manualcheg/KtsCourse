@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.manualcheg.ktscourse.data.shareService.ShareServiceProvider
 import com.manualcheg.ktscourse.screenRocketDetails.domain.GetRocketDetailsUseCase
 import com.manualcheg.ktscourse.screenRocketDetails.domain.ToggleFavoriteUseCaseRocket
+import com.manualcheg.ktscourse.common.util.toUserFriendlyMessage
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,7 +36,7 @@ class RocketDetailsViewModel(
                 }
                 .onFailure { error ->
                     Napier.e("Failed to load rocket details for id: $rocketId", error)
-                    _uiState.update { it.copy(isLoading = false, error = error.message) }
+                    _uiState.update { it.copy(isLoading = false, error = error.toUserFriendlyMessage()) }
                 }
         }
     }
