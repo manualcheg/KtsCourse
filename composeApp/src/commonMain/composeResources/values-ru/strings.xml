@@ -93,7 +93,7 @@
     <string name="unit_kilograms">%1$s кг</string>
     <string name="n_a">Н/Д</string>
     <string name="currency_usd">$%1$s</string>
-    <string name="unit_percent">%1$s%%</string>
+    <string name="unit_percent">%1$s%</string>
     <string name="main_screen_rocket_filter_active">Фильтр по ракете активен</string>
     <string name="main_screen_clear_filter">Сбросить</string>
     <string name="settings_screen_title">Настройки</string>
