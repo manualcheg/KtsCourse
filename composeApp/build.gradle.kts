@@ -147,7 +147,6 @@ tracer {
         appToken = "huahvSoIj4AIKwAhNVe8KIiP437CrhXPnCLC7vI55061"
 
         uploadMapping = true
-//        uploadNativeSymbols = true
         uploadRetryCount = 2
         additionalLibrariesPath = projectDir.toString() + "/aVeryNonstandardLibsDirectory"
     }

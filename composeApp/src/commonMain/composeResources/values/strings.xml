@@ -6,7 +6,7 @@
     <string name="login_screen_textfield_username_label">Email</string>
     <string name="login_screen_textfield_username_placeholder">example@gmail.com</string>
     <string name="login_screen_textfield_password_label">Password</string>
-    <string name="login_screen_textfield_password_placeholder">P@ssw0rd</string>
+    <string name="login_screen_textfield_password_placeholder">password</string>
     <string name="main_screen_mission_image_cont_descript_launch">launch mission image</string>
     <string name="nothing_found_content_description">Nothing found</string>
     <string name="nothing_found_text">Nothing found</string>
